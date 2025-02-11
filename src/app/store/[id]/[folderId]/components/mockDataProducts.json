@@ -1,0 +1,66 @@
+[
+    {
+        "id": "1",
+        "product": "Todos los retratos digitales",
+        "price": 20000,
+        "quantity": 0,
+        "info": "Por favor, elija una foto de su hija/o y le enviaremos todos los retratos que le sacamos. Al confirmarse el pago le enviaremos las fotos en alta definición a su email."
+    },
+    {
+        "id": "2",
+        "product": "1 Archivo Digital",
+        "price": 7000,
+        "quantity": 0,
+        "info": "Al confirmarse el pago le enviaremos la foto en alta definición a su email por WeTransfer.com"
+    },
+    {
+        "id": "3",
+        "product": "Carpeta con retrato y grupo 20x25 + multiple",
+        "price": 18000,
+        "quantity": 0,
+        "info": "La multiple son 2 fotos tipo billetera y 4 tipo carnet del mismo Retrato"
+    },
+    {
+        "id": "4",
+        "product": "Photobook con retrato y grupo 15x21 + multiple",
+        "price": 27000,
+        "quantity": 0,
+        "info": "La multiple es una foto con 2 fotos tipo billetera y 4 tipo carnet del mismo retrato"
+    },
+    {
+        "id": "5",
+        "product": "Grupo solo foto papel 20X25 cms.",
+        "price": 10000,
+        "quantity": 0
+    },
+    {
+        "id": "6",
+        "product": "13 x 18",
+        "price": 3500,
+        "quantity": 0
+    },
+    {
+        "id": "7",
+        "product": "15 x 21",
+        "price": 4500,
+        "quantity": 0
+    },
+    {
+        "id": "8",
+        "product": "20 x 25",
+        "price": 7000,
+        "quantity": 0
+    },
+    {
+        "id": "9",
+        "product": "Múltiple: 2 billetera + 4 carnet",
+        "price": 4000,
+        "quantity": 0
+    },
+    {
+        "id": "10",
+        "product": "Comunion fotobook 4 páginas",
+        "price": 50000,
+        "quantity": 0
+    }
+]
