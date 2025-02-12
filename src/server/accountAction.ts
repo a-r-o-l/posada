@@ -35,7 +35,9 @@ export const createAccount = async (data: FormData) => {
 export const getAllAccounts = async () => {
   try {
     await dbConnect();
-    const accounts = await models.Account.find({ role: "user" }).lean();
+    const accounts = await models.Account.find({ role: "user" })
+      .populate([{ path: "children", populate: ["schoolId", "gradeId"] }])
+      .lean();
     return {
       success: true,
       message: "Cuentas encontradas",

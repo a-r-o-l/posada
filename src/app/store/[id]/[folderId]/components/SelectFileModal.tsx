@@ -38,7 +38,7 @@ function SelectFileModal({
   file: IFile | null;
   open: boolean;
   onClose: () => void;
-  products: IProductWithQuantity[];
+  products: IProduct[];
 }) {
   const addProduct = useCartStore((state) => state.addProduct);
   const [data, setData] = useState([] as IProductWithQuantity[]);

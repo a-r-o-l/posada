@@ -124,7 +124,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
           product?.fileId?.folderId?.schoolId?.name,
           product?.fileId?.folderId?.title,
           priceParserToString(product?.price),
-          product?.quantity,
+          (product?.quantity).toString(),
           priceParserToString(product?.total),
         ];
         tableRows.push(productData);
@@ -214,8 +214,13 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                                       <TableCell>
                                         {child.name} {child.lastname}
                                       </TableCell>
-                                      <TableCell>{child.grade}</TableCell>
-                                      <TableCell>Normal</TableCell>
+                                      <TableCell>
+                                        {child.gradeId.grade}{" "}
+                                        {child.gradeId.division}
+                                      </TableCell>
+                                      <TableCell>
+                                        {child.schoolId.name}
+                                      </TableCell>
                                     </TableRow>
                                   ))}
                                 </TableBody>

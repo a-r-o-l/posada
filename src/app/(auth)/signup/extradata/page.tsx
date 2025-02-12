@@ -9,7 +9,7 @@ import { getAllGradesBySchool } from "@/server/gradeAction";
 export default async function page({
   searchParams,
 }: {
-  searchParams: { account: string; school: string };
+  searchParams: Promise<{ account: string; school: string }>;
 }) {
   const params = await searchParams;
   const accountParam = params.account;

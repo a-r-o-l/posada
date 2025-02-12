@@ -1,5 +1,4 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +10,7 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { User } from "lucide-react";
 import React, { useState } from "react";
-import { IAccount } from "@/models/Account";
+import { IAccountPopulated, IChildrenPopulated } from "@/models/Account";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,8 +23,9 @@ import {
 } from "@/components/ui/table";
 import PasswordInput from "@/components/PasswordInput";
 
-function AccountsClientSide({ accounts }: { accounts: IAccount[] }) {
-  const [selectedAccount, setSelectedAccount] = useState<IAccount | null>(null);
+function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
+  const [selectedAccount, setSelectedAccount] =
+    useState<IAccountPopulated | null>(null);
 
   return (
     <Card className="w-full">
@@ -123,16 +123,20 @@ function AccountsClientSide({ accounts }: { accounts: IAccount[] }) {
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {selectedAccount.children.map((child) => (
-                          <TableRow
-                            key={`${child.name}${child.lastname}${child.grade}`}
-                          >
-                            <TableCell>{child.name}</TableCell>
-                            <TableCell>{child.lastname}</TableCell>
-                            <TableCell>{child.school}</TableCell>
-                            <TableCell>{child.grade}</TableCell>
-                          </TableRow>
-                        ))}
+                        {selectedAccount.children.map(
+                          (child: IChildrenPopulated) => (
+                            <TableRow
+                              key={`${child.name}${child.lastname}${child.gradeId}`}
+                            >
+                              <TableCell>{child.name}</TableCell>
+                              <TableCell>{child.lastname}</TableCell>
+                              <TableCell>{child.schoolId.name}</TableCell>
+                              <TableCell>
+                                {child.gradeId.grade} {child.gradeId.division}
+                              </TableCell>
+                            </TableRow>
+                          )
+                        )}
                       </TableBody>
                     </Table>
                   </div>

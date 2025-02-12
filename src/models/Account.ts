@@ -1,4 +1,6 @@
 import { Schema, Document, model, models } from "mongoose";
+import { IGrade } from "./Grade";
+import { ISchool } from "./School";
 
 export interface IAccount extends Document {
   _id: string;
@@ -20,6 +22,15 @@ export interface IChildren {
   gradeId: string;
   schoolId: string;
 }
+
+export type IChildrenPopulated = Omit<IChildren, "gradeId" | "schoolId"> & {
+  gradeId: IGrade;
+  schoolId: ISchool;
+};
+
+export type IAccountPopulated = Omit<IAccount, "children"> & {
+  children: IChildrenPopulated[];
+};
 
 export type PartialAccount = Partial<IAccount>;
 export type PartialChildren = Partial<IChildren>;

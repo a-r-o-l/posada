@@ -131,7 +131,14 @@ export const getSale = async (id: string) => {
   try {
     await dbConnect();
     const sale = await models.Sale.findById(id)
-      .populate("accountId")
+      .populate({
+        path: "accountId",
+        model: "Account",
+        populate: {
+          path: "children",
+          populate: ["gradeId", "schoolId"],
+        },
+      })
       .populate({
         path: "products",
         populate: [

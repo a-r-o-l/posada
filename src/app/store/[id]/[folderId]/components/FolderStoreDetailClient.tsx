@@ -4,30 +4,30 @@ import React, { useEffect, useState } from "react";
 import { IFolder } from "@/models/Folder";
 import { nameParser } from "@/lib/utilsFunctions";
 import { Separator } from "@/components/ui/separator";
-import { useRouter } from "next/navigation";
 import { Folder } from "lucide-react";
 import PublicFile from "./PublicFile";
 import SelectFileModal from "./SelectFileModal";
 import { IFile } from "@/models/File";
 import { IProduct } from "@/models/Product";
 
+type folderWithFiles = IFolder & { files: IFile[] };
+
 function FolderStoreDetailClient({
   folder,
   products,
 }: {
-  folder: IFolder;
+  folder: folderWithFiles;
   products: IProduct[];
 }) {
-  const router = useRouter();
   const accesses = useCacheSchools((state) => state.accesses);
-  const addAccess = useCacheSchools((state) => state.addAccess);
+  // const addAccess = useCacheSchools((state) => state.addAccess);
 
-  const [needAccess, setNeedAccess] = useState(false);
+  // const [needAccess, setNeedAccess] = useState(false);
   const [fileModal, setFileModal] = useState<IFile | null>(null);
 
   useEffect(() => {
     if (!accesses.includes(folder._id) && folder.isPrivate) {
-      setNeedAccess(true);
+      // setNeedAccess(true);
     }
   }, [accesses, folder]);
 

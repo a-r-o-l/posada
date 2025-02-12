@@ -40,7 +40,7 @@ function FolderModal({
     if (folder && open) {
       setValues({
         title: folder?.title,
-        description: folder?.description,
+        description: folder?.description || "",
         password: folder?.password || "",
         isPrivate: folder?.isPrivate || false,
       });

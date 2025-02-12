@@ -1,8 +1,5 @@
 import { Payment } from "mercadopago";
 import api, { mercadopago } from "@/app/api";
-import { sendEmail } from "@/lib/brevo";
-import { tahnksEmailTemplate } from "@/templates/thanksEmail";
-import { getSale } from "@/server/saleAction";
 
 export async function POST(request: Request) {
   const body: { data: { id: string } } = await request.json();

@@ -1,5 +1,5 @@
 import { Schema, Document, model, models } from "mongoose";
-import { IAccount } from "./Account";
+import { IAccountPopulated } from "./Account";
 import { PartialProductPopulated } from "./Product";
 import { PartialFilePopulated } from "./File";
 
@@ -62,7 +62,7 @@ export type ISaleProductPopulated = Omit<
 > & { productId: PartialProductPopulated; fileId: PartialFilePopulated };
 
 export type ISalePopulated = Omit<ISale, "accountId" | "products"> & {
-  accountId: IAccount;
+  accountId: IAccountPopulated;
   products: ISaleProductPopulated[];
 };
 const SaleProductSchema: Schema = new Schema(
