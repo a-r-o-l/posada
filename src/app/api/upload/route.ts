@@ -39,6 +39,8 @@ export async function POST(request: NextRequest) {
       }
     });
 
+    console.log("files -> ", files);
+
     if (files.length === 0) {
       return NextResponse.json(
         { message: "Las imágenes son requeridas" },
@@ -48,6 +50,8 @@ export async function POST(request: NextRequest) {
 
     const uploadPromises = files.map(async (file) => {
       const buffer = Buffer.from(await file.arrayBuffer());
+      console.log("uploadFileToS3 params -> ", buffer, file.name, folder);
+
       return uploadFileToS3(buffer, file.name, folder);
     });
 
