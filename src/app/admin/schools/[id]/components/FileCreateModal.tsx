@@ -127,12 +127,12 @@ function FileCreateModal({
   };
 
   const handleSubmit = async () => {
+    console.log("comienza el submit");
     setLoading(true);
     if (!!images?.length) {
       const formData = new FormData();
 
       images.forEach((file, index) => {
-        console.log("filecreateModal -> ", file);
         formData.append(`file${index}`, file.file);
       });
 

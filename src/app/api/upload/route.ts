@@ -27,10 +27,18 @@ async function uploadFileToS3(
   return url;
 }
 
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function POST(request: NextRequest) {
   try {
+    console.log("Inicio de la función POST");
     const formData = await request.formData();
+    console.log("FormData recibido");
+
     const folder = formData.get("folder") as string;
+    console.log("Folder:", folder);
 
     const files: File[] = [];
     formData.forEach((value, key) => {
@@ -39,24 +47,28 @@ export async function POST(request: NextRequest) {
       }
     });
 
-    console.log("files -> ", files);
+    console.log("Archivos recibidos:", files.length);
 
     if (files.length === 0) {
+      console.log("No se recibieron imágenes");
       return NextResponse.json(
         { message: "Las imágenes son requeridas" },
         { status: 400 }
       );
     }
 
-    const uploadPromises = files.map(async (file) => {
+    const imageUrls: string[] = [];
+    for (const file of files) {
+      console.log("Procesando archivo:", file.name);
       const arrayBuffer = await file.arrayBuffer();
       const buffer = Buffer.from(arrayBuffer);
+      const imageUrl = await uploadFileToS3(buffer, file.name, folder);
+      console.log("Imagen subida:", imageUrl);
+      imageUrls.push(imageUrl);
+      await delay(1000); // Esperar 1 segundo entre cada subida
+    }
 
-      return uploadFileToS3(buffer, file.name, folder);
-    });
-
-    const imageUrls = await Promise.all(uploadPromises);
-
+    console.log("Todas las imágenes subidas con éxito");
     return NextResponse.json({ success: true, imageUrls });
   } catch (error) {
     console.error("Error al subir las imágenes:", error);
