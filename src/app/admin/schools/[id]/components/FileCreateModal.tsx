@@ -132,6 +132,7 @@ function FileCreateModal({
       const formData = new FormData();
 
       images.forEach((file, index) => {
+        console.log("filecreateModal -> ", file);
         formData.append(`file${index}`, file.file);
       });
 
@@ -142,6 +143,8 @@ function FileCreateModal({
           method: "POST",
           body: formData,
         });
+
+        console.log("response -> ", response);
 
         if (response.ok) {
           const result = await response.json();
