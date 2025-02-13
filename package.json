@@ -43,6 +43,7 @@
     "embla-carousel-fade": "^8.5.2",
     "embla-carousel-react": "^8.5.2",
     "embla-carousel-wheel-gestures": "^8.0.1",
+    "formidable": "^3.5.2",
     "input-otp": "^1.4.2",
     "jsonwebtoken": "^9.0.2",
     "jspdf": "^2.5.2",
@@ -75,6 +76,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/formidable": "^3.4.5",
     "@types/lodash": "^4.17.14",
     "@types/node": "^20",
     "@types/react": "^18",
