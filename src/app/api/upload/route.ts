@@ -14,12 +14,11 @@ async function uploadFileToS3(
   filename: string,
   folder: string
 ) {
-  const fileBuffer = buffer;
   const key = `${folder}/${filename}`;
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME!,
     Key: key,
-    Body: fileBuffer,
+    Body: buffer,
     ContentType: "image/jpeg",
   };
   const command = new PutObjectCommand(params);
@@ -50,8 +49,8 @@ export async function POST(request: NextRequest) {
     }
 
     const uploadPromises = files.map(async (file) => {
-      const buffer = Buffer.from(await file.arrayBuffer());
-      console.log("uploadFileToS3 params -> ", buffer, file.name, folder);
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
 
       return uploadFileToS3(buffer, file.name, folder);
     });
