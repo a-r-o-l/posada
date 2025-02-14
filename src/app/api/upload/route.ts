@@ -40,12 +40,14 @@ export async function POST(request: NextRequest) {
     const folder = formData.get("folder") as string;
     console.log("Folder:", folder);
 
-    const files: File[] = [];
-    formData.forEach((value, key) => {
+    const files: { name: string; buffer: Buffer }[] = [];
+    for (const [key, value] of formData.entries()) {
       if (key.startsWith("file") && value instanceof File) {
-        files.push(value);
+        const arrayBuffer = await value.arrayBuffer();
+        const buffer = Buffer.from(arrayBuffer);
+        files.push({ name: value.name, buffer });
       }
-    });
+    }
 
     console.log("Archivos recibidos:", files.length);
 
@@ -60,9 +62,7 @@ export async function POST(request: NextRequest) {
     const imageUrls: string[] = [];
     for (const file of files) {
       console.log("Procesando archivo:", file.name);
-      const arrayBuffer = await file.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      const imageUrl = await uploadFileToS3(buffer, file.name, folder);
+      const imageUrl = await uploadFileToS3(file.buffer, file.name, folder);
       console.log("Imagen subida:", imageUrl);
       imageUrls.push(imageUrl);
       await delay(1000); // Esperar 1 segundo entre cada subida
