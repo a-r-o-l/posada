@@ -56,15 +56,15 @@ function FileCreateModal({
   };
 
   const simulateProgress = () => {
-    setProcessing(true); // Iniciar el estado de carga
+    setProcessing(true);
     let progressValue = 0;
     const interval = setInterval(() => {
       progressValue += 10;
       setProgress(progressValue);
       if (progressValue >= 100) {
         clearInterval(interval);
-        setProcessing(false); // Finalizar el estado de carga
-        setProgress(0); // Reiniciar el progreso
+        setProcessing(false);
+        setProgress(0);
       }
     }, 100);
   };
@@ -135,7 +135,7 @@ function FileCreateModal({
         formData.append(`file${index}`, file.file);
       });
 
-      formData.append("folder", "posada");
+      formData.append("folder", "files");
 
       try {
         const response = await fetch("/api/upload", {

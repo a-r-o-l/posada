@@ -44,14 +44,13 @@ function CreateSchoolModal({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    console.log("comienza el submit");
     setLoading(true);
     let imageUrl = "";
     try {
       if (file) {
         const formDataImage = new FormData();
         formDataImage.append("file", file);
-        formDataImage.append("folder", "posada");
+        formDataImage.append("folder", "school");
         const response = await fetch("/api/upload/folderImage", {
           method: "POST",
           body: formDataImage,

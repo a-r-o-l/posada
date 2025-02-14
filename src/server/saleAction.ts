@@ -217,8 +217,6 @@ export const updateSaleStatus = async (
   try {
     const condition: { [key: string]: string | boolean } = {};
     condition[field] = value;
-    console.log("condition", condition);
-    console.log("id", id);
     await dbConnect();
     const updatedSale = await models.Sale.findByIdAndUpdate(id, condition, {
       new: true,

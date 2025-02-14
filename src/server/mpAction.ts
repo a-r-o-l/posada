@@ -6,6 +6,9 @@ import { IMPPreference } from "@/types/mercadopago";
 import { ISaleProduct } from "@/models/Sale";
 
 const MERCADOPAGO_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN as string;
+const MERCADOPAGO_SUCCESS = process.env.MP_SUCCESS as string;
+const MERCADOPAGO_FAILURE = process.env.MP_FAILURE as string;
+const MERCADOPAGO_PENDING = process.env.MP_PENDING as string;
 
 export const createPayment = async (data: FormData) => {
   try {
@@ -14,7 +17,7 @@ export const createPayment = async (data: FormData) => {
       const prods = JSON.parse(data.get("products") as string);
       const parsedProds = prods.map((prod: ISaleProduct) => ({
         id: prod.id.toString(),
-        unit_price: 100,
+        unit_price: prod.price,
         title: prod.name,
         quantity: prod.quantity,
       }));
@@ -25,9 +28,9 @@ export const createPayment = async (data: FormData) => {
           sale: res.sale,
         },
         back_urls: {
-          success: "http://localhost:3000/store/cart/checkout?status=success",
-          failure: "http://localhost:3000/store/cart/checkout?status=failure",
-          pending: "http://localhost:3000/store/cart/checkout?status=pending",
+          success: MERCADOPAGO_SUCCESS,
+          failure: MERCADOPAGO_FAILURE,
+          pending: MERCADOPAGO_PENDING,
         },
         auto_return: "approved",
       };

@@ -61,7 +61,7 @@ function CreateFolderModal({
       if (file) {
         const formDataImage = new FormData();
         formDataImage.append("file", file);
-        formDataImage.append("folder", "posada");
+        formDataImage.append("folder", "folder");
         const response = await fetch("/api/upload/folderImage", {
           method: "POST",
           body: formDataImage,
