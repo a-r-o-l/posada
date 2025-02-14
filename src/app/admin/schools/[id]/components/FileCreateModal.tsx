@@ -127,7 +127,6 @@ function FileCreateModal({
   };
 
   const handleSubmit = async () => {
-    console.log("comienza el submit");
     setLoading(true);
     if (!!images?.length) {
       const formData = new FormData();
@@ -144,12 +143,8 @@ function FileCreateModal({
           body: formData,
         });
 
-        console.log("response -> ", response);
-
         if (response.ok) {
           const result = await response.json();
-          console.log("Files uploaded successfully", result);
-
           const updatedImages = images.map((image, index) => ({
             ...image,
             imageUrl: result.imageUrls[index],

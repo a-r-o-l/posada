@@ -7,6 +7,16 @@ export const createAccount = async (data: FormData) => {
   try {
     await dbConnect();
     const formData = Object.fromEntries(data.entries());
+    const accountExists = await models.Account.findOne({
+      email: formData.email,
+    }).lean();
+    if (accountExists) {
+      return {
+        success: false,
+        message: "Ya existe una cuenta registrada con este correo electrónico",
+        account: null,
+      };
+    }
     const newAccount = new models.Account({
       name: formData.name,
       lastname: formData.lastname,

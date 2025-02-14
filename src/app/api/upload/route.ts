@@ -12,14 +12,15 @@ const s3Client = new S3Client({
 async function uploadFileToS3(
   buffer: Buffer,
   filename: string,
-  folder: string
+  folder: string,
+  mimeType: string
 ) {
   const key = `${folder}/${filename}`;
   const params = {
     Bucket: process.env.AWS_BUCKET_NAME!,
     Key: key,
     Body: buffer,
-    ContentType: "image/jpeg",
+    ContentType: mimeType,
   };
   const command = new PutObjectCommand(params);
   await s3Client.send(command);
@@ -33,26 +34,21 @@ function delay(ms: number) {
 
 export async function POST(request: NextRequest) {
   try {
-    console.log("Inicio de la función POST");
     const formData = await request.formData();
-    console.log("FormData recibido");
 
     const folder = formData.get("folder") as string;
-    console.log("Folder:", folder);
 
-    const files: { name: string; buffer: Buffer }[] = [];
+    const files: { name: string; buffer: Buffer; mimeType: string }[] = [];
     for (const [key, value] of formData.entries()) {
       if (key.startsWith("file") && value instanceof Blob) {
         const arrayBuffer = await value.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
-        files.push({ name: key, buffer });
+        const mimeType = value.type;
+        files.push({ name: (value as File).name, buffer, mimeType });
       }
     }
 
-    console.log("Archivos recibidos:", files.length);
-
     if (files.length === 0) {
-      console.log("No se recibieron imágenes");
       return NextResponse.json(
         { message: "Las imágenes son requeridas" },
         { status: 400 }
@@ -61,14 +57,16 @@ export async function POST(request: NextRequest) {
 
     const imageUrls: string[] = [];
     for (const file of files) {
-      console.log("Procesando archivo:", file.name);
-      const imageUrl = await uploadFileToS3(file.buffer, file.name, folder);
-      console.log("Imagen subida:", imageUrl);
+      const imageUrl = await uploadFileToS3(
+        file.buffer,
+        file.name,
+        folder,
+        file.mimeType
+      );
       imageUrls.push(imageUrl);
-      await delay(1000); // Esperar 1 segundo entre cada subida
+      await delay(1000);
     }
 
-    console.log("Todas las imágenes subidas con éxito");
     return NextResponse.json({ success: true, imageUrls });
   } catch (error) {
     console.error("Error al subir las imágenes:", error);
