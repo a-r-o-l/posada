@@ -42,10 +42,10 @@ export async function POST(request: NextRequest) {
 
     const files: { name: string; buffer: Buffer }[] = [];
     for (const [key, value] of formData.entries()) {
-      if (key.startsWith("file") && value instanceof File) {
+      if (key.startsWith("file") && value instanceof Blob) {
         const arrayBuffer = await value.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
-        files.push({ name: value.name, buffer });
+        files.push({ name: key, buffer });
       }
     }
 
