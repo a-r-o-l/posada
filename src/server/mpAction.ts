@@ -11,6 +11,9 @@ const MERCADOPAGO_FAILURE = process.env.MP_FAILURE as string;
 const MERCADOPAGO_PENDING = process.env.MP_PENDING as string;
 
 export const createPayment = async (data: FormData) => {
+  if (!MERCADOPAGO_ACCESS_TOKEN) {
+    throw new Error("El token de acceso de MercadoPago no está configurado.");
+  }
   try {
     const res = await createSale(data);
     if (res.success) {
@@ -41,10 +44,16 @@ export const createPayment = async (data: FormData) => {
           method: "POST",
           headers: {
             Authorization: `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
+            "Content-Type": "application/json",
           },
           body: JSON.stringify(preference),
         }
       );
+
+      console.log("Response:", response);
+      console.log("Response status:", response.status);
+      console.log("Response status text:", response.statusText);
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error(
@@ -81,6 +90,9 @@ export const createPayment = async (data: FormData) => {
 };
 
 export const getPaymentLink = async (saleId: string) => {
+  if (!MERCADOPAGO_ACCESS_TOKEN) {
+    throw new Error("El token de acceso de MercadoPago no está configurado.");
+  }
   try {
     const sale = await getSale(saleId);
     if (!sale) {
