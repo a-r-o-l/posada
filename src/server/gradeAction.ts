@@ -78,7 +78,7 @@ export const createGrade = async (data: FormData) => {
       schoolId: formData.schoolId,
     });
     await newGrade.save();
-    revalidatePath(`/admin/students?school=${newGrade.schoolId}`);
+    revalidatePath(`/schools/students?school=${newGrade.schoolId}`);
     return {
       success: true,
       message: "Curso creado",

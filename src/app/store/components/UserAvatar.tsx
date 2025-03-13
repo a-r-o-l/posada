@@ -11,38 +11,22 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, LogOutIcon, Package2, User } from "lucide-react";
+import { IUser } from "@/context/UserContext";
+import { LogOutIcon, Package2, User } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
-interface Child {
-  name: string;
-  lastname: string;
-  grade: string;
-}
-interface User {
-  id: string;
-  name: string;
-  lastname: string;
-  email: string;
-  role: string;
-  password: string;
-  imageUrl: string;
-  children: Child[];
-}
-
-function UserAvatar({ user }: { user?: User }) {
+function UserAvatar({ user }: { user?: IUser }) {
   const router = useRouter();
   const [openAlert, setOpenAlert] = useState(false);
   return (
     <div className="flex items-center gap-1">
-      <Avatar className="items-center justify-center border border-white">
-        <User className="w-6 h-6" />
-      </Avatar>
       <DropdownMenu>
         <DropdownMenuTrigger>
-          <ChevronDown />
+          <div className="bg-[#139FDC] rounded-full p-3 flex items-center justify-center text-white">
+            <User className="w-6 h-6" />
+          </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
           <div className="flex justify-between items-center">

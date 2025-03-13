@@ -9,7 +9,6 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { EllipsisVertical, Pencil, Trash2 } from "lucide-react";
-import { Button } from "./ui/button";
 
 function CustomDropDownMenu({
   onEditClick,
@@ -23,9 +22,9 @@ function CustomDropDownMenu({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full">
+        <div className="rounded-full cursor-pointer p-2 hover:bg-background">
           <EllipsisVertical />
-        </Button>
+        </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">
         <DropdownMenuLabel>{title}</DropdownMenuLabel>

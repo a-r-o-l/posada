@@ -78,7 +78,6 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
           <TableHeader>
             <TableRow>
               <TableHead>Orden</TableHead>
-              <TableHead>Transaccion</TableHead>
               <TableHead>Tipo</TableHead>
               <TableHead>Fecha</TableHead>
               <TableHead>Cliente</TableHead>
@@ -103,7 +102,6 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                   onClick={() => setSelectedSale(sale)}
                 >
                   <TableCell>{sale.order}</TableCell>
-                  <TableCell>{sale.transactionId}</TableCell>
                   <TableCell>
                     {sale.paymentTypeId === "account_money"
                       ? "Efectivo"

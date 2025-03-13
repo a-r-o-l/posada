@@ -1,22 +1,28 @@
 "use client";
 import React, { createContext, useContext } from "react";
 
-interface User {
+export interface IUser {
   id: string;
   name: string;
+  lastname: string;
   role: string;
   password: string;
   imageUrl: string;
+  availableGrades: string[];
+  children: string[];
+  verified: boolean;
+  email: string;
+  phone: string;
 }
 
 interface UserContextType {
-  user: User | undefined;
+  user: IUser | undefined;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{
-  user: User | undefined;
+  user: IUser | undefined;
   children: React.ReactNode;
 }> = ({ user, children }) => {
   return (

@@ -10,7 +10,9 @@ function HeaderShoppingCart() {
   return (
     <div className="relative">
       <Link href={"/store/cart"}>
-        <ShoppingCart className="h-6 w-6 text-white hover:text-gray-300" />
+        <div className="bg-[#139FDC] rounded-full p-3 flex items-center justify-center">
+          <ShoppingCart className="h-6 w-6 text-white hover:text-gray-300" />
+        </div>
       </Link>
       {cartItems.length > 0 && (
         <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">

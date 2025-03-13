@@ -2,8 +2,10 @@
 
 import dbConnect from "@/lib/mongoose";
 import models from "@/models";
+import { PartialChildren } from "@/models/Account";
+import { revalidatePath } from "next/cache";
 
-export const createAccount = async (data: FormData) => {
+export const createAccount = async (data: FormData, admin: boolean = false) => {
   try {
     await dbConnect();
     const formData = Object.fromEntries(data.entries());
@@ -27,6 +29,9 @@ export const createAccount = async (data: FormData) => {
       imageUrl: formData.imageUrl,
     });
     await newAccount.save();
+    if (admin) {
+      revalidatePath("/admin/accounts");
+    }
     return {
       success: true,
       message: "Cuenta creada correctamente",
@@ -45,7 +50,7 @@ export const createAccount = async (data: FormData) => {
 export const getAllAccounts = async () => {
   try {
     await dbConnect();
-    const accounts = await models.Account.find({ role: "user" })
+    const accounts = await models.Account.find()
       .populate([{ path: "children", populate: ["schoolId", "gradeId"] }])
       .lean();
     return {
@@ -123,6 +128,84 @@ export const updateAccount = async (id: string, data: FormData) => {
       formData,
       { new: true }
     ).lean();
+
+    const plainUpdatedAccount = JSON.parse(JSON.stringify(updatedAccount));
+
+    return {
+      success: true,
+      message: "Cuenta actualizada correctamente.",
+      account: plainUpdatedAccount,
+    };
+  } catch (error) {
+    console.error("Error updating account:", error);
+    return {
+      success: false,
+      message: "Error al actualizar la cuenta, intente nuevamente.",
+      account: null,
+    };
+  }
+};
+
+export const updateChildren = async (id: string, data: FormData) => {
+  try {
+    await dbConnect();
+    const formData = Object.fromEntries(data.entries());
+
+    if (formData.children) {
+      formData.children = JSON.parse(formData.children as string);
+    }
+    const children = formData.children;
+    if (children && Array.isArray(children)) {
+      for (const child of children) {
+        const normalizeText = (text: string) => {
+          return text
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g, "");
+        };
+
+        const normalizedName = normalizeText(child.name);
+        const normalizedLastname = normalizeText(child.lastname);
+        const query = {
+          $or: [
+            {
+              name: new RegExp(`^${normalizedName}$`, "i"),
+              lastname: new RegExp(`^${normalizedLastname}$`, "i"),
+            },
+            {
+              name: child.name,
+              lastname: child.lastname,
+            },
+          ],
+        };
+
+        const existingChild = await models.Student.findOne(query)
+          .collation({
+            locale: "es",
+            strength: 1,
+          })
+          .lean();
+        if (!existingChild) {
+          return {
+            success: false,
+            message: `${child.name} ${child.lastname} no existe en nuestra base de datos.`,
+            account: null,
+          };
+        } else {
+          const parsedChild = JSON.parse(JSON.stringify(existingChild));
+          child.studentId = parsedChild._id;
+        }
+      }
+    }
+    const availableGrades = Array.isArray(children)
+      ? children.map((child: PartialChildren) => child.gradeId)
+      : [];
+    const updatedAccount = await models.Account.findByIdAndUpdate(id, {
+      children: formData.children,
+      verified: true,
+      availableGrades,
+    }).lean();
 
     const plainUpdatedAccount = JSON.parse(JSON.stringify(updatedAccount));
 

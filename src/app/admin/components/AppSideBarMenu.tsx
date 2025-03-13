@@ -1,5 +1,14 @@
 "use client";
-import { Baby, Home, Images, Mail, School, Truck, User } from "lucide-react";
+import {
+  Baby,
+  Folder,
+  Home,
+  Images,
+  Mail,
+  School,
+  Truck,
+  User,
+} from "lucide-react";
 import AppSideBarMenuItem from "./AppSideBarMenuItem";
 import { useUser } from "@/context/UserContext";
 import { useEffect, useState } from "react";
@@ -20,21 +29,22 @@ const items = [
     private: false,
   },
   {
-    title: "Alumnos",
-    url: "/admin/students",
-    icon: Baby,
-    private: false,
-  },
-  {
     title: "Colegios",
     url: "/admin/schools",
     icon: School,
     private: false,
   },
+
   {
     title: "Productos",
     url: "/admin/products",
     icon: Images,
+    private: false,
+  },
+  {
+    title: "Carpetas",
+    url: "/admin/folders",
+    icon: Folder,
     private: false,
   },
   {

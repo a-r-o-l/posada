@@ -18,11 +18,11 @@ export const createMessage = async (data: FormData) => {
     await newMsg.save();
     return {
       success: true,
-      message: "Mensaje creado correctamente",
+      message: "Mensaje enviado correctamente",
       messageData: JSON.parse(JSON.stringify(newMsg)),
     };
   } catch (error) {
-    console.error("Error creating product:", error);
+    console.error("Error enviando el mensajet:", error);
     return {
       success: false,
       message: "Problemas en el servidor, intente nuevamente.",

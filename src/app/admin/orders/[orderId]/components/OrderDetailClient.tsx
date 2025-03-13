@@ -88,8 +88,9 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       doc.text("Detalles de la Orden", 10, startY);
 
       // Agregar detalles de la orden
+
       doc.setFontSize(12);
-      doc.text(`Transacción: ${sale.transactionId}`, 10, startY + 10);
+      doc.text(`Orden: ${sale.order}`, 10, startY + 10);
       doc.text(
         `Fecha: ${format(new Date(sale.createdAt ?? ""), "dd / MM / yyyy", {
           locale: es,
@@ -97,21 +98,39 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         10,
         startY + 20
       );
-      doc.text(`Cliente: ${sale.accountId.email}`, 10, startY + 30);
-      doc.text(`Total: $${sale.total.toFixed(2)}`, 10, startY + 40);
+      doc.text(
+        `Cliente: ${sale.accountId.lastname} ${sale.accountId.name}`,
+        10,
+        startY + 30
+      );
+      doc.text(`Email: ${sale.accountId.email}`, 10, startY + 40);
+      doc.text(`Telefono: ${sale.accountId.phone}`, 10, startY + 50);
+      doc.text(`Total: $${sale.total.toFixed(2)}`, 10, startY + 60);
       doc.text(
         `Estado: ${paymentStateParser(sale.status).text}`,
         10,
-        startY + 50
+        startY + 70
       );
+
+      let childStartY = 10 + 10;
+      doc.setFontSize(16);
+      doc.text("Menores a cargo:", 110, childStartY);
+      sale.accountId.children.forEach((child) => {
+        childStartY += 8;
+        doc.text(
+          `${child.name} ${child.lastname} - ${child.gradeId.grade} ${child.gradeId.division} - ${child.schoolId.name}`,
+          110,
+          childStartY
+        );
+      });
 
       // Agregar productos en una tabla
       const tableColumn = [
         "Archivo",
         "Producto",
         "Colegio",
-        "Curso",
-        "Precio U.",
+        "Carpeta",
+        "Precio",
         "Cantidad",
         "Importe",
       ];
@@ -131,7 +150,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       });
 
       autoTable(doc, {
-        startY: startY + 60,
+        startY: startY + 80,
         head: [tableColumn],
         body: tableRows,
       });
@@ -188,13 +207,13 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                     <TableCell align="right">
                       <Popover>
                         <PopoverTrigger asChild>
-                          <Button variant="outline">Ver hijos</Button>
+                          <Button variant="outline">Menores a cargo</Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-80">
                           <div className="grid gap-4">
                             <div className="space-y-2">
                               <h4 className="font-medium leading-none">
-                                Hijos
+                                Menores a cargo
                               </h4>
                             </div>
                             <div>
@@ -244,17 +263,17 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Transaccion</TableHead>
+                    <TableHead>Orden</TableHead>
                     <TableHead>Fecha</TableHead>
                     <TableHead>Cliente</TableHead>
                     <TableHead>Total</TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead className="text-right">Entrega</TableHead>
+                    <TableHead className="text-center">Entrega</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell>{sale.transactionId}</TableCell>
+                    <TableCell>{sale.order}</TableCell>
                     <TableCell>
                       {format(sale.createdAt!, "dd / MM / yyyy", {
                         locale: es,
@@ -271,7 +290,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                         {paymentStateParser(sale?.status).text}
                       </Badge>
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell align="center">
                       <Checkbox checked={sale?.delivered} />
                     </TableCell>
                   </TableRow>
@@ -291,7 +310,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                     <TableHead>Imagen</TableHead>
                     <TableHead>Archivo</TableHead>
                     <TableHead>Producto</TableHead>
-                    <TableHead>Precio U.</TableHead>
+                    <TableHead>Precio</TableHead>
                     <TableHead>Cantidad</TableHead>
                     <TableHead className="text-right">Importe</TableHead>
                   </TableRow>

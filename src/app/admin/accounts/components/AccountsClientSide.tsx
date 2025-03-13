@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { User } from "lucide-react";
 import React, { useState } from "react";
 import { IAccountPopulated, IChildrenPopulated } from "@/models/Account";
 import { Label } from "@/components/ui/label";
@@ -22,16 +21,55 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import PasswordInput from "@/components/PasswordInput";
+import CreateAccountModal from "./CreateAccountModal";
+import { Badge } from "@/components/ui/badge";
 
 function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
   const [selectedAccount, setSelectedAccount] =
     useState<IAccountPopulated | null>(null);
+  const [openAccountModal, setOpenAccountModal] = useState(false);
+
+  const RenderBadge = ({ role }: { role: string }) => {
+    if (!role) {
+      return <></>;
+    } else if (role === "admin") {
+      return (
+        <Badge
+          className="w-20 text-center justify-center bg-red-500 text-white"
+          variant="outline"
+        >
+          Admin
+        </Badge>
+      );
+    } else if (role === "superuser") {
+      return (
+        <Badge
+          className="w-20 text-center justify-center bg-blue-500 text-white"
+          variant="outline"
+        >
+          Superuser
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge
+          className="w-20 text-center justify-center bg-green-500 text-white"
+          variant="outline"
+        >
+          User
+        </Badge>
+      );
+    }
+  };
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Cuentas</CardTitle>
-        <CardDescription>Ver y administrar cuentas</CardDescription>
+      <CardHeader className="flex flex-row justify-between">
+        <div>
+          <CardTitle>Cuentas</CardTitle>
+          <CardDescription>Ver y administrar cuentas</CardDescription>
+        </div>
+        <Button onClick={() => setOpenAccountModal(true)}>Crear cuenta</Button>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -56,7 +94,9 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                   >
                     <div className="flex items-center space-x-2 w-full justify-between">
                       <div className="flex items-center gap-5">
-                        <User className="w-4 h-4" />
+                        <div className="flex flex-col items-center">
+                          <RenderBadge role={account.role} />
+                        </div>
 
                         <div>
                           <div className="font-semibold">
@@ -67,6 +107,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                           </div>
                         </div>
                       </div>
+                      <div className="w-full h-full flex items-center justify-end"></div>
                     </div>
                   </Button>
                 ))}
@@ -112,7 +153,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                     </div>
                   </div>
                   <div className="w-full">
-                    <p className="font-black text-base">Hijos de la cuenta</p>
+                    <p className="font-black text-base">Menores a cargo</p>
                     <Table>
                       <TableHeader>
                         <TableRow>
@@ -152,6 +193,10 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
           </Card>
         </div>
       </CardContent>
+      <CreateAccountModal
+        open={openAccountModal}
+        onClose={() => setOpenAccountModal(false)}
+      />
     </Card>
   );
 }

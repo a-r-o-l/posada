@@ -3,22 +3,28 @@ import { useCacheSchools } from "@/zustand/useCacheSchools";
 import React, { useEffect, useState } from "react";
 import { IFolder } from "@/models/Folder";
 import { nameParser } from "@/lib/utilsFunctions";
-import { Separator } from "@/components/ui/separator";
-import { Folder } from "lucide-react";
 import PublicFile from "./PublicFile";
 import SelectFileModal from "./SelectFileModal";
 import { IFile } from "@/models/File";
 import { IProduct } from "@/models/Product";
+import { ISchool } from "@/models/School";
+import Image from "next/image";
+import DynamicFolder from "../../components/DynamicFolder";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 type folderWithFiles = IFolder & { files: IFile[] };
 
 function FolderStoreDetailClient({
   folder,
   products,
+  school,
 }: {
   folder: folderWithFiles;
   products: IProduct[];
+  school: ISchool;
 }) {
+  const router = useRouter();
   const accesses = useCacheSchools((state) => state.accesses);
   // const addAccess = useCacheSchools((state) => state.addAccess);
 
@@ -35,19 +41,51 @@ function FolderStoreDetailClient({
     setFileModal(file);
   };
 
+  const getFolderColor = (level: string) => {
+    switch (level) {
+      case "jardin":
+        return "blue";
+      case "primaria":
+        return "green";
+      case "secundaria":
+        return "yellow";
+      default:
+        return "red";
+    }
+  };
+
   return (
-    <div className="">
-      <div className="flex items-center gap-5 p-10">
-        <Folder className="w-28 h-28" />
-        <div>
-          <div className="font-semibold text-2xl">
-            {nameParser(folder.title)}
-          </div>
-          <div className="text-gray-500 text-xl">{folder.description}</div>
-        </div>
+    <div className="flex h-full">
+      <div className="flex flex-col items-center gap-10 p-10 bg-[#F0F1FF] h-full rounded-l-3xl">
+        <Link href={`/store/${school._id}`}>
+          <Image
+            src={school.imageUrl || ""}
+            alt={school.name}
+            width={150}
+            height={150}
+          />
+        </Link>
+        <DynamicFolder
+          color={getFolderColor(folder.level)}
+          title={nameParser(folder.level)}
+          isOpened={true}
+          height={130}
+          width={130}
+          onClick={() =>
+            router.push(`/store/${school._id}?level=${folder.level}`)
+          }
+        />
+        <DynamicFolder
+          color="blue"
+          title={nameParser(folder.title)}
+          isOpened={true}
+          height={130}
+          width={130}
+          onClick={() => {}}
+        />
       </div>
-      <Separator className="" />
-      <div className="flex flex-wrap gap-5 p-10">
+
+      <div className="flex flex-wrap gap-5 p-10 bg-[#F0F1FF] w-full rounded-r-3xl items-start border-l-8 border-[#139FDC]">
         {folder?.files?.map((file) => (
           <PublicFile file={file} key={file._id} onClick={onClickFile} />
         ))}

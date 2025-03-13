@@ -28,6 +28,9 @@ function SchoolList({ schools }: { schools: ISchool[] }) {
   }, [user]);
 
   const haveAccess = (schoolId: string): boolean => {
+    if (user?.role !== "user") {
+      return true;
+    }
     return availableSchools.includes(schoolId);
   };
 
@@ -44,7 +47,9 @@ function SchoolList({ schools }: { schools: ISchool[] }) {
             if (haveAccess(school._id)) {
               router.push(`/store/${school._id}`);
             } else {
-              toast.error("No tienes hijos registrados en este colegio");
+              toast.error(
+                "No tienes menores a cargo registrados en este colegio"
+              );
             }
           }}
         >

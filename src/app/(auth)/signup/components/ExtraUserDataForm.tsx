@@ -32,11 +32,12 @@ import {
 import { IAccount } from "@/models/Account";
 import { IGrade } from "@/models/Grade";
 import { ISchool } from "@/models/School";
-import { updateAccount } from "@/server/accountAction";
-import { Info, Trash2, UserPlus } from "lucide-react";
+import { updateChildren } from "@/server/accountAction";
+import { HelpCircle, Info, Save, Trash2, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import NeedHelpModal from "./NeedHelpModal";
 
 interface Child {
   name: string;
@@ -61,6 +62,7 @@ function ExtraUserDataForm({
   const [newChildSchool, setNewChildSchool] = useState<ISchool | null>(null);
   const [newChildGrade, setNewChildGrade] = useState<IGrade | null>(null);
   const [loading, setLoading] = useState(false);
+  const [needHelp, setNeedHelp] = useState(false);
 
   const addChild = () => {
     if (newChildName.trim() && newChildLastname.trim()) {
@@ -108,7 +110,7 @@ function ExtraUserDataForm({
       }));
       const formData = new FormData();
       formData.append("children", JSON.stringify(mappedChildren));
-      const res = await updateAccount(user._id, formData);
+      const res = await updateChildren(user._id, formData);
       if (res.success) {
         toast.success("Registro completado, ya puedes iniciar sesión.");
         setLoading(false);
@@ -146,9 +148,28 @@ function ExtraUserDataForm({
             <div>
               <AlertTitle>Atencion</AlertTitle>
               <AlertDescription>
-                Necesitamos algunos datos adicionales de sus hijos para mayor
-                seguridad y brindar una mejor experiencia. Sin esta información
-                no podras realizar ninguna compra de nuestros productos.
+                <ul className="list-disc">
+                  <li>
+                    {" "}
+                    Por temas de seguridad y para brindar una mejor experiencia
+                    a los usuarios, necesitamos los datos de tus menores a
+                    cargo.
+                  </li>
+                  <li>Sin esta informacion no podras acceder al sitio.</li>
+                  <li>
+                    Por cualquier inconveniente ingresa a solicitar ayuda.
+                  </li>
+                </ul>
+                <div className="w-full flex justify-end">
+                  <Button
+                    variant="outline"
+                    onClick={() => setNeedHelp(true)}
+                    className="w-full sm:w-40"
+                  >
+                    <HelpCircle />
+                    Solicitar ayuda
+                  </Button>
+                </div>
               </AlertDescription>
             </div>
           </Alert>
@@ -157,23 +178,13 @@ function ExtraUserDataForm({
       <CardContent className="flex gap-10 flex-col md:flex-row mt-5">
         <Card className="w-full">
           <CardHeader>
-            <CardTitle>Agregar hijo/a</CardTitle>
+            <CardTitle>Agregar un menor</CardTitle>
+            <CardDescription>
+              Ingresa la informacion de tus menores a cargo, los datos deben ser
+              exactos
+            </CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col gap-5">
-            <div className="space-y-2">
-              <Label>Nombre</Label>
-              <Input
-                value={newChildName}
-                onChange={(e) => setNewChildName(e.target.value)}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Apellido</Label>
-              <Input
-                value={newChildLastname}
-                onChange={(e) => setNewChildLastname(e.target.value)}
-              />
-            </div>
             <div className="space-y-2">
               <Label>Colegio</Label>
               <Select
@@ -232,6 +243,21 @@ function ExtraUserDataForm({
                 </SelectContent>
               </Select>
             </div>
+            <div className="space-y-2">
+              <Label>Nombre</Label>
+              <Input
+                value={newChildName}
+                onChange={(e) => setNewChildName(e.target.value)}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Apellido</Label>
+              <Input
+                value={newChildLastname}
+                onChange={(e) => setNewChildLastname(e.target.value)}
+              />
+            </div>
+
             <Button
               onClick={addChild}
               disabled={
@@ -241,13 +267,13 @@ function ExtraUserDataForm({
                 !newChildLastname
               }
             >
-              <UserPlus className="mr-2 h-4 w-4" /> Agregar hijo/a
+              <UserPlus className="mr-2 h-4 w-4" /> Agregar
             </Button>
           </CardContent>
         </Card>
         <Card className="w-full">
           <CardHeader>
-            <CardTitle>Tus hijos</CardTitle>
+            <CardTitle>Menores</CardTitle>
           </CardHeader>
           <CardContent>
             <Table>
@@ -284,8 +310,11 @@ function ExtraUserDataForm({
                   })
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="text-center h-40">
-                      No hay hijos registrados
+                    <TableCell
+                      colSpan={4}
+                      className="text-center h-40 text-muted-foreground"
+                    >
+                      No hay menores registrados
                     </TableCell>
                   </TableRow>
                 )}
@@ -295,16 +324,34 @@ function ExtraUserDataForm({
         </Card>
       </CardContent>
       <CardFooter className="flex w-full justify-end">
-        <div className="flex justify-end">
+        <div className="flex flex-col gap-10 w-full sm:flex-row sm:justify-end">
           <LoadingButton
             loading={loading}
             title="Finalizar registro"
             variant="default"
             onClick={saveData}
             disabled={!children.length}
-          />
+            classname="w-full sm:w-40"
+          >
+            <Save />
+          </LoadingButton>
+
+          <Button
+            variant="link"
+            className="w-full sm:w-40"
+            onClick={() => {
+              router.push("/");
+            }}
+          >
+            Salir
+          </Button>
         </div>
       </CardFooter>
+      <NeedHelpModal
+        open={needHelp}
+        onClose={() => setNeedHelp(false)}
+        user={user}
+      />
     </Card>
   );
 }

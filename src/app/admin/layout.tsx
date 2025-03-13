@@ -1,23 +1,23 @@
 import { Toaster } from "sonner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
-import { UserProvider } from "@/context/UserContext";
+import { IUser, UserProvider } from "@/context/UserContext";
 import { auth } from "@/auth";
 import { Session } from "next-auth";
 import { redirect } from "next/navigation";
 
-interface User {
-  id: string;
-  name: string;
-  role: string;
-  password: string;
-  imageUrl: string;
-}
+// interface User {
+//   id: string;
+//   name: string;
+//   role: string;
+//   password: string;
+//   imageUrl: string;
+// }
 
 interface ExtendedSession extends Session {
   token?: {
     token: {
-      user?: User;
+      user?: IUser;
     };
   };
 }
@@ -31,11 +31,11 @@ export default async function RootLayout({
 
   const user = session?.token?.token?.user;
 
-  if (!session) {
+  if (!session || !user) {
     redirect("/signin");
   }
 
-  if (user?.role === "user") {
+  if (user?.role === "user" || user?.role === "superuser") {
     redirect("/store");
   }
 

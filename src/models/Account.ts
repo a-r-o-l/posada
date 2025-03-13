@@ -14,6 +14,9 @@ export interface IAccount extends Document {
   children: IChildren[];
   schoolEngagement: string;
   isNewAccount: boolean;
+  availableGrades: string[];
+  schoolId?: string;
+  verified: boolean;
 }
 
 export interface IChildren {
@@ -21,6 +24,7 @@ export interface IChildren {
   lastname: string;
   gradeId: string;
   schoolId: string;
+  studentId?: string;
 }
 
 export type IChildrenPopulated = Omit<IChildren, "gradeId" | "schoolId"> & {
@@ -41,6 +45,7 @@ const ChildSchema: Schema = new Schema(
     lastname: { type: String, required: true },
     schoolId: { type: Schema.ObjectId, ref: "School", required: true },
     gradeId: { type: Schema.ObjectId, ref: "Grade", required: true },
+    studentId: { type: Schema.ObjectId, ref: "Student", required: true },
   },
   {
     _id: false,
@@ -59,6 +64,9 @@ const AccountSchema: Schema = new Schema(
     children: { type: [ChildSchema], default: [] },
     schoolEngagement: { type: String },
     isNewAccount: { type: Boolean, default: true },
+    availableGrades: { type: [Schema.ObjectId], ref: "Grade", default: [] },
+    verified: { type: Boolean, default: false },
+    schoolId: { type: Schema.ObjectId, ref: "School" },
   },
   {
     timestamps: false,

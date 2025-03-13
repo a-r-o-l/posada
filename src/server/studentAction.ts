@@ -1,6 +1,7 @@
 "use server";
 import dbConnect from "@/lib/mongoose";
 import models from "@/models";
+import { PartialStudent } from "@/models/Student";
 import { revalidatePath } from "next/cache";
 
 export const getAllStudent = async (schoolId: string) => {
@@ -79,7 +80,7 @@ export const createStudent = async (data: FormData) => {
       schoolId: formData.schoolId,
     });
     revalidatePath(
-      `/admin/students?school=${formData.schoolId}&grade=${formData.gradeId}`
+      `/schools/students?school=${formData.schoolId}&grade=${formData.gradeId}`
     );
     await newStudent.save();
     return {
@@ -92,6 +93,26 @@ export const createStudent = async (data: FormData) => {
     return {
       success: false,
       message: "Error al crear el estudiante",
+    };
+  }
+};
+
+export const createManyStudents = async (students: PartialStudent[]) => {
+  try {
+    await dbConnect();
+    await models.Student.insertMany(students);
+    revalidatePath(
+      `/admin/schools?school=${students[0].schoolId}&grade=${students[0].gradeId}`
+    );
+    return {
+      success: true,
+      message: "Estudiantes creados",
+    };
+  } catch (error) {
+    console.error("Error creando estudiantes:", error);
+    return {
+      success: false,
+      message: "Error al crear los estudiantes",
     };
   }
 };
