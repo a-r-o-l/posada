@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import React from "react";
 
-function TestHeader() {
+function RootHeader() {
   return (
     <header className="shadow-md top-0 sticky z-50 bg-[#F0F1FF]">
       <div className="px-5">
@@ -15,7 +15,7 @@ function TestHeader() {
             ></div>
           </Link>
           <div className="w-full flex items-end justify-center px-5">
-            <div className="w-full flex items-center gap-10 justify-between">
+            <div className="w-full flex items-center justify-between lg:justify-end lg:gap-20">
               <Link href="#quienes-somos" className="text-base hidden lg:block">
                 Quienes somos
               </Link>
@@ -48,4 +48,4 @@ function TestHeader() {
   );
 }
 
-export default TestHeader;
+export default RootHeader;

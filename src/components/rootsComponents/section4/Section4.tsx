@@ -3,7 +3,7 @@ import React from "react";
 
 function Section4() {
   return (
-    <div className="flex flex-col mt-10" id="nuestro-trabajo">
+    <div className="flex flex-col mt-20" id="nuestro-trabajo">
       <div
         style={{ backgroundImage: "url(/ui/seccion4/yellowwave.png)" }}
         className="w-[10vw] h-[1vh] md:h-[4vh] bg-contain bg-center bg-no-repeat"

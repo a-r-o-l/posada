@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/context/theme-provider";
 import { Toaster } from "sonner";
 
 const geistSans = Geist({
@@ -26,18 +25,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className="light">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ThemeProvider
-          attribute="class"
-          disableTransitionOnChange
-          themes={["light", "dark"]}
-          defaultTheme="dark"
-        >
-          <main className="flex flex-col w-full">{children}</main>
-        </ThemeProvider>
+        <main className="flex flex-col w-full">{children}</main>
         <Toaster richColors={true} />
       </body>
     </html>

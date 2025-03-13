@@ -36,7 +36,10 @@ function Section3() {
   const [selected, setSelected] = useState(data[0]);
 
   return (
-    <div className="flex flex-col w-full relative  mt-20" id="productos">
+    <div
+      className="hidden lg:flex flex-col w-full relative mt-20"
+      id="productos"
+    >
       <div className="mb-10 text-center flex flex-col text-4xl sm:text-5xl lg:text-6xl pl-10 md:pl-20 leading-none">
         <h1 className="font-bold text-[#F9AE48]">
           <span className="text-black">Conocé nuestros</span>
@@ -53,8 +56,8 @@ function Section3() {
         />
       </div>
       <div className="flex flex-1 justify-center items-center relative">
-        <div className="w-4/5 bg-[#F9AE48] rounded-l-3xl absolute right-0 top-0 z-10 h-[100vh] lg:h-[55vh]"></div>
-        <div className="w-[70vw]  border-2 border-[#F9AE48] bg-[#EFF0F9] rounded-3xl mt-10 z-20 flex flex-col h-[100vh] lg:h-[65vh]">
+        <div className="w-4/5 bg-[#F9AE48] rounded-l-3xl absolute right-0 top-0 z-10 h-[70vh] lg:h-[55vh]"></div>
+        <div className="w-[70vw]  border-2 border-[#F9AE48] bg-[#EFF0F9] rounded-3xl mt-10 z-20 flex flex-col h-[70vh] lg:h-[65vh]">
           <div className="grid grid-cols-1 lg:grid-cols-5 p-5 gap-5">
             {data.map((p) => (
               <ProductTab
