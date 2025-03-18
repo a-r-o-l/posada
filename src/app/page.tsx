@@ -88,7 +88,9 @@ function page() {
         style={{ backgroundImage: "url(/logoposada.png)" }}
         className="w-60 h-60 bg-contain bg-center bg-no-repeat"
       ></div>
-      <h1 className="font-black text-4xl">Pagina en construccion</h1>
+      <h1 className="font-black text-5xl text-center">
+        Pagina en construccion
+      </h1>
       <div
         style={{ backgroundImage: "url(/underConstruction.png)" }}
         className="w-96 h-60 bg-contain bg-center bg-no-repeat"
