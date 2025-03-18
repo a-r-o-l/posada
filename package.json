@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "start-dev": "cloudflared tunnel --url http://localhost:3000"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.7.4",

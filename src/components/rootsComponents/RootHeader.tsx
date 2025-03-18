@@ -5,7 +5,7 @@ import React from "react";
 
 function RootHeader() {
   return (
-    <header className="shadow-md top-0 sticky z-50 bg-[#F0F1FF]">
+    <header className="hidden lg:block shadow-md top-0 sticky z-50 bg-[#F0F1FF]">
       <div className="px-5">
         <nav className="flex flex-col md:flex-row items-center justify-between p-2">
           <Link href="/" className="">

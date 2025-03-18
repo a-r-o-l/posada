@@ -1,12 +1,12 @@
 import Image from "next/image";
 import React from "react";
 
-function Section2() {
+function Section2Mini() {
   return (
-    <div className="hidden lg:flex flex-col w-full relative" id="servicio">
+    <div className="flex flex-col w-full relative lg:hidden" id="servicio">
       <div className="flex flex-row justify-between w-full">
         <div className="flex justify-between w-full">
-          <div className="flex flex-col text-4xl sm:text-5xl lg:text-6xl pl-5 leading-none">
+          <div className="flex flex-col text-3xl pl-5 leading-none">
             <h1 className="font-black text-[#1D1D1B] leading-none">¡Hace tu</h1>
             <h1 className="font-black text-[#8DB946] leading-none ml-10">
               pedido!
@@ -55,4 +55,4 @@ function Section2() {
   );
 }
 
-export default Section2;
+export default Section2Mini;

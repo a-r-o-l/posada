@@ -115,82 +115,74 @@ function SignUpForm() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4 pt-6">
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-500">Nombre</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Juan"
-                          {...field}
-                          autoComplete="off"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-500" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="lastname"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-500">Apellido</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="Pérez"
-                          {...field}
-                          autoComplete="off"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-500" />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-500">Nombre</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Juan" {...field} autoComplete="off" />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="lastname"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-500">Apellido</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="Pérez"
+                        {...field}
+                        autoComplete="off"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
 
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-500">Telefono</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="+54 9 11-1234-1234"
-                          {...field}
-                          autoComplete="off"
-                          type="number"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-500" />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-gray-500">
-                        Correo Electrónico
-                      </FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="juanperez@ejemplo.com"
-                          {...field}
-                          autoComplete="off"
-                        />
-                      </FormControl>
-                      <FormMessage className="text-red-500" />
-                    </FormItem>
-                  )}
-                />
-              </div>
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-500">Telefono</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="+54 9 11-1234-1234"
+                        {...field}
+                        autoComplete="off"
+                        type="number"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-gray-500">
+                      Correo Electrónico
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="juanperez@ejemplo.com"
+                        {...field}
+                        autoComplete="off"
+                      />
+                    </FormControl>
+                    <FormMessage className="text-red-500" />
+                  </FormItem>
+                )}
+              />
               <FormField
                 control={form.control}
                 name="password"
@@ -202,6 +194,7 @@ function SignUpForm() {
                         placeholder="********"
                         {...field}
                         autoComplete="off"
+                        type="password"
                       />
                     </FormControl>
                     <FormMessage className="text-red-500" />

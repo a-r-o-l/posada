@@ -4,7 +4,7 @@ import React from "react";
 
 function Section5() {
   return (
-    <div className="flex flex-col mt-20 relative" id="contacto">
+    <div className="hidden lg:flex flex-col mt-20 relative" id="contacto">
       <div className="px-20 z-20">
         <h1 className="text-4xl font-black text-center lg:text-end lg:ml-20 sm:text-5xl lg:text-6xl text-[#812E8A] leading-none">
           ¿Tenés alguna duda?

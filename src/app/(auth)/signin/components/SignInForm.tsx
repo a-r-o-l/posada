@@ -49,9 +49,10 @@ function SignInForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const response = await login(values.email, values.password);
+    const email = values.email.toLowerCase();
+    const response = await login(email, values.password);
     if (response.success) {
-      toast.success(`Bienvenido ${values.email}`);
+      toast.success(`Bienvenido ${values.email.toLowerCase()}`);
       router.push("/admin");
     } else {
       toast.error(response.message);

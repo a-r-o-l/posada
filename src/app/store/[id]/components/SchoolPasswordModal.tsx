@@ -31,6 +31,16 @@ function SchoolPasswordModal({
   const router = useRouter();
   const [password, setPassword] = useState("");
 
+  const onSubmit = () => {
+    const pswrd = school.password;
+    if (pswrd?.toLowerCase() === password) {
+      onAccess();
+      onClose();
+    } else {
+      toast.error("Contraseña incorrecta, intenta nuevamente.");
+    }
+  };
+
   return (
     <SchoolDialog open={open} onOpenChange={onClose}>
       <SchoolDialogContent
@@ -55,27 +65,28 @@ function SchoolPasswordModal({
         <SchoolDialogHeader>
           <SchoolDialogTitle>{nameParser(school.name)}</SchoolDialogTitle>
           <SchoolDialogDescription>
-            Debe ingresar la contraseña para acceder a esta escuela
+            Debe ingresar la contraseña para acceder a este colegio
           </SchoolDialogDescription>
         </SchoolDialogHeader>
         <div className="space-y-2 mt-5">
           <Label>Password</Label>
           <Input
+            autoFocus
             value={password}
             onChange={({ target }) => setPassword(target.value)}
+            type="password"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                onSubmit();
+              }
+            }}
           />
           <SchoolDialogFooter>
             <div className="flex justify-end gap-5 w-full mt-10">
               <Button
                 className="w-32"
                 onClick={() => {
-                  const pswrd = school.password;
-                  if (pswrd === password) {
-                    onAccess();
-                    onClose();
-                  } else {
-                    toast.error("Contraseña incorrecta, intenta nuevamente.");
-                  }
+                  onSubmit();
                 }}
               >
                 Entrar

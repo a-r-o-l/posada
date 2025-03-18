@@ -41,9 +41,10 @@ function Section3Mini() {
       className="flex flex-col w-full relative mt-20 lg:hidden"
       id="productos"
     >
-      <div className="mb-10 flex flex-col text-4xl sm:text-5xl pl-10 md:pl-20">
+      <div className="mb-10 flex flex-col text-3xl pl-10">
         <h1 className="font-bold text-[#F9AE48]">
           <span className="text-black">Conocé nuestros</span>
+          <br />
           <span className="ml-3">productos</span>
         </h1>
       </div>
@@ -58,7 +59,7 @@ function Section3Mini() {
       </div>
       <div className="flex flex-1 justify-center items-center relative">
         <div className="w-4/5 bg-[#F9AE48] rounded-l-3xl absolute right-0 top-0 z-10 h-[50vh]"></div>
-        <div className="w-[70vw]  border-2 border-[#F9AE48] bg-[#EFF0F9] rounded-3xl mt-10 z-20 flex flex-col">
+        <div className="w-[80vw]  border-2 border-[#F9AE48] bg-[#EFF0F9] rounded-3xl mt-10 z-20 flex flex-col">
           <div className="grid grid-cols-1 p-5 gap-5">
             {data.map((p) => (
               <Accordion type="single" collapsible key={p.id}>

@@ -1,5 +1,47 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import React from "react";
+import SchoolsCarrousel from "./SchoolsCarrousel";
+const data = [
+  {
+    id: 1,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/BDS.png",
+  },
+  {
+    id: 2,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/CRISTOFOLO+COLOMBO.png",
+  },
+  {
+    id: 3,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/FDS.png",
+  },
+  {
+    id: 4,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/FRANKLIN.png",
+  },
+  {
+    id: 5,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/JACARANDA.png",
+  },
+  {
+    id: 6,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/MORULI.png",
+  },
+  {
+    id: 7,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/NTRA+SRA+MECEDES.png",
+  },
+  {
+    id: 8,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/SAINT+GEORGES.png",
+  },
+  {
+    id: 9,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/STANFORD+COLLEGE.png",
+  },
+  {
+    id: 10,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/UHS.png",
+  },
+];
 
 function Section4() {
   return (
@@ -18,16 +60,27 @@ function Section4() {
           <span className="text-[#AC292F] ml-3">Nosotros</span>
         </h1>
       </div>
-      <div className="w-full flex justify-between px-20 mt-10 lg:mt-10">
+      {/* <div className="w-full flex justify-between px-20 mt-10 lg:mt-10">
         <div className="rounded-full bg-[#AC292F] text-white flex items-center justify-center p-2">
           <ChevronLeft size={30} />
         </div>
         <div className="rounded-full bg-[#AC292F] text-white flex items-center justify-center p-2">
           <ChevronRight size={30} />
         </div>
-      </div>
+      </div> */}
       <div className="bg-[#AC292F] w-[15vw] md:w-[5vw] h-[5vh] rounded-r-full mt-5 md:mt-10"></div>
-      <div className="w-full rounded-3xl bg-[#AC292F] h-[55vh] mt-10"></div>
+      {/* <div className="w-full rounded-3xl bg-[#AC292F] mt-10">
+        <div className="flex flex-wrap justify-center items-center w-full p-1">
+          {data.map((item) => (
+            <div
+              key={item.id}
+              style={{ backgroundImage: `url(${item.src})` }}
+              className="w-32 h-20 bg-contain bg-center bg-no-repeat"
+            ></div>
+          ))}
+        </div>
+      </div> */}
+      <SchoolsCarrousel images={data} />
     </div>
   );
 }
