@@ -8,16 +8,16 @@ function Section5Mini() {
   return (
     <div className="lg:hidden flex flex-col mt-20 relative" id="contacto">
       <div className="px-10 z-20">
-        <h1 className="text-3xl font-black text-[#812E8A] leading-none">
+        <h1 className="text-3xl font-black text-[#812E8A] leading-none sm:text-5xl">
           ¿Tenés alguna duda?
         </h1>
         <div className="flex justify-center items-center gap-5">
-          <h1 className="text-3xl font-black text-center text-[#812E8A]">
+          <h1 className="text-3xl font-black text-center text-[#812E8A]   sm:text-5xl">
             ¡Contactanos!
           </h1>
         </div>
       </div>
-      <div className="absolute right-0 top-20 h-[25vh] w-[40vw] bg-[#812E8A] rounded-l-3xl z-10"></div>
+      <div className="absolute right-0 top-20 sm:top-24 h-[25vh] w-[40vw] bg-[#812E8A] rounded-l-3xl z-10"></div>
       <div
         style={{ backgroundImage: "url(/ui/seccion5/greenwave.png)" }}
         className="m-10 w-[20vw] h-5 bg-contain bg-center bg-no-repeat"

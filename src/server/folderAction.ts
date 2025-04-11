@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 export const getAllFolders = async (
   schoolId?: string,
   level?: string,
+  year?: string,
   estrict: boolean = false,
   type: string = ""
 ) => {
@@ -16,10 +17,14 @@ export const getAllFolders = async (
       schoolId?: string;
       type?: string;
       level?: string;
+      year?: string;
     } = {};
 
     if (type !== "") {
       matchStage.type = type;
+    }
+    if (year !== undefined && year !== "") {
+      matchStage.year = year;
     }
     if (level !== undefined && level !== "") {
       matchStage.level = level;

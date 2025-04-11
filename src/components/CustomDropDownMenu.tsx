@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
-import { EllipsisVertical, Pencil, Trash2 } from "lucide-react";
+import { Ellipsis, EllipsisVertical, Pencil, Trash2 } from "lucide-react";
 
 function CustomDropDownMenu({
   onEditClick,
@@ -23,7 +23,7 @@ function CustomDropDownMenu({
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="rounded-full cursor-pointer p-2 hover:bg-background">
-          <EllipsisVertical />
+          <Ellipsis />
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56">

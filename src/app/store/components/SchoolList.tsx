@@ -35,12 +35,12 @@ function SchoolList({ schools }: { schools: ISchool[] }) {
   };
 
   return (
-    <div className="flex flex-row flex-wrap gap-5 w-full">
+    <div className="flex flex-row flex-wrap gap-5 w-full justify-center lg:justify-normal p-5">
       {schools?.map((school) => (
         <Button
           key={school._id}
           variant="outline"
-          className={`w-60 h-60 rounded-xl flex flex-col items-center gap-5 ${
+          className={`w-40 h-40 lg:w-60 lg:h-60 rounded-xl flex flex-col items-center gap-5 ${
             haveAccess(school._id) ? "" : "opacity-10"
           }`}
           onClick={() => {
@@ -53,7 +53,7 @@ function SchoolList({ schools }: { schools: ISchool[] }) {
             }
           }}
         >
-          <Avatar className="w-28 h-28">
+          <Avatar className="w-20 h-20 lg:w-28 lg:h-28">
             <AvatarImage src={school.imageUrl} alt={school.name} />
             <AvatarFallback></AvatarFallback>
           </Avatar>

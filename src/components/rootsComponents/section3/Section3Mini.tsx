@@ -11,27 +11,38 @@ const data = [
     id: 1,
     title: "Archivos digitales",
     text: "Al confirmar el pago le enviaremos el/los archivo elegidos.",
+    img: "/ui/products/13x18.jpeg",
   },
   {
     id: 2,
     title: "Carpeta",
     text: "Retrato y grupo en 20x25 cm + Multiple ( 2  billerera y 4 carnet de la misma foto de la carpeta).",
+    img: "/ui/products/13x18.jpeg",
   },
   {
     id: 3,
     title: "Foto libro",
     text: "En tapa dura con escudo del colegio, con retrato y grupo en 15x21 cm + Multiple ( 2  billerera y 4 carnet de la misma foto del foto-book) Todo en papel fotográfico.",
+    img: "/ui/products/books.jpeg",
   },
   {
     id: 4,
-    title: "Foto grupales y orlas",
+    title: "Foto grupales",
     text: "Formato tradicional, divertida u orla Archivo digital para compartir.",
+    img: "/ui/products/grupo.jpeg",
+  },
+  {
+    id: 5,
+    title: "orlas",
+    text: "Formato tradicional, divertida u orla Archivo digital para compartir.",
+    img: "/ui/products/orla.jpeg",
   },
 
   {
-    id: 5,
+    id: 6,
     title: "Copias papel",
-    text: "texto del producto copias de papel.",
+    text: "",
+    img: "/ui/products/13x18.jpeg",
   },
 ];
 
@@ -42,7 +53,7 @@ function Section3Mini() {
       id="productos"
     >
       <div className="mb-10 flex flex-col text-3xl pl-10">
-        <h1 className="font-bold text-[#F9AE48]">
+        <h1 className="font-bold text-[#F9AE48] sm:text-5xl">
           <span className="text-black">Conocé nuestros</span>
           <br />
           <span className="ml-3">productos</span>
@@ -72,12 +83,13 @@ function Section3Mini() {
                   <AccordionContent>
                     <div className="flex flex-col items-center justify-center">
                       <div className="flex flex-1 h-full w-full justify-center items-center">
-                        <div className="border-2">
+                        <div className="">
                           <Image
-                            src="/s-uhs.jpg"
-                            width={400}
-                            height={400}
-                            alt="section1"
+                            src={p.img}
+                            width={200}
+                            height={200}
+                            alt={p.title}
+                            className="w-60 h-60 object-contain"
                           />
                         </div>
                       </div>
