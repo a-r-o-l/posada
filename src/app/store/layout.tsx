@@ -65,7 +65,6 @@ export default async function RootLayout({
         </nav>
       </header>
       <main className="flex flex-col w-full">{children}</main>
-      <Toaster richColors={true} />
     </UserProvider>
   );
 }

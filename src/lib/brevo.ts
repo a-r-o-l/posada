@@ -23,7 +23,7 @@ export async function sendEmail({ subject, to, htmlContent }: params) {
   smtpEmail.subject = subject;
   smtpEmail.to = to;
   smtpEmail.htmlContent = htmlContent;
-  smtpEmail.sender = { name: "POSADA", email: "alonsoaroldev@gmail.com" };
+  smtpEmail.sender = { name: "POSADA", email: "contacto@fotosposada.com" };
 
   await apiInstance.sendTransacEmail(smtpEmail);
 }

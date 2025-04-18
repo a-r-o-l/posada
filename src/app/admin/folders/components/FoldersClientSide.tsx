@@ -76,15 +76,23 @@ function FoldersClientSide({
             <YearSelect url="/admin/folders" />
           </div>
         </div>
-        <div className="flex flex-row flex-wrap gap-5 w-full py-10">
-          {folders?.map((folder) => (
-            <FolderComponent
-              key={folder._id}
-              folder={folder}
-              onDeleteFolder={onDeleteFolder}
-              onEditFolder={onEditFolder}
-            />
-          ))}
+        <div className="flex flex-row flex-wrap gap-5 w-full py-10 mt-10">
+          {!!folders?.length ? (
+            folders?.map((folder) => (
+              <FolderComponent
+                key={folder._id}
+                folder={folder}
+                onDeleteFolder={onDeleteFolder}
+                onEditFolder={onEditFolder}
+              />
+            ))
+          ) : (
+            <div className="flex justify-center items-center w-full h-full">
+              <p className="text-muted-foreground text-sm">
+                No hay carpetas creadas
+              </p>
+            </div>
+          )}
         </div>
       </CardContent>
       <CreateFolderModal

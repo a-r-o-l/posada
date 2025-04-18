@@ -81,7 +81,7 @@ function SelectFileModal({
             Lista de productos disponibles para el archivo
           </DrawerDescription>
         </DrawerHeader>
-        <div className="flex flex-col w-full items-center gap-5 justify-center max-h-[600px] overflow-y-auto pt-80 md:flex-row md:pt-0">
+        <div className="flex flex-col w-full items-center gap-5 justify-center max-h-[600px] md:max-h-[700px] overflow-y-auto pt-80 md:flex-row md:pt-0 py-10">
           <div className="w-80 h-80 flex justify-center">
             {file?.imageUrl && (
               <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
@@ -95,8 +95,8 @@ function SelectFileModal({
               </AspectRatio>
             )}
           </div>
-          <div className="py-10">
-            <Table className="min-w-[600px]">
+          <div className="pb-10">
+            <Table className="max-w-[450px]">
               <TableHeader>
                 <TableRow>
                   <TableHead></TableHead>

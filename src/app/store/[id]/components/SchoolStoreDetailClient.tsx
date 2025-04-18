@@ -44,10 +44,10 @@ function SchoolStoreDetailClient({
   return (
     <div className="flex flex-col lg:flex-row h-full">
       <div className="flex flex-row items-center justify-evenly rounded-t-3xl bg-[#F0F1FF] lg:min-w-40 lg:h-full lg:flex-col lg:justify-start lg:rounded-l-3xl lg:rounded-r-none lg:gap-5 lg:w-40">
-        <Link href={`/store/${school._id}`}>
+        <Link href={school?._id ? `/store/${school._id}` : "#"}>
           <Image
-            src={school.imageUrl || ""}
-            alt={school.name}
+            src={school?.imageUrl || "/placeholderimg.jpg"}
+            alt={school?.name || "School Image"}
             width={150}
             height={150}
           />

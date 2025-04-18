@@ -44,7 +44,7 @@ function PaymentModal({
             <div className="flex flex-col justify-center items-center">
               <button
                 type="submit"
-                className="bg-blue-500 flex items-center justify-center gap-2 rounded-md p-2 px-4"
+                className="bg-blue-500 text-white flex items-center justify-center gap-2 rounded-md p-2 px-4"
                 onClick={async () => {
                   if (!sale) {
                     toast.error("No se pudo obtener la orden");

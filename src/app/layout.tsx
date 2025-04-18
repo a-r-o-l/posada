@@ -16,7 +16,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Fotos posada",
   description: "",
-  icons: "./loguito.png",
+  icons: {
+    icon: "/loguito.png", // Move icon to public folder
+  },
 };
 
 export default function RootLayout({
@@ -29,8 +31,8 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
-        {children}
-        <Toaster richColors={true} />
+        <main className="flex-1">{children}</main>
+        <Toaster richColors />
       </body>
     </html>
   );

@@ -80,13 +80,13 @@ function Section3() {
             ))}
           </div>
           <div className="flex flex-col lg:flex-row items-center justify-center lg:py-20">
-            <div className="border-2">
+            <div className="border-4 border-black rounded-xl">
               <Image
                 src={selected.img}
-                width={300}
-                height={300}
+                width={200}
+                height={200}
                 alt={selected.title}
-                className="w-full h-full object-contain"
+                className="object-contain rounded-lg"
               />
             </div>
             <div className="flex flex-col h-full mt-10 lg:m-0 px-10 lg:px-20 max-w-[30vw] pt-10">
