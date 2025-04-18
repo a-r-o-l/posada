@@ -20,7 +20,7 @@ function FileComponent({
     >
       <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
         <Image
-          src={file?.imageUrl || ""}
+          src={file?.imageUrl || "/placeholderimg.jpg"}
           alt={file?.title}
           layout="fill"
           objectFit="contain"

@@ -45,7 +45,7 @@ function ShowImgModal({
             <div className="flex justify-center">
               <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
                 <Image
-                  src={img?.imageUrl || ""}
+                  src={img?.imageUrl || "/placeholderimg.jpg"}
                   alt={img?.title}
                   layout="fill"
                   objectFit="contain"

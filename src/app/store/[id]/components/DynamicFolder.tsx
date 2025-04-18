@@ -41,7 +41,7 @@ function DynamicFolder({
       <Image src={field} alt={title} width={width} height={height} />
       <div className="absolute inset-0 flex flex-col items-center justify-center">
         <div className="w-[80%] px-2">
-          <h1 className="text-center font-black text-base line-clamp-2">
+          <h1 className="text-center font-black lg:text-base line-clamp-2 text-xs">
             {nameParser(title)}
           </h1>
           <p className="text-center font-thin text-base text-foreground line-clamp-2 leading-4">

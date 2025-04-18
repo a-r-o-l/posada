@@ -55,7 +55,7 @@ function Section4() {
         className="w-[10vw] h-[1vh] md:h-[4vh] bg-contain bg-center bg-no-repeat"
       ></div>
       <div>
-        <h1 className="text-4xl font-black text-center lg:text-start lg:ml-20  mt-10 sm:text-5xl lg:text-6xl">
+        <h1 className="text-3xl font-black text-center lg:text-start lg:ml-20  mt-10 sm:text-5xl lg:text-6xl">
           <span className="text-[#1D1D1B]">Confian en</span>
           <span className="text-[#AC292F] ml-3">Nosotros</span>
         </h1>

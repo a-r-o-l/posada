@@ -55,7 +55,7 @@ function SchoolsSelect({
               <SelectItem key={school._id} value={school._id!}>
                 <div className="flex items-center justify-between flex-row gap-2 py-3">
                   <Image
-                    src={school?.imageUrl || ""}
+                    src={school?.imageUrl || "/placeholderimg.jpg"}
                     alt={school.name!}
                     width={50}
                     height={50}

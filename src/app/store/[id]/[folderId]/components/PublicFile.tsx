@@ -13,14 +13,14 @@ function PublicFile({
   return (
     <div
       key={file._id}
-      className="w-40 flex justify-center items-center rounded-md opacity-70 hover:opacity-100 cursor-pointer"
+      className="w-32 lg:w-40 flex justify-center items-center rounded-md opacity-70 hover:opacity-100 cursor-pointer"
       onClick={() => {
         onClick(file);
       }}
     >
       <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
         <Image
-          src={file?.imageUrl || ""}
+          src={file?.imageUrl || "/placeholderimg.jpg"}
           alt={file?.title}
           layout="fill"
           objectFit="contain"

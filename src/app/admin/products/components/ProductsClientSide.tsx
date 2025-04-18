@@ -123,10 +123,8 @@ function ProductsClientSide({
                         key={product._id}
                         onClick={() => setSelectedProduct(product)}
                         className={`${
-                          selectedProduct?._id === product._id
-                            ? "bg-blue-950"
-                            : ""
-                        }`}
+                          selectedProduct?._id === product._id ? "bg-muted" : ""
+                        } hover:cursor-pointer`}
                       >
                         <TableCell className="w-96 truncate max-w-96">
                           {product.name}

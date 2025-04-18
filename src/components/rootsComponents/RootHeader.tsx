@@ -37,9 +37,11 @@ function RootHeader() {
               <Link href="/signin" className="text-base lg:block">
                 Iniciar sesión
               </Link>
-              <Button className="bg-[#139FDC] rounded-full w-28 h-12 text-base">
-                Registrate
-              </Button>
+              <Link href="/signup" className="text-base lg:block">
+                <Button className="bg-[#139FDC] rounded-full w-28 h-12 text-base">
+                  Registrate
+                </Button>
+              </Link>
             </div>
           </div>
         </nav>

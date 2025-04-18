@@ -77,7 +77,7 @@ function CartItemsList() {
                     >
                       <AspectRatio ratio={21 / 9}>
                         <Image
-                          src={item?.fileImageUrl || ""}
+                          src={item?.fileImageUrl || "/placeholderimg.jpg"}
                           alt={item?.fileTitle}
                           layout="fill"
                           objectFit="contain"
@@ -169,7 +169,7 @@ function CartItemsList() {
                 <>
                   <button
                     type="submit"
-                    className="bg-blue-500 flex items-center justify-center gap-2 rounded-md p-2 px-4"
+                    className="bg-blue-500 text-white flex items-center justify-center gap-2 rounded-md p-2 px-4"
                   >
                     <MercadoPago className="w-6 h-6" />
                     Pagar con Mercado Pago

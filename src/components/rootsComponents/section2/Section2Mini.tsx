@@ -6,7 +6,7 @@ function Section2Mini() {
     <div className="flex flex-col w-full relative lg:hidden" id="servicio">
       <div className="flex flex-row justify-between w-full">
         <div className="flex justify-between w-full">
-          <div className="flex flex-col text-3xl pl-5 leading-none">
+          <div className="flex flex-col text-3xl sm:text-5xl pl-5 leading-none">
             <h1 className="font-black text-[#1D1D1B] leading-none">¡Hace tu</h1>
             <h1 className="font-black text-[#8DB946] leading-none ml-10">
               pedido!
@@ -27,11 +27,11 @@ function Section2Mini() {
       </div>
       <div className="w-full h-full relative place-items-center pt-10">
         <Image
-          src="/ui/seccion2/stepper.png"
+          src="/ui/seccion2/ministepper.png"
           width={5000}
           height={500}
           alt="section1"
-          className="w-[450px] sm:w-[90vw] md:w-[90vw] lg:w-[90vw] xl:w-[80vw] h-auto relative z-20"
+          className="w-[450px] sm:w-[70vw] h-auto relative z-20"
         />
         <Image
           src="/ui/seccion2/path75.png"

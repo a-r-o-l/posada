@@ -15,7 +15,7 @@ import { Mail } from "lucide-react";
 import InstagramLogo from "@/icons/Igsvg";
 import FacebookLogo from "@/icons/facebooksvg";
 
-const ready = false;
+const ready = true;
 
 function page() {
   if (ready) {

@@ -34,6 +34,12 @@ import { Badge } from "@/components/ui/badge";
 import CustomDropDownMenu from "@/components/CustomDropDownMenu";
 import CreateSchoolModal from "./CreateSchoolModal";
 import SeveralStudentsModal from "./SeveralStudentsModal";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 function StudentsClientSide({
   schools,
@@ -88,7 +94,7 @@ function StudentsClientSide({
                       variant={
                         selectedSchool === school._id ? "secondary" : "outline"
                       }
-                      className="w-full justify-between text-left mb-2 py-10"
+                      className="w-full justify-between mb-2 py-10 flex"
                       onClick={() => {
                         const currentUrl = new URL(window.location.href);
                         const params = new URLSearchParams(currentUrl.search);
@@ -99,23 +105,32 @@ function StudentsClientSide({
                         );
                       }}
                     >
-                      <div className="flex items-center gap-5">
-                        <Avatar>
-                          <AvatarImage
-                            src={school.imageUrl}
-                            alt={school.name}
-                          />
-                          <AvatarFallback>
-                            {initialsParser(school?.name || "")}
-                          </AvatarFallback>
-                        </Avatar>
-
-                        <div>
-                          <div className="font-semibold">{school.name}</div>
-                          <div className="text-sm text-gray-500">
-                            {school.name}
-                          </div>
-                        </div>
+                      <div className="flex justify-center w-full items-center">
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Avatar className="h-16 w-16">
+                                <AvatarImage
+                                  src={school.imageUrl}
+                                  alt={school.name}
+                                />
+                                <AvatarFallback>
+                                  {initialsParser(school?.name || "")}
+                                </AvatarFallback>
+                              </Avatar>
+                            </TooltipTrigger>
+                            <TooltipContent className="border border-black bg-background">
+                              <div className="min-w-14 overflow-hidden">
+                                <div className="font-semibold text-black">
+                                  {school.name}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {school.name}
+                                </div>
+                              </div>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
                       </div>
                       <CustomDropDownMenu
                         onEditClick={() => {}}

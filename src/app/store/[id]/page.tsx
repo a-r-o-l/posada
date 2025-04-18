@@ -7,12 +7,18 @@ export default async function page({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ level?: string }>;
+  searchParams: Promise<{ level?: string; year?: string }>;
 }) {
   const param = await params;
   const sp = await searchParams;
   const { school: selectedSchool } = await getSchool(param.id);
-  const { folders } = await getAllFolders(param.id, sp.level, true, "parent");
+  const { folders } = await getAllFolders(
+    param.id,
+    sp.level,
+    sp.year,
+    true,
+    "parent"
+  );
 
   return (
     <div className="p-4 w-full bg-[#139FDC] h-[90vh]">

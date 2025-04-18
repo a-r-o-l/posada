@@ -4,23 +4,13 @@ import { useCacheSchools } from "@/zustand/useCacheSchools";
 import React, { useEffect, useState } from "react";
 import SchoolPasswordModal from "./SchoolPasswordModal";
 import { IFolder } from "@/models/Folder";
-import Folder from "./Folder";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@/context/UserContext";
 import Image from "next/image";
 import DynamicFolder from "./DynamicFolder";
 import Link from "next/link";
 import BuyTutorial from "./BuyTutorial";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Calendar } from "lucide-react";
+import DateSelect from "./DateSelect";
 
 function SchoolStoreDetailClient({
   school,
@@ -38,7 +28,6 @@ function SchoolStoreDetailClient({
   const { user } = useUser();
 
   const [needAccess, setNeedAccess] = useState(false);
-  const [year, setYear] = useState("");
 
   useEffect(() => {
     if (!accesses.includes(school._id) && school.isPrivate) {
@@ -55,10 +44,10 @@ function SchoolStoreDetailClient({
   return (
     <div className="flex flex-col lg:flex-row h-full">
       <div className="flex flex-row items-center justify-evenly rounded-t-3xl bg-[#F0F1FF] lg:min-w-40 lg:h-full lg:flex-col lg:justify-start lg:rounded-l-3xl lg:rounded-r-none lg:gap-5 lg:w-40">
-        <Link href={`/store/${school._id}`}>
+        <Link href={school?._id ? `/store/${school._id}` : "#"}>
           <Image
-            src={school.imageUrl || ""}
-            alt={school.name}
+            src={school?.imageUrl || "/placeholderimg.jpg"}
+            alt={school?.name || "School Image"}
             width={150}
             height={150}
           />
@@ -97,27 +86,9 @@ function SchoolStoreDetailClient({
           onClick={() => handleClick("eventos")}
         />
       </div>
-      <div className="flex flex-col h-full w-full bg-[#F0F1FF] border-t-8 rounded-b-3xl lg:border-l-8 lg:border-t-0 border-[#139FDC] p-5 lg:rounded-r-3xl">
-        <div className="w-full flex justify-end items-end absolute right-5">
-          <div className="w-1/4 px-5 text-center">
-            <Label>Seleccione el año</Label>
-            <div className="flex items-center gap-2">
-              <Calendar size={24} />
-              <Select value={year} onValueChange={setYear}>
-                <SelectTrigger className="border-[#139FDC] border-2">
-                  <SelectValue>{year}</SelectValue>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="2024">2024</SelectItem>
-                    <SelectItem value="2025">2025</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-        </div>
+      <div className="flex flex-col h-full w-full bg-[#F0F1FF] border-t-8 rounded-b-3xl lg:border-l-8 lg:border-t-0 border-[#139FDC] p-5 lg:rounded-r-3xl lg:rounded-l-none">
         <BuyTutorial />
+        <DateSelect url={`/store/${school._id}`} />
         <div className="flex flex-wrap gap-5 p-5 h-full w-full rounded-3xl items-start border-2 border-[#139FDC]">
           {!!level ? (
             folders.length ? (

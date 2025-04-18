@@ -55,11 +55,11 @@ function FolderStoreDetailClient({
   };
 
   return (
-    <div className="flex h-full">
-      <div className="flex flex-col items-center gap-10 p-10 bg-[#F0F1FF] h-full rounded-l-3xl">
+    <div className="flex flex-col lg:flex-row h-full">
+      <div className="flex flex-row items-center justify-evenly rounded-t-3xl bg-[#F0F1FF] lg:min-w-40 lg:h-full lg:flex-col lg:justify-start lg:rounded-l-3xl lg:rounded-r-none lg:gap-5 lg:w-40">
         <Link href={`/store/${school._id}`}>
           <Image
-            src={school.imageUrl || ""}
+            src={school.imageUrl || "/placeholderimg.jpg"}
             alt={school.name}
             width={150}
             height={150}
@@ -85,10 +85,23 @@ function FolderStoreDetailClient({
         />
       </div>
 
-      <div className="flex flex-wrap gap-5 p-10 bg-[#F0F1FF] w-full rounded-r-3xl items-start border-l-8 border-[#139FDC]">
-        {folder?.files?.map((file) => (
-          <PublicFile file={file} key={file._id} onClick={onClickFile} />
-        ))}
+      <div
+        className="flex flex-wrap gap-5 p-10 bg-[#F0F1FF] w-full
+      border-t-8
+      lg:border-t-0
+      lg:rounded-r-3xl items-start lg:border-l-8 border-[#139FDC] h-full overflow-y-auto justify-center lg:justify-normal"
+      >
+        {!!folder.files.length ? (
+          folder?.files?.map((file) => (
+            <PublicFile file={file} key={file._id} onClick={onClickFile} />
+          ))
+        ) : (
+          <div className="flex flex-1 justify-center items-center h-full">
+            <p className="text-muted-foreground">
+              No hay fotos en esta carpeta
+            </p>
+          </div>
+        )}
       </div>
       <SelectFileModal
         open={!!fileModal}
