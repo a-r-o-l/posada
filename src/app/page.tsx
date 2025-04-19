@@ -24,7 +24,6 @@ function page() {
         <RootHeader />
         <MiniRootHeader />
         <div className="py-20" id="quienes-somos">
-          a
           <Section1 />
           <Section1Mini />
           <Section2 />
