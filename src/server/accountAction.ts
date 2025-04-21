@@ -47,6 +47,52 @@ export const createAccount = async (data: FormData, admin: boolean = false) => {
   }
 };
 
+export const changeDisabled = async (id: string, value?: boolean) => {
+  console.log(value);
+  try {
+    await dbConnect();
+
+    // Log antes de la actualización
+    console.log("ID de cuenta a actualizar:", id);
+
+    // Intentar con updateOne primero
+    const result = await models.Account.updateOne(
+      { _id: id },
+      { disabled: false }
+    );
+
+    console.log("Resultado de updateOne:", result);
+
+    // Verificar si se actualizó
+    const updatedAccount = await models.Account.findById(id).lean();
+
+    if (!updatedAccount) {
+      console.error("No se pudo encontrar la cuenta después de actualizar");
+      return {
+        success: false,
+        message: "Error al actualizar la cuenta",
+        account: null,
+      };
+    }
+
+    console.log("Estado de la cuenta después de actualizar:", updatedAccount);
+
+    revalidatePath("/admin/accounts");
+    return {
+      success: true,
+      message: "Cuenta actualizada correctamente.",
+      account: JSON.parse(JSON.stringify(updatedAccount)),
+    };
+  } catch (error) {
+    console.error("Error completo:", error);
+    return {
+      success: false,
+      message: "Error al actualizar la cuenta, intente nuevamente.",
+      account: null,
+    };
+  }
+};
+
 export const getAllAccounts = async () => {
   try {
     await dbConnect();

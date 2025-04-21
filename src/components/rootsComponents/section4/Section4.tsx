@@ -3,43 +3,43 @@ import SchoolsCarrousel from "./SchoolsCarrousel";
 const data = [
   {
     id: 1,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/BDS.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/BDS+escudo.jpg",
   },
   {
     id: 2,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/CRISTOFOLO+COLOMBO.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/CRISTOFOLO+COLOMBO.png",
   },
   {
     id: 3,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/FDS.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/florida100.jpeg",
   },
   {
     id: 4,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/FRANKLIN.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/FRANKLIN.png",
   },
   {
     id: 5,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/JACARANDA.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/JACA+nuevo+logo-jaca-tressecciones-trescolores-CV.png",
   },
   {
     id: 6,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/MORULI.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/moruli60.jpeg",
   },
   {
     id: 7,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/NTRA+SRA+MECEDES.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/escudo+garcia+tranparente.jpg",
   },
   {
     id: 8,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/SAINT+GEORGES.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/SAINT+GEORGES.png",
   },
   {
     id: 9,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/STANFORD+COLLEGE.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/STANFORD+COLLEGE.png",
   },
   {
     id: 10,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/schools/UHS.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/uhs.PNG",
   },
 ];
 

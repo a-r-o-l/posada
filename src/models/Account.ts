@@ -17,6 +17,7 @@ export interface IAccount extends Document {
   availableGrades: string[];
   schoolId?: string;
   verified: boolean;
+  disabled?: boolean;
 }
 
 export interface IChildren {
@@ -67,6 +68,7 @@ const AccountSchema: Schema = new Schema(
     availableGrades: { type: [Schema.ObjectId], ref: "Grade", default: [] },
     verified: { type: Boolean, default: false },
     schoolId: { type: Schema.ObjectId, ref: "School" },
+    disabled: { type: Boolean, default: false },
   },
   {
     timestamps: false,

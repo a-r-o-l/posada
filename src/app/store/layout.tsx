@@ -1,4 +1,3 @@
-import { Toaster } from "sonner";
 import { IUser, UserProvider } from "@/context/UserContext";
 import { auth } from "@/auth";
 import { Session } from "next-auth";

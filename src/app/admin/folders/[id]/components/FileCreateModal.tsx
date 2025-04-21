@@ -100,7 +100,7 @@ function FileCreateModal({
     canvas.height = height;
     ctx.drawImage(img, 0, 0, width, height);
 
-    const fontSize = 150;
+    const fontSize = 100;
     ctx.font = `${fontSize}px Arial`;
     ctx.fillStyle = `rgba(255, 255, 255, 0.8)`;
     ctx.textAlign = "center";
@@ -191,7 +191,15 @@ function FileCreateModal({
   }, [open]);
 
   return (
-    <Dialog open={open} onOpenChange={onClose}>
+    <Dialog
+      open={open}
+      onOpenChange={() => {
+        if (loading || processing) {
+          return;
+        }
+        onClose();
+      }}
+    >
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Subir archivos</DialogTitle>
@@ -268,7 +276,17 @@ function FileCreateModal({
             onClick={handleSubmit}
             classname="w-40"
           />
-          <Button variant="outline" className="w-40" onClick={onClose}>
+          <Button
+            variant="outline"
+            className="w-40"
+            onClick={() => {
+              if (loading || processing) {
+                return;
+              }
+              onClose();
+            }}
+            disabled={loading || processing}
+          >
             Cancelar
           </Button>
         </div>

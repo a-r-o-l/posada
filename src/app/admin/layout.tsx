@@ -1,4 +1,3 @@
-import { Toaster } from "sonner";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
 import { IUser, UserProvider } from "@/context/UserContext";
@@ -51,7 +50,6 @@ export default async function RootLayout({
             </div>
             {children}
           </main>
-          <Toaster richColors={true} />
         </SidebarProvider>
       </div>
     </UserProvider>

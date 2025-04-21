@@ -23,6 +23,9 @@ import {
 import PasswordInput from "@/components/PasswordInput";
 import CreateAccountModal from "./CreateAccountModal";
 import { Badge } from "@/components/ui/badge";
+import { Switch } from "@/components/ui/switch";
+import { changeDisabled } from "@/server/accountAction";
+import { toast } from "sonner";
 
 function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
   const [selectedAccount, setSelectedAccount] =
@@ -71,6 +74,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
         </div>
         <Button onClick={() => setOpenAccountModal(true)}>Crear cuenta</Button>
       </CardHeader>
+
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
@@ -82,15 +86,19 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
             <CardContent>
               <ScrollArea className="h-[500px]">
                 {accounts?.map((account) => (
-                  <Button
+                  <div
+                    role="button"
                     key={account._id}
-                    variant={
+                    className={`flex items-center justify-between w-full p-4 mb-2 rounded-md border ${
                       selectedAccount?._id === account._id
-                        ? "secondary"
-                        : "outline"
-                    }
-                    className="w-full justify-start text-left mb-2 py-10"
-                    onClick={() => setSelectedAccount(account)}
+                        ? "bg-secondary"
+                        : "bg-background hover:bg-accent"
+                    }`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      setSelectedAccount(account);
+                    }}
                   >
                     <div className="flex items-center space-x-2 w-full justify-between">
                       <div className="flex items-center gap-5">
@@ -109,7 +117,19 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                       </div>
                       <div className="w-full h-full flex items-center justify-end"></div>
                     </div>
-                  </Button>
+                    <Switch
+                      checked={!account.disabled}
+                      onCheckedChange={async () => {
+                        const response = await changeDisabled(
+                          account._id,
+                          !account.disabled
+                        );
+                        if (response.success) {
+                          toast.success(response.message);
+                        }
+                      }}
+                    />
+                  </div>
                 ))}
               </ScrollArea>
             </CardContent>
@@ -152,35 +172,37 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                       />
                     </div>
                   </div>
-                  <div className="w-full">
-                    <p className="font-black text-base">Menores a cargo</p>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>nombre</TableHead>
-                          <TableHead>apellido</TableHead>
-                          <TableHead>Escuela</TableHead>
-                          <TableHead>curso</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {selectedAccount.children.map(
-                          (child: IChildrenPopulated) => (
-                            <TableRow
-                              key={`${child.name}${child.lastname}${child.gradeId}`}
-                            >
-                              <TableCell>{child.name}</TableCell>
-                              <TableCell>{child.lastname}</TableCell>
-                              <TableCell>{child.schoolId.name}</TableCell>
-                              <TableCell>
-                                {child.gradeId.grade} {child.gradeId.division}
-                              </TableCell>
-                            </TableRow>
-                          )
-                        )}
-                      </TableBody>
-                    </Table>
-                  </div>
+                  {selectedAccount?.role !== "admin" && (
+                    <div className="w-full">
+                      <p className="font-black text-base">Menores a cargo</p>
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>nombre</TableHead>
+                            <TableHead>apellido</TableHead>
+                            <TableHead>Escuela</TableHead>
+                            <TableHead>curso</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {selectedAccount.children.map(
+                            (child: IChildrenPopulated) => (
+                              <TableRow
+                                key={`${child.name}${child.lastname}${child.gradeId}`}
+                              >
+                                <TableCell>{child.name}</TableCell>
+                                <TableCell>{child.lastname}</TableCell>
+                                <TableCell>{child.schoolId.name}</TableCell>
+                                <TableCell>
+                                  {child.gradeId.grade} {child.gradeId.division}
+                                </TableCell>
+                              </TableRow>
+                            )
+                          )}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center justify-center h-full">

@@ -30,7 +30,7 @@ const data = [
   },
   {
     id: 5,
-    title: "orlas",
+    title: "Orlas",
     text: "Formato tradicional, divertida u orla Archivo digital para compartir.",
     img: "/ui/products/orla.jpeg",
   },

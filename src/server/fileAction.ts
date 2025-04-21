@@ -3,6 +3,7 @@
 import dbConnect from "@/lib/mongoose";
 import { deleteFileFromS3 } from "@/lib/uploadFileToS3";
 import models from "@/models";
+import { Types } from "mongoose";
 import { revalidatePath } from "next/cache";
 // import { revalidatePath } from "next/cache";
 
@@ -86,17 +87,32 @@ export const createManyFiles = async (
   try {
     await dbConnect();
 
+    const now = new Date();
     const files = filesData.map((file) => ({
       ...file,
       price: Number(file.price),
+      folderId: new Types.ObjectId(file.folderId),
+      createdAt: now,
+      updatedAt: now,
     }));
 
-    const newFiles = await models.File.insertMany(files);
+    const batchSize = 50;
+    const results = [];
+
+    for (let i = 0; i < files.length; i += batchSize) {
+      const batch = files.slice(i, i + batchSize);
+      const batchResults = await models.File.insertMany(batch, {
+        ordered: false,
+        lean: true,
+      });
+      results.push(...batchResults);
+    }
+
     revalidatePath(`/admin/folders/${folderId}`);
     return {
       success: true,
       message: "Archivos creados correctamente.",
-      files: JSON.parse(JSON.stringify(newFiles)),
+      files: JSON.parse(JSON.stringify(results)),
     };
   } catch (error) {
     console.error("Error creando los archivos:", error);
