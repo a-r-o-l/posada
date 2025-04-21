@@ -30,7 +30,7 @@ export default async function page({
         <div className="w-60">
           <AspectRatio ratio={1 / 1}>
             <Image
-              src={"/posadalogowhite.png"}
+              src={"/logoposada.png"}
               alt="Logo Posada"
               layout="fill"
               style={{ objectFit: "contain" }}

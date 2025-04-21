@@ -7,39 +7,39 @@ const data = [
   {
     id: 1,
     title: "Archivos digitales",
-    text: "Al confirmar el pago le enviaremos el/los archivo elegidos.",
+    text: "Al confirmar el pago le enviaremos el/los archivo elegidos a su whatsapp.",
     img: "/ui/products/13x18.jpeg",
   },
   {
     id: 2,
     title: "Carpeta",
-    text: "Retrato y grupo en 20x25 cm + Multiple ( 2  billerera y 4 carnet de la misma foto de la carpeta).",
-    img: "/ui/products/13x18.jpeg",
+    text: "Retrato y grupo en 20 x 25 cm + Multiple ( 2  billerera y 4 carnet de la misma foto de la carpeta).",
+    img: "/ui/products/carpetaweb.png",
   },
   {
     id: 3,
-    title: "Foto libro",
-    text: "En tapa dura con escudo del colegio, con retrato y grupo en 15x21 cm + Multiple ( 2  billerera y 4 carnet de la misma foto del foto-book) Todo en papel fotográfico.",
-    img: "/ui/products/books.jpeg",
+    title: "Foto Book",
+    text: "En tapa dura con escudo del colegio, con retrato y grupo en 15 x 21 cm + Multiple ( 2  billerera y 4 carnet de la misma foto del foto-book) Todo en papel fotográfico.",
+    img: "/ui/products/bookweb.png",
   },
   {
     id: 4,
     title: "Foto grupales",
-    text: "Formato tradicional, divertida u orla Archivo digital para compartir.",
+    text: "Formato tradicional, divertida u Orla, Archivo digital para compartir.",
     img: "/ui/products/grupo.jpeg",
   },
   {
     id: 5,
     title: "Orlas",
-    text: "Formato tradicional, divertida u orla Archivo digital para compartir.",
+    text: "Formato tradicional, divertida u Orla, Archivo digital para compartir.",
     img: "/ui/products/orla.jpeg",
   },
 
   {
     id: 6,
-    title: "Copias papel",
-    text: "",
-    img: "/ui/products/13x18.jpeg",
+    title: "Copias Impresas",
+    text: "Tamaño de impresión 13 x 18 cm, 15 x 21 cm, 20 x 25 cm y multiple (2 billetera + 4 carnet) del retrato elegido.",
+    img: "/ui/products/copiaspapelweb.png",
   },
 ];
 

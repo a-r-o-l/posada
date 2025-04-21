@@ -15,8 +15,8 @@ function Section1() {
             etapa irrepetible como es la escolar.
           </p>
           <p className="mt-10">
-            Si usted no posee la contraseña para ingresar a su institución, por
-            favor envíenos un mail a contacto@fotosposada.com.ar indicándonos
+            Si no tenes la contraseña para ingresar a tu institución, por favor
+            solicitela a nuestro whatsapp +54 911 5403-2747 indicándonos
             colegio, nombre y curso del alumno.
           </p>
         </div>
