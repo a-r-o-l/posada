@@ -8,16 +8,23 @@ function Section1Mini() {
         <div className="flex flex-col px-5">
           <h1 className="font-black text-2xl">¿Quienes somos?</h1>
           <p className="mt-5 text-xs">
-            Somos una empresa familiar, dedicada durante mas de 40 años a la
-            fotografía escolar, hemos entrado en sus hogares a través de los
-            colegios, que depositaron su confianza en nosotros, para poder tener
-            una memoria histórica gráfica y el mismo tiempo un recuerdo de una
-            etapa irrepetible como es la escolar.
+            Somos una empresa familiar con más de 40 años de experiencia en
+            fotografía escolar. A lo largo de estas décadas, tuvimos el honor de
+            entrar a sus hogares a través de las instituciones educativas que
+            confiaron en nosotros, permitiéndonos construir una memoria gráfica
+            de momentos únicos e irrepetibles: los años escolares.
           </p>
-          <p className="mt-5 text-xs">
-            Si no tenes la contraseña para ingresar a tu institución, por favor
-            solicitela a nuestro whatsapp +54 911 5403-2747 indicándonos
-            colegio, nombre y curso del alumno.
+          <p className="mt-5 font-bold text-sm">
+            ¿No tenés la contraseña para ingresar a tu colegio?
+          </p>
+          <p className="text-xs whitespace-pre-line leading-none">
+            {`
+              Escribinos por WhatsApp al +54 911 5403-2747\n 
+  indicando:\n
+  • Nombre del colegio\n
+  • Nombre del alumno\n
+  • Curso\n
+  Así podremos ayudarte rápidamente.`}
           </p>
         </div>
       </div>

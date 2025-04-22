@@ -48,7 +48,6 @@ export const createAccount = async (data: FormData, admin: boolean = false) => {
 };
 
 export const changeDisabled = async (id: string, value?: boolean) => {
-  console.log(value);
   try {
     await dbConnect();
 
@@ -58,7 +57,7 @@ export const changeDisabled = async (id: string, value?: boolean) => {
     // Intentar con updateOne primero
     const result = await models.Account.updateOne(
       { _id: id },
-      { disabled: false }
+      { disabled: value }
     );
 
     console.log("Resultado de updateOne:", result);

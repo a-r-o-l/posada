@@ -7,7 +7,7 @@ const data = [
   {
     id: 1,
     title: "Archivos digitales",
-    text: "Al confirmar el pago le enviaremos el/los archivo elegidos a su whatsapp.",
+    text: "Al confirmar el pago le enviaremos el/los archivo elegidos a tu whatsapp.",
     img: "/ui/products/13x18.jpeg",
   },
   {
@@ -19,26 +19,36 @@ const data = [
   {
     id: 3,
     title: "Foto Book",
-    text: "En tapa dura con escudo del colegio, con retrato y grupo en 15 x 21 cm + Multiple ( 2  billerera y 4 carnet de la misma foto del foto-book) Todo en papel fotográfico.",
+    text: `• Confeccionado 100% en papel fotográfico.
+• Incluye el retrato individual y la foto grupal.
+• Tapa dura con escudo del colegio.
+• Tamaño abierto: 20 x 30 cm.
+• 2 fotos tipo billetera y 4 tipo carnet del retrato elegido.
+`,
     img: "/ui/products/bookweb.png",
   },
   {
     id: 4,
-    title: "Foto grupales",
-    text: "Formato tradicional, divertida u Orla, Archivo digital para compartir.",
+    title: "Fotos grupales",
+    text: `Formato tradicional impreso.
+    Archivo digital para compartir.`,
     img: "/ui/products/grupo.jpeg",
   },
   {
     id: 5,
-    title: "Orlas",
-    text: "Formato tradicional, divertida u Orla, Archivo digital para compartir.",
+    title: "Orla",
+    text: `Orla impresa.
+    Archivo digital para compartir.`,
     img: "/ui/products/orla.jpeg",
   },
-
   {
     id: 6,
     title: "Copias Impresas",
-    text: "Tamaño de impresión 13 x 18 cm, 15 x 21 cm, 20 x 25 cm y multiple (2 billetera + 4 carnet) del retrato elegido.",
+    text: `Tamaño de impresión:
+    • 20 x 25 cm. 
+    • 15 x 21 cm. 
+    • 13 x 18 cm.
+    • multiple (2 billetera + 4 carnet) del retrato elegido.`,
     img: "/ui/products/copiaspapelweb.png",
   },
 ];
@@ -80,20 +90,22 @@ function Section3() {
             ))}
           </div>
           <div className="flex flex-col lg:flex-row items-center justify-center lg:py-20">
-            <div className="border-4 border-black rounded-xl">
+            <div className="border-8 border-gray-200 rounded-xl w-[400px] h-[300px]">
               <Image
                 src={selected.img}
-                width={200}
-                height={200}
+                width={300}
+                height={300}
                 alt={selected.title}
-                className="object-contain rounded-lg"
+                className="object-contain rounded-lg w-full h-full"
               />
             </div>
-            <div className="flex flex-col h-full mt-10 lg:m-0 px-10 lg:px-20 max-w-[30vw] pt-10">
-              <h1 className="font-black text-[#F9AE48] text-2xl">
+            <div className="flex flex-col h-full mt-10 lg:m-0 px-10 lg:px-20 max-w-[35vw] pt-10">
+              <h1 className="font-black text-[#F9AE48] text-3xl">
                 {selected.title}
               </h1>
-              <p className="">{selected.text}</p>
+              <p className="whitespace-pre-line mt-2 text-lg">
+                {selected.text}
+              </p>
             </div>
           </div>
         </div>

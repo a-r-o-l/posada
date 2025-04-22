@@ -1,5 +1,8 @@
 import { Payment } from "mercadopago";
 import api, { mercadopago } from "@/app/api";
+import { getSale } from "@/server/saleAction";
+import { sendEmail } from "@/lib/brevo";
+import { tahnksEmailTemplate } from "@/templates/thanksEmail";
 
 export async function POST(request: Request) {
   const body: { data: { id: string } } = await request.json();
@@ -20,14 +23,14 @@ export async function POST(request: Request) {
   if (payment.status === "approved") {
     formData.append("status", "approved");
     const res = await api.product.update(formData);
-    // const { sale: foundSale } = await getSale(sale._id);
-    // await sendEmail({
-    //   subject: "Compra Exitosa",
-    //   to: [
-    //     { name: foundSale.accountId.name, email: foundSale.accountId.email },
-    //   ],
-    //   htmlContent: tahnksEmailTemplate(foundSale),
-    // });
+    const { sale: foundSale } = await getSale(sale._id);
+    await sendEmail({
+      subject: "Compra Exitosa",
+      to: [
+        { name: foundSale.accountId.name, email: foundSale.accountId.email },
+      ],
+      htmlContent: tahnksEmailTemplate(foundSale),
+    });
 
     if (res.success) {
       return new Response(null, { status: 200 });

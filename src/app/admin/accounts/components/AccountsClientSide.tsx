@@ -117,18 +117,21 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                       </div>
                       <div className="w-full h-full flex items-center justify-end"></div>
                     </div>
-                    <Switch
-                      checked={!account.disabled}
-                      onCheckedChange={async () => {
-                        const response = await changeDisabled(
-                          account._id,
-                          !account.disabled
-                        );
-                        if (response.success) {
-                          toast.success(response.message);
-                        }
-                      }}
-                    />
+                    {account.role !== "admin" && (
+                      <Switch
+                        checked={account.disabled}
+                        onCheckedChange={async () => {
+                          const response = await changeDisabled(
+                            account._id,
+                            !account.disabled
+                          );
+                          if (response.success) {
+                            toast.success(response.message);
+                          }
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    )}
                   </div>
                 ))}
               </ScrollArea>

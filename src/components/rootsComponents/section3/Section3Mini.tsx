@@ -10,7 +10,7 @@ const data = [
   {
     id: 1,
     title: "Archivos digitales",
-    text: "Al confirmar el pago le enviaremos el/los archivo elegidos whatsapp.",
+    text: "Al confirmar el pago le enviaremos el/los archivo elegidos a tu whatsapp.",
     img: "/ui/products/13x18.jpeg",
   },
   {
@@ -22,26 +22,36 @@ const data = [
   {
     id: 3,
     title: "Foto Book",
-    text: "En tapa dura con escudo del colegio, con retrato y grupo en 15 x 21 cm + Multiple ( 2  billerera y 4 carnet de la misma foto del foto-book) Todo en papel fotográfico.",
+    text: `• Confeccionado 100% en papel fotográfico.
+• Incluye el retrato individual y la foto grupal.
+• Tapa dura con escudo del colegio.
+• Tamaño abierto: 20 x 30 cm.
+• 2 fotos tipo billetera y 4 tipo carnet del retrato elegido.
+`,
     img: "/ui/products/bookweb.png",
   },
   {
     id: 4,
-    title: "Foto grupales",
-    text: "Formato tradicional, divertida u Orla, Archivo digital para compartir.",
+    title: "Fotos grupales",
+    text: `Formato tradicional impreso.
+    Archivo digital para compartir.`,
     img: "/ui/products/grupo.jpeg",
   },
   {
     id: 5,
-    title: "Orlas",
-    text: "Formato tradicional, divertida u Orla, Archivo digital para compartir.",
+    title: "Orla",
+    text: `Orla impresa.
+    Archivo digital para compartir.`,
     img: "/ui/products/orla.jpeg",
   },
-
   {
     id: 6,
     title: "Copias Impresas",
-    text: "Tamaño de impresión 13 x 18 cm, 15 x 21 cm, 20 x 25 cm y multiple (2 billetera + 4 carnet) del retrato elegido.",
+    text: `Tamaño de impresión:
+    • 20 x 25 cm. 
+    • 15 x 21 cm. 
+    • 13 x 18 cm.
+    • multiple (2 billetera + 4 carnet) del retrato elegido.`,
     img: "/ui/products/copiaspapelweb.png",
   },
 ];
@@ -94,7 +104,7 @@ function Section3Mini() {
                         </div>
                       </div>
                       <div className="flex flex-col h-full mt-10 px-10 justify-center">
-                        <p className="">{p.text}</p>
+                        <p className="whitespace-pre-line">{p.text}</p>
                       </div>
                     </div>
                   </AccordionContent>

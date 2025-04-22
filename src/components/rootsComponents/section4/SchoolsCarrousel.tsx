@@ -61,16 +61,19 @@ function SchoolsCarrousel({
             duration: 2500,
           }}
         >
-          <CarouselContent className="-ml-2 md:-ml-4 shadow-none border-0">
+          <CarouselContent className="-ml-2 md:-ml-4 shadow-none border-0 py-5">
             {images.map((image) => (
               <CarouselItem key={image.id} className="pl-2 basis-1/3 mx-2">
-                <Image
-                  src={image.src}
-                  alt={`Gallery Image ${image.id + 1}`}
-                  width={200}
-                  height={200}
-                  className="object-contain w-[180px] h-[180px]"
-                />
+                <div className="relative w-[140px] aspect-square rounded-lg overflow-hidden">
+                  <Image
+                    src={image.src}
+                    alt={`Gallery Image ${image.id + 1}`}
+                    fill
+                    sizes="(max-width: 768px) 140px, 140px"
+                    className="object-cover"
+                    priority
+                  />
+                </div>
               </CarouselItem>
             ))}
           </CarouselContent>

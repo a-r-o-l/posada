@@ -1,10 +1,34 @@
 "use server";
 
 import { signIn } from "@/auth";
+import dbConnect from "@/lib/mongoose";
+import models from "@/models";
+import { IAccount } from "@/models/Account";
 import { AuthError } from "next-auth";
 
 export const login = async (email: string, password: string) => {
   try {
+    await dbConnect();
+    const account = (await models.Account.findOne({
+      email,
+    }).lean()) as IAccount | null;
+
+    console.log("account => ", account);
+
+    if (!account) {
+      return {
+        success: false,
+        message: "Cuenta no encontrada",
+      };
+    }
+
+    if (account?.disabled === false) {
+      return {
+        success: false,
+        message:
+          "Esta cuenta está deshabilitada. Por favor contacte al administrador.",
+      };
+    }
     const data = await signIn("credentials", {
       email,
       password,

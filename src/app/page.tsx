@@ -41,7 +41,7 @@ function page() {
               className="w-28 h-10 bg-contain bg-center bg-no-repeat"
             ></div>
           </div>
-          <div className="flex flex-col mt-4 gap-1">
+          {/* <div className="flex flex-col mt-4 gap-1">
             <p className="text-xs text-gray-400 underline whitespace-nowrap font-bold">
               Amigos:
             </p>
@@ -51,7 +51,7 @@ function page() {
             <p className="text-xs text-white whitespace-nowrap">
               www.webdemarcelo.com
             </p>
-          </div>
+          </div> */}
           <div className="flex flex-col mt-4 gap-1">
             <p className="text-xs text-gray-400 underline whitespace-nowrap font-bold">
               Contacto:
@@ -64,14 +64,14 @@ function page() {
               <WhatsAppLogo className="w-5 h-5" />
               <p className="text-white text-xs">+54 9 11 5403-2747</p>
             </div>
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <InstagramLogo className="w-5 h-5" />
               <p className="text-white text-xs">/fotosposada</p>
             </div>
             <div className="flex items-center gap-2">
               <FacebookLogo className="w-5 h-5" />
               <p className="text-white text-xs">/fotosposada</p>
-            </div>
+            </div> */}
           </div>
           <div className="flex flex-col mt-4 gap-1 text-end">
             <p className="text-xs text-muted-foreground">

@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Send } from "lucide-react";
 import React from "react";
 
 function Section5() {
@@ -27,11 +29,9 @@ function Section5() {
             <br />
             tuviste un problema con tu pedido o tenés alguna
             <br />
-            duda sobre nuestros servicios, rellena nuestro
+            duda sobre nuestros servicios, completa nuestro
             <br />
-            formulario y nos pondremos en contacto con usted
-            <br />
-            lo antes posible.
+            formulario y nos pondremos en contacto a la brevedad.
           </p>
           <div className="flex flex-col gap-5">
             <p>
@@ -53,6 +53,10 @@ function Section5() {
             <Input placeholder="Telefono" className="bg-[#D1D3E5] h-12" />
           </div>
           <Textarea placeholder="Mensaje" rows={10} className="bg-[#D1D3E5]" />
+          <Button className="bg-[#812E8A] rounded-full w-full h-10 hover:bg-[#812E8A] hover:opacity-85">
+            <Send />
+            Enviar
+          </Button>
         </div>
       </div>
       <div

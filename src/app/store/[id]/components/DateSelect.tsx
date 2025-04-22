@@ -29,7 +29,7 @@ function DateSelect({ url }: { url: string }) {
   }, [router, url, year]);
 
   return (
-    <div className="w-full flex justify-center items-end mb-5 lg:justify-end">
+    <div className="w-full flex justify-center items-end mb-5 lg:justify-start">
       <div className="w-96 px-5 text-center">
         <Label>Seleccione el año</Label>
         <div className="flex items-center gap-2">

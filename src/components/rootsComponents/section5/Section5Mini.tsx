@@ -28,8 +28,8 @@ function Section5Mini() {
             <p className="text-xs">
               Si tuviste inconvenientes a la hora de iniciar sesión, tuviste un
               problema con tu pedido o tenés alguna duda sobre nuestros
-              servicios, rellena nuestro formulario y nos pondremos en contacto
-              con usted lo antes posible.
+              servicios, completa nuestro formulario y nos pondremos en contacto
+              a la brevedad.
             </p>
             <div className="flex flex-col gap-5">
               <p className="text-xs [&_a]:no-underline [&_a]:text-inherit [&_a]:pointer-events-none">

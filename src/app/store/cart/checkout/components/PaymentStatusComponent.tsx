@@ -1,14 +1,19 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Frown, Smile } from "lucide-react";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import { useRouter } from "next/navigation";
 
 function PaymentStatusComponent({ status }: { status: boolean }) {
   const router = useRouter();
+  const [dimensions, setDimensions] = useState({ height: 0, width: 0 });
   const { height, width } = useWindowSize();
+
+  useEffect(() => {
+    setDimensions({ height, width });
+  }, [height, width]);
 
   const isSuccessful = useMemo(() => {
     return status;
@@ -18,7 +23,7 @@ function PaymentStatusComponent({ status }: { status: boolean }) {
     return (
       <div
         className="flex flex-col justify-center items-center text-center"
-        style={{ height: height - 200 }}
+        style={{ height: dimensions.height ? dimensions.height - 200 : "auto" }}
       >
         <div className="flex flex-col gap-5 w-3/4">
           <div className="flex justify-center items-center text-green-500">
@@ -56,7 +61,7 @@ function PaymentStatusComponent({ status }: { status: boolean }) {
   return (
     <div
       className="flex flex-col justify-center items-center text-center"
-      style={{ height: height - 200 }}
+      style={{ height: dimensions.height ? dimensions.height - 200 : "auto" }}
     >
       <div className="flex flex-col gap-5 w-3/4">
         <div className="flex justify-center items-center text-red-500">
@@ -67,7 +72,7 @@ function PaymentStatusComponent({ status }: { status: boolean }) {
           No se realizo correctamente el pago, la compra quedara como pendiente
           hasta que realices el pago.
           <br /> Puedes abonar en otro momento ingresando a{" "}
-          <span className="text-blue-500 underline">mis compras </span>
+          <span className="text-black font-black">{`mis compras`} </span>
           <br />
           desde la navegacion o en el boton ubicado abajo.
         </h3>

@@ -33,14 +33,17 @@ function UserAvatar({ user }: { user?: IUser }) {
             <DropdownMenuLabel>
               {user?.name} {user?.lastname}
             </DropdownMenuLabel>
-            <ThemeButton />
+            {/* <ThemeButton /> */}
           </div>
           <div className="px-2">
             <p className="text-xs text-gray-400">{user?.email}</p>
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
-            <DropdownMenuItem className="flex items-center justify-between">
+            <DropdownMenuItem
+              className="flex items-center justify-between"
+              disabled
+            >
               Cuenta
               <User />
             </DropdownMenuItem>

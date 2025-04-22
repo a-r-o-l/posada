@@ -15,7 +15,7 @@ const data = [
   },
   {
     id: 4,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/FRANKLIN.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/franklinnuevo.png",
   },
   {
     id: 5,
@@ -56,7 +56,7 @@ function Section4() {
       ></div>
       <div>
         <h1 className="text-3xl font-black text-center lg:text-start lg:ml-20  mt-10 sm:text-5xl lg:text-6xl">
-          <span className="text-[#1D1D1B]">Confian en</span>
+          <span className="text-[#1D1D1B]">Confían en</span>
           <span className="text-[#AC292F] ml-3">Nosotros</span>
         </h1>
       </div>
