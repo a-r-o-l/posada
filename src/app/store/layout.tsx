@@ -38,7 +38,7 @@ export default async function RootLayout({
     <UserProvider user={user}>
       <header className="shadow-md top-0 sticky z-50 bg-[#F0F1FF]">
         <nav className="flex flex-row items-center overflow-hidden px-5 h-[10vh]">
-          <Link href="/store" className="">
+          <Link href="/" className="">
             <div
               style={{ backgroundImage: "url(/logoposada.png)" }}
               className="w-40 h-20 bg-cover bg-center"

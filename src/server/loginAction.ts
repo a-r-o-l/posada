@@ -22,7 +22,7 @@ export const login = async (email: string, password: string) => {
       };
     }
 
-    if (account?.disabled === false) {
+    if (account?.disabled === true) {
       return {
         success: false,
         message:

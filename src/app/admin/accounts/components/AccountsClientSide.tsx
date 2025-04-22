@@ -119,7 +119,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                     </div>
                     {account.role !== "admin" && (
                       <Switch
-                        checked={account.disabled}
+                        checked={!account.disabled}
                         onCheckedChange={async () => {
                           const response = await changeDisabled(
                             account._id,
