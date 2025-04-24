@@ -56,7 +56,35 @@ function FolderStoreDetailClient({
 
   return (
     <div className="flex flex-col lg:flex-row h-full">
-      <div className="flex flex-row items-center justify-evenly rounded-t-3xl bg-[#F0F1FF] lg:min-w-40 lg:h-full lg:flex-col lg:justify-start lg:rounded-l-3xl lg:rounded-r-none lg:gap-5 lg:w-40">
+      <div className="flex flex-row items-center justify-evenly rounded-t-3xl bg-[#F0F1FF] lg:hidden">
+        <Link href={`/store/${school._id}`}>
+          <Image
+            src={school.imageUrl || "/placeholderimg.jpg"}
+            alt={school.name}
+            width={100}
+            height={100}
+          />
+        </Link>
+        <DynamicFolder
+          color={getFolderColor(folder.level)}
+          title={nameParser(folder.level)}
+          isOpened={true}
+          height={80}
+          width={80}
+          onClick={() =>
+            router.push(`/store/${school._id}?level=${folder.level}`)
+          }
+        />
+        <DynamicFolder
+          color="blue"
+          title={nameParser(folder.title)}
+          isOpened={true}
+          height={80}
+          width={80}
+          onClick={() => {}}
+        />
+      </div>
+      <div className="hidden bg-[#F0F1FF] items-center lg:flex lg:min-w-40 lg:h-full lg:flex-col lg:justify-start lg:rounded-l-3xl lg:rounded-r-none lg:gap-5 lg:w-40">
         <Link href={`/store/${school._id}`}>
           <Image
             src={school.imageUrl || "/placeholderimg.jpg"}

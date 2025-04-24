@@ -100,16 +100,16 @@ function SelectFileModal({
     <Drawer open={open} onOpenChange={onClose} dismissible={false}>
       <DrawerContent className="">
         <DrawerHeader>
-          <DrawerTitle className="text-center text-2xl">
+          <DrawerTitle className="text-center text-xl lg:text-2xl">
             {file?.title}
           </DrawerTitle>
-          <DrawerDescription className="text-center">
+          <DrawerDescription className="text-center text-xs lg:text-base">
             Lista de productos disponibles para el archivo
           </DrawerDescription>
         </DrawerHeader>
         <div className="h-full hidden flex-row w-full gap-5 justify-center overflow-y-auto lg:flex">
           <div className="h-[500px] flex items-center justify-center">
-            <div className="w-96 h-96 flex justify-center">
+            <div className="w-80 h-80 flex justify-center">
               {file?.imageUrl && (
                 <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
                   <Image
@@ -123,7 +123,7 @@ function SelectFileModal({
               )}
             </div>
           </div>
-          <div className="pb-10">
+          <div className="pb-5">
             <Table className="max-w-[450px]">
               <TableHeader>
                 <TableRow>
@@ -147,14 +147,11 @@ function SelectFileModal({
               </TableBody>
               <TableFooter>
                 <TableRow className="bg-gray-100">
-                  <TableCell
-                    colSpan={3}
-                    className="font-bold text-lg px-5 py-5"
-                  >
+                  <TableCell colSpan={3} className="font-bold text-lg px-5">
                     Total
                   </TableCell>
-                  <TableCell align="right" className="py-5">
-                    <Badge className="min-w-28 justify-start h-10 text-lg bg-black">
+                  <TableCell align="right" className="">
+                    <Badge className="min-w-28 justify-start text-lg bg-black">
                       ${" "}
                       {data
                         .map((item) => item.price * item.quantity)
@@ -176,7 +173,7 @@ function SelectFileModal({
           </div>
         </div>
         <div className="flex flex-col lg:hidden w-full justify-center items-center">
-          <div className="w-60 h-60 flex justify-center">
+          <div className="w-40 h-40 flex justify-center">
             {file?.imageUrl && (
               <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
                 <Image
@@ -189,8 +186,8 @@ function SelectFileModal({
               </AspectRatio>
             )}
           </div>
-          <div className="pb-10">
-            <Table className="max-w-[450px]">
+          <div className="pb-5">
+            <Table className="max-w-[450px] text-xs">
               <TableHeader>
                 <TableRow>
                   <TableHead></TableHead>
@@ -212,15 +209,15 @@ function SelectFileModal({
                 ))}
               </TableBody>
               <TableFooter>
-                <TableRow className="bg-gray-100">
-                  <TableCell
-                    colSpan={3}
-                    className="font-bold text-lg px-5 py-5"
-                  >
+                <TableRow className="">
+                  <TableCell colSpan={3} className="font-bold text-xs px-5">
                     Total
                   </TableCell>
-                  <TableCell align="right" className="py-5">
-                    <Badge className="min-w-28 justify-start h-10 text-lg bg-black">
+                  <TableCell align="right" className="">
+                    <Badge
+                      className="min-w-28 justify-start text-xs"
+                      variant="outline"
+                    >
                       ${" "}
                       {data
                         .map((item) => item.price * item.quantity)
@@ -231,11 +228,15 @@ function SelectFileModal({
                 </TableRow>
               </TableFooter>
             </Table>
-            <div className="flex justify-evenly mt-10">
-              <Button className="w-40" onClick={addHandler}>
+            <div className="flex justify-evenly mt-5">
+              <Button className="w-32 text-xs" onClick={addHandler}>
                 Agregar
               </Button>
-              <Button className="w-40" onClick={onClose} variant="outline">
+              <Button
+                className="w-32 text-xs"
+                onClick={onClose}
+                variant="outline"
+              >
                 Cerrar
               </Button>
             </div>

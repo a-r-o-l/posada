@@ -13,7 +13,7 @@ function PublicFile({
   return (
     <div
       key={file._id}
-      className="w-32 lg:w-40 flex justify-center items-center rounded-md opacity-100 hover:opacity-80 cursor-pointer"
+      className="w-20 lg:w-40 flex justify-center items-center rounded-md opacity-100 hover:opacity-80 cursor-pointer"
       onClick={() => {
         onClick(file);
       }}

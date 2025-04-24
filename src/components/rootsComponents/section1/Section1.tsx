@@ -9,7 +9,7 @@ function Section1() {
         <div className="flex flex-row lg:w-full h-full justify-between items-center gap-20">
           <div className="rounded-3xl w-[1200px] h-[300px] overflow-hidden">
             <Image
-              src={"/ui/seccion1/img1.jpg"}
+              src={"/ui/seccion1/img4.jpeg"}
               width={1000}
               height={300}
               alt="Quienes somos"
