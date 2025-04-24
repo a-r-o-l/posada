@@ -17,6 +17,7 @@ import { toast } from "sonner";
 const initialValues = {
   grade: "",
   division: "",
+  year: new Date().getFullYear().toString(),
 };
 
 function StudentModal({
@@ -40,6 +41,7 @@ function StudentModal({
       const formData = new FormData();
       formData.append("grade", values.grade);
       formData.append("division", values.division);
+      formData.append("year", values.year);
       formData.append("displayName", `${values.grade} ${values.division}`);
       formData.append("schoolId", school);
       const res = await createGrade(formData);
@@ -87,6 +89,13 @@ function StudentModal({
               }
             />
           </div>
+          <div className="space-y-2">
+            <Label>Año</Label>
+            <Input
+              value={values.year}
+              onChange={(e) => setValues({ ...values, year: e.target.value })}
+            />
+          </div>
         </div>
 
         <div className="flex w-full justify-evenly mt-10 gap-5">
@@ -94,7 +103,7 @@ function StudentModal({
             title="Crear"
             loading={loading}
             onClick={handleSubmit}
-            disabled={!values.grade || !values.division}
+            disabled={!values.grade || !values.division || !values.year}
             classname="w-40"
           />
           <Button variant="outline" className="w-40" onClick={onClose}>

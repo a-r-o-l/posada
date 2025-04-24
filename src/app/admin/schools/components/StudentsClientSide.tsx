@@ -40,6 +40,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import DateSelectAdminSchools from "./DateSelectAdminSchools";
 
 function StudentsClientSide({
   schools,
@@ -67,11 +68,16 @@ function StudentsClientSide({
 
   return (
     <Card className="w-full">
-      <CardHeader>
-        <div className="flex items-center justify-between w-full">
-          <CardTitle>Alumnos</CardTitle>
+      <CardHeader className="flex flex-row items-center">
+        <div className="w-full">
+          <div className="flex items-center justify-between w-full">
+            <CardTitle>Alumnos</CardTitle>
+          </div>
+          <CardDescription>Ver y administrar alumnos</CardDescription>
         </div>
-        <CardDescription>Ver y administrar alumnos</CardDescription>
+        <div className="">
+          <DateSelectAdminSchools url={`/admin/schools`} />
+        </div>
       </CardHeader>
       <CardContent>
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">

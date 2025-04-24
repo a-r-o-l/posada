@@ -6,6 +6,7 @@ export interface IGrade extends Document {
   division: string;
   displayName: string;
   schoolId: string;
+  year: string;
 }
 
 export type PartialGrade = Partial<IGrade>;
@@ -16,6 +17,7 @@ const GradeSchema: Schema = new Schema(
     division: { type: String, required: true },
     displayName: { type: String },
     schoolId: { type: Schema.ObjectId, ref: "School", required: true },
+    year: { type: String },
   },
   {
     timestamps: false,

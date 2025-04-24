@@ -1,18 +1,21 @@
 import React from "react";
 import StudentsClientSide from "./components/StudentsClientSide";
 import { getAllSchools } from "@/server/schoolAction";
-import { getAllGradesBySchool } from "@/server/gradeAction";
+import { getAllGradesBySchoolAndYear } from "@/server/gradeAction";
 import { getAllStudentByGrade } from "@/server/studentAction";
 
 export default async function page({
   searchParams,
 }: {
-  searchParams: Promise<{ school: string; grade: string }>;
+  searchParams: Promise<{ school: string; grade: string; year: string }>;
 }) {
   const search = await searchParams;
 
   const { schools } = await getAllSchools();
-  const { grades } = await getAllGradesBySchool(search.school);
+  const { grades } = await getAllGradesBySchoolAndYear(
+    search.school,
+    search.year
+  );
   const { students } = await getAllStudentByGrade(search.grade);
 
   return (

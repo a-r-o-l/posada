@@ -58,17 +58,17 @@ function SelectFileTableRow({
       <TableCell className="flex justify-between items-center">
         <Button
           size="icon"
-          className="rounded-full p-0 w-7 h-7"
-          variant="ghost"
+          className="rounded-full p-0 w-7 h-7 bg-red-300 text-black hover:bg-red-600 hover:text-white"
+          variant="outline"
           onClick={onMinus}
         >
           <Minus />
         </Button>
-        {item.quantity}
+        <p className="font-black">{item.quantity}</p>
         <Button
           size="icon"
-          className="rounded-full p-0 w-7 h-7"
-          variant="ghost"
+          className="rounded-full p-0 w-7 h-7 bg-green-100 text-black hover:bg-green-500 hover:text-white"
+          variant="outline"
           onClick={onPlus}
         >
           <Plus />

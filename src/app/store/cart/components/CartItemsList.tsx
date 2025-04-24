@@ -132,7 +132,7 @@ function CartItemsList() {
                   className="font-bold text-lg"
                 >
                   <Badge
-                    className="min-w-20 justify-center"
+                    className="min-w-20 justify-center h-12 text-lg"
                     onClick={() => console.log(cartItems)}
                   >
                     ${" "}

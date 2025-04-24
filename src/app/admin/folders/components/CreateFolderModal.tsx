@@ -211,7 +211,7 @@ function CreateFolderModal({
               />
             </div>
             <div className="flex items-center gap-2 mt-5">
-              <Label>Privada</Label>
+              <Label>Carpeta privada</Label>
               <Checkbox
                 checked={isPrivate}
                 onCheckedChange={(e: boolean) => {

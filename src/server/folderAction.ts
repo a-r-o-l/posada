@@ -117,7 +117,9 @@ export const getOneFolder = async (id: string) => {
 
     const filesData = await models.File.find({
       folderId: id,
-    }).lean();
+    })
+      .sort({ title: 1 })
+      .lean();
 
     const folderData = JSON.parse(JSON.stringify(folder));
     const files = JSON.parse(JSON.stringify(filesData));

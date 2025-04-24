@@ -3,23 +3,23 @@ import React from "react";
 const data = [
   {
     id: 1,
-    text: "Selecciona el grado o curso al que quieras acceder",
+    text: "Selecciona un nivel, seguido del grado o curso al que quieras acceder",
   },
   {
     id: 2,
-    text: "Busca el retrato de tu hijo/a para encontrar todas sus fotos",
+    text: "Busca el/los retratos de tu hijo/a para encontrar todas sus fotos",
   },
   {
     id: 3,
-    text: "En la columna de la derecha te aparecerán todas las opciones de compra",
+    text: "Al seleccionar una foto te aparecerán todos los productos disponibles para esa foto",
   },
   {
     id: 4,
-    text: "Selecciona todas las fotos que quieras, esto ira directo a tu carrito de compras",
+    text: "Selecciona todos los productos que quieras, estos iran directo a tu carrito de compras",
   },
   {
     id: 5,
-    text: "Una vez realizado el pago te llegara un email de confirmacion de la compra",
+    text: "Revisa tu carrito con los productos y el total. Podrás modificar cantidades o eliminar items. Al confirmar, clickea en Pagar con Mercado Pago y recibirás un email con tu comprobante.",
   },
 ];
 

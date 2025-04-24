@@ -47,6 +47,40 @@ export const getAllGradesBySchool = async (schoolId?: string) => {
   }
 };
 
+export const getAllGradesBySchoolAndYear = async (
+  schoolId?: string,
+  year?: string
+) => {
+  if (!schoolId)
+    return {
+      success: false,
+      message: "Falta el id de la escuela",
+      grades: [],
+    };
+  if (!year)
+    return {
+      success: false,
+      message: "Falta el año",
+      grades: [],
+    };
+  try {
+    await dbConnect();
+    const grades = await models.Grade.find({ schoolId, year }).lean();
+    return {
+      success: true,
+      message: "Cursos encontrados",
+      grades: JSON.parse(JSON.stringify(grades)),
+    };
+  } catch (error) {
+    console.error("Error buscando cursos:", error);
+
+    return {
+      success: false,
+      message: "Error al buscar los cursos",
+    };
+  }
+};
+
 export const getGrade = async (id: string) => {
   try {
     await dbConnect();
@@ -75,6 +109,7 @@ export const createGrade = async (data: FormData) => {
       grade: formData.grade,
       division: formData.division,
       displayName: formData.displayName,
+      year: formData.year,
       schoolId: formData.schoolId,
     });
     await newGrade.save();

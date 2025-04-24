@@ -89,7 +89,11 @@ function GradeSelect({
                     }}
                     className="hover:cursor-pointer"
                   >
-                    {nameParser(`${grade.grade} ${grade?.division}`)}
+                    <div className="flex w-full justify-between">
+                      {nameParser(`${grade.grade} ${grade?.division}`)}
+                      <p>{grade.year}</p>
+                    </div>
+
                     <Check
                       className={cn(
                         "ml-auto",

@@ -3,7 +3,7 @@ import SchoolsCarrousel from "./SchoolsCarrousel";
 const data = [
   {
     id: 1,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/BDS+escudo.jpg",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/BDS.png",
   },
   {
     id: 2,
@@ -11,23 +11,23 @@ const data = [
   },
   {
     id: 3,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/florida100.jpeg",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/FDS.png",
   },
   {
     id: 4,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/franklinnuevo.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/FRANKLIN.png",
   },
   {
     id: 5,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/JACA+nuevo+logo-jaca-tressecciones-trescolores-CV.png",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/JACARANDA.png",
   },
   {
     id: 6,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/moruli60.jpeg",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/MORULI.png",
   },
   {
     id: 7,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/escudo+garcia+tranparente.jpg",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/M+GARCIA.png",
   },
   {
     id: 8,
@@ -39,7 +39,11 @@ const data = [
   },
   {
     id: 10,
-    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/uhs.PNG",
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/UHS.png",
+  },
+  {
+    id: 11,
+    src: "https://fotosposada.s3.us-east-2.amazonaws.com/school/NTRA+SRA+MECEDES.png",
   },
 ];
 

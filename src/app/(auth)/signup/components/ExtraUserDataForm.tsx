@@ -44,6 +44,7 @@ interface Child {
   lastname: string;
   grade: IGrade | null;
   school: ISchool | null;
+  year: string;
 }
 
 function ExtraUserDataForm({
@@ -61,6 +62,9 @@ function ExtraUserDataForm({
   const [newChildLastname, setNewChildLastname] = useState("");
   const [newChildSchool, setNewChildSchool] = useState<ISchool | null>(null);
   const [newChildGrade, setNewChildGrade] = useState<IGrade | null>(null);
+  const [newChildYear, setNewChildYear] = useState(
+    new Date().getFullYear().toString()
+  );
   const [loading, setLoading] = useState(false);
   const [needHelp, setNeedHelp] = useState(false);
 
@@ -73,12 +77,14 @@ function ExtraUserDataForm({
           lastname: newChildLastname.trim(),
           grade: newChildGrade,
           school: newChildSchool,
+          year: newChildYear,
         },
       ]);
       setNewChildName("");
       setNewChildLastname("");
       setNewChildGrade(null);
       setNewChildSchool(null);
+      setNewChildYear(new Date().getFullYear().toString());
     }
   };
 
@@ -186,6 +192,20 @@ function ExtraUserDataForm({
           </CardHeader>
           <CardContent className="flex flex-col gap-5">
             <div className="space-y-2">
+              <Label>Año</Label>
+              <Select value={newChildYear} onValueChange={setNewChildYear}>
+                <SelectTrigger className="border-[#139FDC] border-2">
+                  <SelectValue>{newChildYear}</SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="2024">2024</SelectItem>
+                    <SelectItem value="2025">2025</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
               <Label>Colegio</Label>
               <Select
                 value={newChildSchool ? newChildSchool._id : ""}
@@ -282,7 +302,8 @@ function ExtraUserDataForm({
                   <TableHead>Nombre</TableHead>
                   <TableHead>Apellido</TableHead>
                   <TableHead>Colegio</TableHead>
-                  <TableHead className="w-[100px]">Curso</TableHead>
+                  <TableHead>Curso</TableHead>
+                  <TableHead className="w-[100px]">Año</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -296,6 +317,7 @@ function ExtraUserDataForm({
                         <TableCell>
                           {child?.grade?.grade} {child.grade?.division}
                         </TableCell>
+                        <TableCell>{child.year}</TableCell>
                         <TableCell align="right">
                           <Button
                             variant="ghost"
