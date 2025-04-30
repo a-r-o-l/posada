@@ -1,4 +1,5 @@
 "use client";
+import { IChildren } from "@/models/Account";
 import React, { createContext, useContext } from "react";
 
 export interface IUser {
@@ -9,7 +10,7 @@ export interface IUser {
   password: string;
   imageUrl: string;
   availableGrades: string[];
-  children: string[];
+  children: IChildren[];
   verified: boolean;
   email: string;
   phone: string;

@@ -15,7 +15,7 @@ export default async function page({
   const { folders } = await getAllFolders(
     param.id,
     sp.level,
-    sp.year,
+    sp.year || new Date().getFullYear().toString(),
     true,
     "parent"
   );

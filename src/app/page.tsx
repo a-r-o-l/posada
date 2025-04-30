@@ -12,8 +12,8 @@ import Section2Mini from "@/components/rootsComponents/section2/Section2Mini";
 import Section5Mini from "@/components/rootsComponents/section5/Section5Mini";
 import WhatsAppLogo from "@/icons/whatsappsvg";
 import { Mail } from "lucide-react";
-import InstagramLogo from "@/icons/Igsvg";
-import FacebookLogo from "@/icons/facebooksvg";
+import Section6 from "@/components/rootsComponents/section6/Section6";
+import Section6Mini from "@/components/rootsComponents/section6/Section6Mini";
 
 const ready = true;
 
@@ -31,6 +31,8 @@ function page() {
           <Section3 />
           <Section3Mini />
           <Section4 />
+          <Section6 />
+          <Section6Mini />
           <Section5 />
           <Section5Mini />
         </div>

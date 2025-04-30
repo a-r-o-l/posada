@@ -12,7 +12,7 @@ import { PartialSchool } from "@/models/School";
 import SchoolsSelect from "./SchoolsSelect";
 import CreateFolderModal from "./CreateFolderModal";
 import { IFolder } from "@/models/Folder";
-import FolderComponent from "./FolderComponent";
+import { nameParser } from "@/lib/utilsFunctions";
 import { IGrade } from "@/models/Grade";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import { deleteFolder } from "@/server/folderAction";
@@ -20,6 +20,17 @@ import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import LevelSelect from "./LevelSelect";
 import YearSelect from "./YearSelect";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import FolderDropDownMenu from "./FolderDropDownMenu";
+import { useRouter } from "next/navigation";
+import { Lock, LockOpen } from "lucide-react";
 
 function FoldersClientSide({
   schools,
@@ -32,6 +43,7 @@ function FoldersClientSide({
   folders: IFolder[] | [];
   grades: IGrade[];
 }) {
+  const router = useRouter();
   const [openFolderModal, setOpenFolderModal] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -77,6 +89,71 @@ function FoldersClientSide({
           </div>
         </div>
         <div className="flex flex-row flex-wrap gap-5 w-full py-10 mt-10">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Titulo</TableHead>
+                <TableHead>Nivel</TableHead>
+                <TableHead>Año</TableHead>
+                <TableHead>Privada</TableHead>
+                <TableHead></TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="text-xl">
+              {!!folders?.length ? (
+                folders?.map((folder) => (
+                  <TableRow
+                    key={folder._id}
+                    className="hover:cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      router.push(`/admin/folders/${folder._id}`);
+                    }}
+                  >
+                    <TableCell className="text-gray-900  text-base">
+                      {nameParser(folder.title)}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {folder.level}
+                    </TableCell>
+                    <TableCell className="text-gray-700 text-base">
+                      {folder.year || new Date().getFullYear().toString()}
+                    </TableCell>
+                    <TableCell>
+                      {folder.isPrivate ? (
+                        <Lock className="text-red-500" />
+                      ) : (
+                        <LockOpen className="text-green-500" />
+                      )}
+                    </TableCell>
+                    <TableCell className="text-sm text-gray-700" align="right">
+                      <FolderDropDownMenu
+                        onClick={() => {}}
+                        title={folder.title}
+                        onEditClick={() => onEditFolder(folder)}
+                        onDeleteClick={() => onDeleteFolder(folder)}
+                        onViewClick={() =>
+                          router.push(`/admin/folders/${folder._id}`)
+                        }
+                      />
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={3}
+                    className="text-muted-foreground text-sm text-center h-60"
+                  >
+                    No hay carpetas creadas
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+        {/* <div className="flex flex-row flex-wrap gap-5 w-full py-10 mt-10">
           {!!folders?.length ? (
             folders?.map((folder) => (
               <FolderComponent
@@ -93,7 +170,7 @@ function FoldersClientSide({
               </p>
             </div>
           )}
-        </div>
+        </div> */}
       </CardContent>
       <CreateFolderModal
         open={openFolderModal}

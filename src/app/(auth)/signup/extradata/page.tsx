@@ -4,7 +4,7 @@ import Image from "next/image";
 import ExtraUserDataForm from "../components/ExtraUserDataForm";
 import { getAccount } from "@/server/accountAction";
 import { getAllSchools } from "@/server/schoolAction";
-import { getAllGradesBySchool } from "@/server/gradeAction";
+import { getAllGradesBySchoolAndYear } from "@/server/gradeAction";
 
 export default async function page({
   searchParams,
@@ -22,7 +22,7 @@ export default async function page({
 
   const plainAccount = JSON.parse(JSON.stringify(account));
   const { schools } = await getAllSchools();
-  const { grades } = await getAllGradesBySchool(params.school);
+  const { grades } = await getAllGradesBySchoolAndYear(params.school, "2025");
 
   return (
     <div className="container mx-auto">

@@ -49,12 +49,9 @@ export default async function RootLayout({
               <Link href="/store" className="">
                 Tienda
               </Link>
-              <div
-                className="cursor-not-allowed px-4 py-2 rounded-md text-gray-400"
-                title="Opción no disponible"
-              >
+              <Link href="/store/account" className="">
                 Mi cuenta
-              </div>
+              </Link>
               <Link href="/store/purchases" className="">
                 Mis compras
               </Link>

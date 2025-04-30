@@ -127,3 +127,34 @@ export const createGrade = async (data: FormData) => {
     };
   }
 };
+
+export const deleteGrade = async (id: string) => {
+  try {
+    await dbConnect();
+
+    const deletedStudents = await models.Student.deleteMany({ gradeId: id });
+    console.log(`Deleted ${deletedStudents.deletedCount} students from grade`);
+
+    const grade = await models.Grade.findByIdAndDelete(id);
+
+    if (!grade) {
+      return {
+        success: false,
+        message: "Curso no encontrado",
+      };
+    }
+
+    revalidatePath(`/admin/schools`);
+    return {
+      success: true,
+      message: `Curso eliminado y ${deletedStudents.deletedCount} estudiantes removidos`,
+      grade: JSON.parse(JSON.stringify(grade)),
+    };
+  } catch (error) {
+    console.error("Error eliminando curso:", error);
+    return {
+      success: false,
+      message: "Error al eliminar el curso y sus estudiantes",
+    };
+  }
+};

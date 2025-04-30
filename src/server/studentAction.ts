@@ -121,6 +121,7 @@ export const deleteStudent = async (id: string) => {
   try {
     await dbConnect();
     await models.Student.findByIdAndDelete(id);
+    revalidatePath(`/admin/schools`);
     return {
       success: true,
       message: "Estudiante eliminado",

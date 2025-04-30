@@ -11,6 +11,9 @@ import DynamicFolder from "./DynamicFolder";
 import Link from "next/link";
 import BuyTutorial from "./BuyTutorial";
 import DateSelect from "./DateSelect";
+import { toast } from "sonner";
+import { getAllStudentByGrade } from "@/server/studentAction";
+import { IStudent } from "@/models/Student";
 
 function SchoolStoreDetailClient({
   school,
@@ -100,9 +103,43 @@ function SchoolStoreDetailClient({
                   isOpened={false}
                   height={130}
                   width={130}
-                  onClick={() =>
-                    router.push(`/store/${school._id}/${folder._id}`)
-                  }
+                  onClick={async () => {
+                    const folderGrades = folder.grades || [];
+                    // const availableGrades = user?.availableGrades || [];
+                    const children = user?.children || [];
+                    if (folderGrades.length === 0) {
+                      router.push(`/store/${school._id}/${folder._id}`);
+                      return;
+                    }
+                    const { students } = await getAllStudentByGrade(
+                      folderGrades[0]
+                    );
+                    const hasAccess = children.some((child) =>
+                      students.some(
+                        (student: IStudent) =>
+                          student.name.toLowerCase() ===
+                            child.name.toLowerCase() &&
+                          student.lastname.toLowerCase() ===
+                            child.lastname.toLowerCase()
+                      )
+                    );
+
+                    if (!hasAccess) {
+                      toast.error("No tienes acceso a esta carpeta");
+                      return;
+                    }
+                    router.push(`/store/${school._id}/${folder._id}`);
+                    // const hasAccess = folderGrades.some((gradeId) => {
+                    //   const hasMatch = availableGrades.includes(gradeId);
+                    //   return hasMatch;
+                    // });
+
+                    // if (!hasAccess) {
+                    //   toast.error("No tienes acceso a esta carpeta");
+                    //   return;
+                    // }
+                    // router.push(`/store/${school._id}/${folder._id}`);
+                  }}
                 />
               ))
             ) : (

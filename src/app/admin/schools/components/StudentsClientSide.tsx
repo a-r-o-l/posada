@@ -41,6 +41,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import DateSelectAdminSchools from "./DateSelectAdminSchools";
+import { deleteGrade } from "@/server/gradeAction";
 
 function StudentsClientSide({
   schools,
@@ -62,6 +63,7 @@ function StudentsClientSide({
   const [openSeveralStudentsModal, setOpenSeveralStudentsModal] =
     useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
+  const [openDeleteGradeAlert, setOpenDeleteGradeAlert] = useState(false);
   const [selectedStudent, setSelectedStudent] = useState<IStudentWP | null>(
     null
   );
@@ -115,7 +117,7 @@ function StudentsClientSide({
                         <TooltipProvider>
                           <Tooltip>
                             <TooltipTrigger asChild>
-                              <Avatar className="h-16 w-16">
+                              <Avatar className="h-16 w-24">
                                 <AvatarImage
                                   src={school.imageUrl}
                                   alt={school.name}
@@ -192,15 +194,18 @@ function StudentsClientSide({
                         <div className="flex items-center gap-5">
                           <p className="font-semibold">{grade.grade}</p>
                           <Badge variant="outline">
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-gray-500 font-semibold">
                               {nameParser(grade.division)}
                             </p>
                           </Badge>
                         </div>
+                        <p className="text-muted-foreground">{grade.year}</p>
                         <div className="flex gap-5">
                           <CustomDropDownMenu
                             onEditClick={() => {}}
-                            onDeleteClick={() => {}}
+                            onDeleteClick={() => {
+                              setOpenDeleteGradeAlert(true);
+                            }}
                             title={`${grade.grade} - ${nameParser(
                               grade.division
                             )}`}
@@ -262,9 +267,9 @@ function StudentsClientSide({
                         <TableRow
                           key={student._id}
                           onClick={() => setSelectedStudent(student)}
-                          className={`${
+                          className={`hover:cursor-pointer ${
                             selectedStudent?._id === student._id
-                              ? "bg-blue-950"
+                              ? "bg-slate-100 text-black"
                               : ""
                           }`}
                         >
@@ -274,16 +279,16 @@ function StudentsClientSide({
                           <TableCell>
                             {nameParser(student.gradeId?.division)}
                           </TableCell>
-                          <TableCell className="text-end">
+                          <TableCell className="text-end gap-2 flex justify-end">
                             <Button
-                              className="rounded-full"
+                              className="rounded-full text-black"
                               size="icon"
                               variant="outline"
                             >
                               <Pencil size={20} />
                             </Button>
                             <Button
-                              className="rounded-full"
+                              className="rounded-full text-black"
                               size="icon"
                               variant="outline"
                               onClick={(e) => {
@@ -326,6 +331,22 @@ function StudentsClientSide({
             toast.success(res.message);
             setOpenDeleteAlert(false);
             setSelectedStudent(null);
+          } else {
+            toast.error(res.message);
+          }
+        }}
+      />
+      <CustomAlertDialog
+        title="Eliminar curso"
+        description="¿Estás seguro que deseas eliminar este curso?"
+        open={openDeleteGradeAlert}
+        onClose={() => setOpenDeleteGradeAlert(false)}
+        onAccept={async () => {
+          if (!selectedGrade) return;
+          const res = await deleteGrade(selectedGrade || "");
+          if (res.success) {
+            toast.success(res.message);
+            setOpenDeleteGradeAlert(false);
           } else {
             toast.error(res.message);
           }

@@ -18,6 +18,8 @@ interface CartState {
   addProduct: (product: IProd) => void;
   removeProduct: (productId: string) => void;
   clearCart: () => void;
+  addOne: (productId: string) => void;
+  removeOne: (productId: string) => void;
 }
 
 export const useCartStore = create<CartState>()(
@@ -55,6 +57,42 @@ export const useCartStore = create<CartState>()(
           ),
         })),
       clearCart: () => set({ products: [] }),
+      addOne: (productId: string) =>
+        set((state) => ({
+          products: state.products.map((product) =>
+            product.id === productId
+              ? {
+                  ...product,
+                  quantity: product.quantity + 1,
+                  total: (product.quantity + 1) * product.price,
+                }
+              : product
+          ),
+        })),
+      removeOne: (productId: string) =>
+        set((state) => {
+          const product = state.products.find((p) => p.id === productId);
+
+          // If product quantity is 1, remove it completely
+          if (product && product.quantity === 1) {
+            return {
+              products: state.products.filter((p) => p.id !== productId),
+            };
+          }
+
+          // Otherwise decrease quantity by 1
+          return {
+            products: state.products.map((product) =>
+              product.id === productId
+                ? {
+                    ...product,
+                    quantity: product.quantity - 1,
+                    total: (product.quantity - 1) * product.price,
+                  }
+                : product
+            ),
+          };
+        }),
     }),
     {
       name: "cart-storage",

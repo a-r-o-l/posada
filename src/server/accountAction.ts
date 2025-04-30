@@ -142,8 +142,16 @@ export const getAccountByEmail = async (email: string) => {
       };
     }
     await dbConnect();
-    const account = await models.Account.findOne({ email }).lean();
+
+    const account = await models.Account.findOne({ email })
+      .populate({
+        path: "children",
+        populate: [{ path: "schoolId" }, { path: "gradeId" }],
+      })
+      .lean();
+
     const plainAccount = JSON.parse(JSON.stringify(account));
+
     return {
       success: true,
       message: "Cuenta encontrada",

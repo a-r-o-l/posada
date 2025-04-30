@@ -63,7 +63,6 @@ function SchoolList({ schools }: { schools: ISchool[] }) {
 
           <div>
             <div className="font-semibold">{school.name}</div>
-            <div className="text-sm text-gray-500">{school.name}</div>
           </div>
         </Button>
       ))}

@@ -36,14 +36,20 @@ function FolderDropDownMenu({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
-            onClick={onViewClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              onViewClick();
+            }}
             className="flex items-center justify-between"
           >
             Ir a la carpeta
             <SquareArrowUpRight />
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={onEditClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              onEditClick();
+            }}
             className="flex items-center justify-between"
           >
             Editar
@@ -51,7 +57,10 @@ function FolderDropDownMenu({
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={onDeleteClick}
+            onClick={(e) => {
+              e.stopPropagation();
+              onDeleteClick();
+            }}
             className="flex items-center justify-between text-red-500"
           >
             Eliminar
