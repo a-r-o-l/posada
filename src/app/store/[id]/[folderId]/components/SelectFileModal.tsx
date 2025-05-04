@@ -124,7 +124,7 @@ function SelectFileModal({
             </div>
           </div>
           <div className="pb-5">
-            <Table className="max-w-[450px]">
+            <Table className="max-w-[700px]">
               <TableHeader>
                 <TableRow>
                   <TableHead></TableHead>

@@ -46,6 +46,8 @@ function FolderDetailClientSide({
     null
   );
 
+  console.log(selectedFolder);
+
   const onDeleteFolder = (folder: IFolder) => {
     setSelectedSubfolder(folder);
     setOpenAlert(true);

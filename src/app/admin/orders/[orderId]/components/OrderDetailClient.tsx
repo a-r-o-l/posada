@@ -75,7 +75,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
 
     try {
       // Cargar la imagen desde la carpeta public y convertirla a base64
-      const imgData = await getImageBase64("/posadalogoblack.png");
+      const imgData = await getImageBase64("/logoposada.png");
 
       // Agregar imagen de la empresa
       doc.addImage(imgData as string, "PNG", 10, 10, 50, 30);

@@ -189,11 +189,6 @@ function Section6() {
                   </ul>
                 </li>
               </ul>
-              <p className="text-xl mt-5">
-                Utilizamos encuadre full frame, tal como se ve en el
-                muestrario.En algunos tamaños puede haber un leve reencuadre
-                para adaptar al formato solicitado.
-              </p>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

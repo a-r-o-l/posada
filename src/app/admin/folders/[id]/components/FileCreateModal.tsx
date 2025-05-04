@@ -13,7 +13,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { IFolder } from "@/models/Folder";
+import { ISchool } from "@/models/School";
 import { createManyFiles } from "@/server/fileAction";
+import { getSchool } from "@/server/schoolAction";
 import { Upload, X } from "lucide-react";
 import Image from "next/image";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -41,6 +43,7 @@ function FileCreateModal({
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
+  const [school, setSchool] = useState<null | ISchool>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -134,9 +137,10 @@ function FileCreateModal({
       images.forEach((file, index) => {
         formData.append(`file${index}`, file.file);
       });
-
-      formData.append("folder", "files");
-
+      formData.append(
+        "folder",
+        `files/${school?.name}/${folder?.title}(${folder?.year})`
+      );
       try {
         const response = await fetch("/api/upload", {
           method: "POST",
@@ -183,6 +187,18 @@ function FileCreateModal({
       }
     }
   };
+
+  useEffect(() => {
+    if (folder) {
+      const fetchSchool = async () => {
+        const { school: fetchedSchool } = await getSchool(
+          folder?.schoolId || ""
+        );
+        setSchool(fetchedSchool);
+      };
+      fetchSchool();
+    }
+  }, [folder]);
 
   useEffect(() => {
     if (!open) {

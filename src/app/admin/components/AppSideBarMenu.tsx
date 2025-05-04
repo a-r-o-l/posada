@@ -1,6 +1,6 @@
 "use client";
 import {
-  Baby,
+  Blocks,
   Folder,
   Home,
   Images,
@@ -57,6 +57,12 @@ const items = [
     title: "Mensajes",
     url: "/admin/messages",
     icon: Mail,
+    private: false,
+  },
+  {
+    title: "Tutorial",
+    url: "/admin/tutorial",
+    icon: Blocks,
     private: false,
   },
 ];

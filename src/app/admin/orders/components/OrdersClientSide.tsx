@@ -25,6 +25,7 @@ import { useRouter } from "next/navigation";
 import StateSelect from "./StateSelect";
 import PaymentBadge from "@/app/store/purchases/components/PaymentBadge";
 import DeliveredSelect from "./DeliveredSelect";
+import { priceParserToString } from "@/lib/utilsFunctions";
 
 function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
   const router = useRouter();
@@ -45,6 +46,17 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
     const totalSales = sales?.length;
     const newSales = sales?.filter((sale) => !sale.isNewSale).length;
     return { totalSales, newSales };
+  }, [sales]);
+
+  const salesTotal = useMemo(() => {
+    if (!sales || !sales.length) return 0;
+    const total = sales?.reduce((acc, sale) => {
+      if (sale.total) {
+        return acc + sale.total;
+      }
+      return acc;
+    }, 0);
+    return total;
   }, [sales]);
 
   return (
@@ -154,11 +166,13 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
           </TableBody>
           <TableFooter>
             <TableRow className="">
-              <TableCell colSpan={5} align="left" className="">
+              <TableCell colSpan={7} align="left" className="text-xl font-bold">
                 Total
               </TableCell>
-              <TableCell colSpan={4} className="">
-                <Badge>$567567</Badge>
+              <TableCell colSpan={1} className="" align="right">
+                <Badge className="text-xl">
+                  ${priceParserToString(salesTotal)}
+                </Badge>
               </TableCell>
             </TableRow>
           </TableFooter>

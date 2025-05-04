@@ -69,7 +69,7 @@ function StudentModal({
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Crear producto</DialogTitle>
+          <DialogTitle>Crear Curso</DialogTitle>
           <DialogDescription>colegio: </DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-5">

@@ -12,7 +12,6 @@ import AppSideBarMenu from "./AppSideBarMenu";
 import { NavUser } from "./nav-user";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import Image from "next/image";
-import { useTheme } from "next-themes";
 
 const user = {
   name: "Cristina Posada",
@@ -21,10 +20,7 @@ const user = {
 };
 
 export function AppSidebar() {
-  const theme = useTheme();
-
-  const imageUrl =
-    theme.theme === "dark" ? "/posadalogowhite.png" : "/posadalogoblack.png";
+  const imageUrl = "/logoposada.png";
 
   return (
     <Sidebar>

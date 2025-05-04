@@ -1,6 +1,6 @@
 "use client";
 
-import { BadgeCheck, ChevronsUpDown, LogOut } from "lucide-react";
+import { BadgeCheck, ChevronsUpDown, LogOut, Server } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -22,6 +22,7 @@ import { ThemeButton } from "@/components/ThemeButton";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import { useState } from "react";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 export function NavUser({
   user,
@@ -34,6 +35,8 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const [open, setOpen] = useState(false);
+
+  const router = useRouter();
 
   return (
     <SidebarMenu>
@@ -81,6 +84,10 @@ export function NavUser({
               <DropdownMenuItem>
                 <BadgeCheck />
                 Cuenta
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/admin/services")}>
+                <Server />
+                Servicios
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
