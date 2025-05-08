@@ -13,8 +13,6 @@ export const login = async (email: string, password: string) => {
       email,
     }).lean()) as IAccount | null;
 
-    console.log("account => ", account);
-
     if (!account) {
       return {
         success: false,

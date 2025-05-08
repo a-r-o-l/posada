@@ -1,5 +1,5 @@
 export const passwordRecoveryTemplate = (pasword: string) => {
-  const imageUrl = `https://malaquitabucket.s3.us-east-2.amazonaws.com/posada/posadalogoblack.png`;
+  const imageUrl = `https://fotosposada.s3.us-east-2.amazonaws.com/assets/logoposada.png`;
   return `
     <html>
     <body>
@@ -9,7 +9,9 @@ export const passwordRecoveryTemplate = (pasword: string) => {
       <div>
         <p>
           <strong>Hola, has solicitado recuperar tu contraseña.</strong>
-          <br/>
+        </p>
+        <br/>
+        <p>
           Tu contraseña es: ${pasword}
         </p>
       </div>

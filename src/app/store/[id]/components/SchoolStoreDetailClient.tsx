@@ -44,6 +44,13 @@ function SchoolStoreDetailClient({
     router.push(`?${params.toString()}`);
   };
 
+  const normalizeString = (str: string): string => {
+    return str
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "");
+  };
+
   return (
     <div className="flex flex-col lg:flex-row h-full">
       <div className="flex flex-row items-center justify-evenly rounded-t-3xl bg-[#F0F1FF] lg:min-w-40 lg:h-full lg:flex-col lg:justify-start lg:rounded-l-3xl lg:rounded-r-none lg:gap-5 lg:w-40">
@@ -104,8 +111,11 @@ function SchoolStoreDetailClient({
                   height={130}
                   width={130}
                   onClick={async () => {
+                    if (user?.role !== "user") {
+                      router.push(`/store/${school._id}/${folder._id}`);
+                      return;
+                    }
                     const folderGrades = folder.grades || [];
-                    // const availableGrades = user?.availableGrades || [];
                     const children = user?.children || [];
                     if (folderGrades.length === 0) {
                       router.push(`/store/${school._id}/${folder._id}`);
@@ -115,13 +125,23 @@ function SchoolStoreDetailClient({
                       folderGrades[0]
                     );
                     const hasAccess = children.some((child) =>
-                      students.some(
-                        (student: IStudent) =>
-                          student.name.toLowerCase() ===
-                            child.name.toLowerCase() &&
-                          student.lastname.toLowerCase() ===
-                            child.lastname.toLowerCase()
-                      )
+                      students.some((student: IStudent) => {
+                        const normalizedChildName = normalizeString(child.name);
+                        const normalizedChildLastname = normalizeString(
+                          child.lastname
+                        );
+                        const normalizedStudentName = normalizeString(
+                          student.name
+                        );
+                        const normalizedStudentLastname = normalizeString(
+                          student.lastname
+                        );
+
+                        return (
+                          normalizedChildName === normalizedStudentName &&
+                          normalizedChildLastname === normalizedStudentLastname
+                        );
+                      })
                     );
 
                     if (!hasAccess) {
@@ -129,16 +149,6 @@ function SchoolStoreDetailClient({
                       return;
                     }
                     router.push(`/store/${school._id}/${folder._id}`);
-                    // const hasAccess = folderGrades.some((gradeId) => {
-                    //   const hasMatch = availableGrades.includes(gradeId);
-                    //   return hasMatch;
-                    // });
-
-                    // if (!hasAccess) {
-                    //   toast.error("No tienes acceso a esta carpeta");
-                    //   return;
-                    // }
-                    // router.push(`/store/${school._id}/${folder._id}`);
                   }}
                 />
               ))

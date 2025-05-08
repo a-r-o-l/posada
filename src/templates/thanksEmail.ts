@@ -3,7 +3,7 @@ import { ISalePopulated, ISaleProductPopulated } from "@/models/Sale";
 import { format } from "date-fns";
 
 export const tahnksEmailTemplate = (sale: ISalePopulated) => {
-  const imageUrl = `https://malaquitabucket.s3.us-east-2.amazonaws.com/posada/posadalogoblack.png`;
+  const imageUrl = `https://fotosposada.s3.us-east-2.amazonaws.com/assets/logoposada.png`;
 
   return `
 <html>

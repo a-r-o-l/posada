@@ -14,7 +14,7 @@ function MiniRootHeader() {
           ></div>
         </Link>
         <div className="w-full flex items-center justify-end gap-5">
-          <Link href="/signin" className="text-base lg:block">
+          <Link href="/signin" className="text-base lg:block font-bold">
             Iniciar sesión
           </Link>
           <Button className="bg-[#139FDC] rounded-full w-28 h-10 text-base">

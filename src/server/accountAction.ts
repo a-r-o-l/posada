@@ -27,6 +27,8 @@ export const createAccount = async (data: FormData, admin: boolean = false) => {
       password: formData.password,
       role: formData.role,
       imageUrl: formData.imageUrl,
+      schoolId: formData.schoolId,
+      verified: formData.role !== "user" ? true : false,
     });
     await newAccount.save();
     if (admin) {

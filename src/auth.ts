@@ -36,6 +36,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           imageUrl: foundAccount.imageUrl,
           verified: foundAccount.verified,
           availableGrades: foundAccount.availableGrades,
+          schoolId: foundAccount.schoolId,
         };
       },
     }),

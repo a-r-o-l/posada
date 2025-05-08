@@ -14,6 +14,7 @@ export interface IUser {
   verified: boolean;
   email: string;
   phone: string;
+  schoolId?: string;
 }
 
 interface UserContextType {

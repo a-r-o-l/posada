@@ -20,7 +20,7 @@ function RootHeader() {
                 Quienes somos
               </Link>
               <Link href="#servicio" className="text-base hidden lg:block">
-                Servicio
+                Servicios
               </Link>
               <Link href="#productos" className="text-base hidden lg:block">
                 Productos
@@ -29,12 +29,12 @@ function RootHeader() {
                 href="#nuestro-trabajo"
                 className="text-base hidden lg:block"
               >
-                Nuestro trabajo
+                Clientes
               </Link>
               <Link href="#contacto" className="text-base hidden lg:block">
                 Contacto
               </Link>
-              <Link href="/signin" className="text-base lg:block">
+              <Link href="/signin" className="text-base lg:block font-bold">
                 Iniciar sesión
               </Link>
               <Link href="/signup" className="text-base lg:block">

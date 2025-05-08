@@ -358,7 +358,7 @@ function Section6Mini() {
             </AccordionTrigger>
             <AccordionContent>
               <p className="text-sm">
-                Sí son privados. Solo recolectamos los datos necesarios para
+                Sí, son privados. Solo recolectamos los datos necesarios para
                 brindar el servicio. No vendemos ni compartimos tus datos con
                 terceros.
               </p>

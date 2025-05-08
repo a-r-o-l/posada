@@ -13,7 +13,7 @@ function Section1() {
               width={1000}
               height={300}
               alt="Quienes somos"
-              className="object-cover w-full h-full"
+              className="object-contain w-full h-full"
               priority
             />
           </div>
@@ -33,6 +33,7 @@ function Section1() {
               {`
               Escribinos por WhatsApp al +54 911 5403-2747\n 
   indicando:\n
+  • Tu nombre\n
   • Nombre del colegio\n
   • Nombre del alumno\n
   • Curso\n

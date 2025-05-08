@@ -16,10 +16,10 @@ export default async function page({
   const { account } = await getAccountByEmail(email);
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="w-60 h-32 flex justify-center items-center ">
+      <div className="w-52 h-32 flex justify-center items-center ">
         <AspectRatio ratio={1 / 1}>
           <Image
-            src={"/posadalogowhite.png"}
+            src={"/logoposada.png"}
             alt="Logo Posada"
             layout="fill"
             style={{ objectFit: "contain" }}

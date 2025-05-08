@@ -360,7 +360,7 @@ function Section6() {
             </AccordionTrigger>
             <AccordionContent>
               <p className="text-xl">
-                Sí son privados. Solo recolectamos los datos necesarios para
+                Sí, son privados. Solo recolectamos los datos necesarios para
                 brindar el servicio. No vendemos ni compartimos tus datos con
                 terceros.
               </p>

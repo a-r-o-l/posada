@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React from "react";
 
 function Section1Mini() {
@@ -6,7 +7,17 @@ function Section1Mini() {
       <div className="w-[87vw] lg:w-[47vw]  bg-[#139FDC] absolute right-0 h-20 z-10 rounded-l-3xl top-0"></div>
       <div className="flex flex-col items-start w-[90vw] lg:w-[50vw] justify-end border-[#139FDC] border-l-2 border-t-2 border-b-2 rounded-l-3xl p-7 lg:p-14 z-20 mt-5 bg-[#F0F1FF]">
         <div className="flex flex-col px-5">
-          <h1 className="font-black text-2xl">¿Quienes somos?</h1>
+          <div className="rounded-3xl w-[200px] h-[200px] overflow-hidden">
+            <Image
+              src={"/ui/seccion1/img4.jpeg"}
+              width={1000}
+              height={300}
+              alt="Quienes somos"
+              className="object-contain w-full h-full"
+              priority
+            />
+          </div>
+          <h1 className="font-black text-2xl mt-5">¿Quienes somos?</h1>
           <p className="mt-5 text-xs">
             Somos una empresa familiar con más de 40 años de experiencia en
             fotografía escolar. A lo largo de estas décadas, tuvimos el honor de
@@ -21,6 +32,7 @@ function Section1Mini() {
             {`
               Escribinos por WhatsApp al +54 911 5403-2747\n 
   indicando:\n
+  • Tu nombre del colegio\n
   • Nombre del colegio\n
   • Nombre del alumno\n
   • Curso\n
