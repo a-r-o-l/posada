@@ -33,7 +33,7 @@ function SchoolPasswordModal({
 
   const onSubmit = () => {
     const pswrd = school.password;
-    if (pswrd?.toLowerCase() === password) {
+    if (pswrd?.toLowerCase() === password?.toLowerCase()) {
       onAccess();
       onClose();
     } else {

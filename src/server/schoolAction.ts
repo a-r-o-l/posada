@@ -47,9 +47,9 @@ export const createSchool = async (data: FormData) => {
     await dbConnect();
     const formData = Object.fromEntries(data.entries());
     const newSchool = new models.School({
-      name: formData.name,
-      description: formData.description,
-      password: formData.password,
+      name: String(formData.name).toLowerCase(),
+      description: String(formData.description).toLowerCase(),
+      password: String(formData.password).toLowerCase(),
       imageUrl: formData.imageUrl,
       isPrivate: !!formData.password,
     });
@@ -90,6 +90,36 @@ export const deleteSchool = async (id: string) => {
     return {
       success: false,
       message: "Error al eliminar el colegio, intente nuevamente.",
+    };
+  }
+};
+
+export const updateSchool = async (id: string, data: FormData) => {
+  try {
+    await dbConnect();
+    const formData = Object.fromEntries(data.entries());
+    const updatedSchool = await models.School.findByIdAndUpdate(
+      id,
+      {
+        name: String(formData.name).toLowerCase(),
+        description: String(formData.description).toLowerCase(),
+        password: String(formData.password).toLowerCase(),
+        imageUrl: formData.imageUrl,
+        isPrivate: !!formData.password,
+      },
+      { new: true }
+    );
+    revalidatePath("/admin/schools");
+    return {
+      success: true,
+      message: "Colegio actualizado correctamente",
+      product: JSON.parse(JSON.stringify(updatedSchool)),
+    };
+  } catch (error) {
+    console.error("Error actualizando el colegio:", error);
+    return {
+      success: false,
+      message: "Error al actualizar el colegio, intente nuevamente",
     };
   }
 };

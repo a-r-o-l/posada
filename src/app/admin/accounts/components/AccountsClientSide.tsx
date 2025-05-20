@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { IAccountPopulated, IChildrenPopulated } from "@/models/Account";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -26,11 +26,26 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { changeDisabled } from "@/server/accountAction";
 import { toast } from "sonner";
+import { CircleX, Search } from "lucide-react";
 
 function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
   const [selectedAccount, setSelectedAccount] =
     useState<IAccountPopulated | null>(null);
   const [openAccountModal, setOpenAccountModal] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+
+  const filteredAccounts = useMemo(() => {
+    if (searchValue === "") {
+      return accounts;
+    } else {
+      return accounts.filter(
+        (account) =>
+          account.name.toLowerCase().includes(searchValue) ||
+          account.lastname.toLowerCase().includes(searchValue) ||
+          account.email.toLowerCase().includes(searchValue)
+      );
+    }
+  }, [searchValue, accounts]);
 
   const RenderBadge = ({ role }: { role: string }) => {
     if (!role) {
@@ -79,13 +94,41 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between w-full">
-                <CardTitle>Lista de cuentas</CardTitle>
+              <div className="flex items-center justify-center w-full">
+                <CardTitle></CardTitle>
+                <CardDescription></CardDescription>
+                <div className="relative">
+                  <Search className="absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-500" />
+                  {!!searchValue && (
+                    <CircleX
+                      className="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer text-red-500"
+                      onClick={() => {
+                        setSearchValue("");
+                      }}
+                    />
+                  )}
+                  <Input
+                    placeholder="Buscar cuenta"
+                    className="w-60 pl-10"
+                    value={searchValue}
+                    onKeyDown={(e) => {
+                      if (selectedAccount) {
+                        setSelectedAccount(null);
+                      }
+                      if (e.key === "Escape") {
+                        setSearchValue("");
+                      }
+                    }}
+                    onChange={(e) => {
+                      setSearchValue(e.target.value.toLowerCase());
+                    }}
+                  />
+                </div>
               </div>
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[500px]">
-                {accounts?.map((account) => (
+                {filteredAccounts?.map((account) => (
                   <div
                     role="button"
                     key={account._id}

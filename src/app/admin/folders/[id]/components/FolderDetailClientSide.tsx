@@ -85,13 +85,6 @@ function FolderDetailClientSide({
           </div>
           <div>
             <Button
-              variant="link"
-              disabled={!selectedFolder}
-              onClick={() => setOpenFolderModal(true)}
-            >
-              Crear carpeta
-            </Button>
-            <Button
               onClick={() => setOpenUploadModal(true)}
               variant="link"
               disabled={!selectedFolder}

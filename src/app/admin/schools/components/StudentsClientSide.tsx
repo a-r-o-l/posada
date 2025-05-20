@@ -7,9 +7,8 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { PartialSchool } from "@/models/School";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -21,7 +20,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
+import { ArrowLeft, FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import StudentModal from "./StudentModal";
 import GradeModal from "./GradeModal";
@@ -30,18 +29,11 @@ import { IStudentWP } from "@/models/Student";
 import { deleteStudent } from "@/server/studentAction";
 import { toast } from "sonner";
 import { initialsParser, nameParser } from "@/lib/utilsFunctions";
-import { Badge } from "@/components/ui/badge";
 import CustomDropDownMenu from "@/components/CustomDropDownMenu";
-import CreateSchoolModal from "./CreateSchoolModal";
 import SeveralStudentsModal from "./SeveralStudentsModal";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import DateSelectAdminSchools from "./DateSelectAdminSchools";
 import { deleteGrade } from "@/server/gradeAction";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 function StudentsClientSide({
   schools,
@@ -59,7 +51,6 @@ function StudentsClientSide({
   const router = useRouter();
   const [studentModal, setStudentModal] = useState(false);
   const [gradeModal, setGradeModal] = useState(false);
-  const [openSchoolModal, setOpenSchoolModal] = useState(false);
   const [openSeveralStudentsModal, setOpenSeveralStudentsModal] =
     useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
@@ -67,105 +58,65 @@ function StudentsClientSide({
   const [selectedStudent, setSelectedStudent] = useState<IStudentWP | null>(
     null
   );
+  const [editGrade, setEditGrade] = useState<IGrade | null>(null);
+  const [editStudent, setEditStudent] = useState<IStudentWP | null>(null);
+
+  const school = useMemo(() => {
+    const foundSchool = schools.find(
+      (eachSchool) => eachSchool._id === selectedSchool
+    );
+    if (!foundSchool) {
+      return null;
+    }
+    return foundSchool;
+  }, [schools, selectedSchool]);
 
   return (
     <Card className="w-full">
-      <CardHeader className="flex flex-row items-center">
-        <div className="w-full">
-          <div className="flex items-center justify-between w-full">
-            <CardTitle>Alumnos</CardTitle>
+      <CardHeader className="flex flex-row">
+        <CardTitle></CardTitle>
+        <CardDescription></CardDescription>
+        <div className="w-full flex flex-col gap-5">
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => router.push("/admin/schools")}
+            className="rounded-full"
+          >
+            <ArrowLeft />
+          </Button>
+          <div className="flex items-center justify-between w-full px-20">
+            <div className="flex items-center">
+              <Avatar className="h-20 w-20">
+                <AvatarImage
+                  src={school?.imageUrl}
+                  alt={school?.name}
+                  className="object-contain !aspect-square p-1"
+                />
+                <AvatarFallback>
+                  {initialsParser(school?.name || "")}
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex flex-col">
+                <p className="text-muted-foreground">Colegio </p>
+                <h1 className="font-bold">{school?.name}</h1>
+              </div>
+            </div>
+            <div className="">
+              <DateSelectAdminSchools
+                url={`/admin/schools/${selectedSchool}`}
+              />
+            </div>
           </div>
-          <CardDescription>Ver y administrar alumnos</CardDescription>
-        </div>
-        <div className="">
-          <DateSelectAdminSchools url={`/admin/schools`} />
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between w-full">
-                <CardTitle>Colegios</CardTitle>
-                <Button variant="link" onClick={() => setOpenSchoolModal(true)}>
-                  Registrar colegio
-                </Button>
-              </div>
-            </CardHeader>
-            <Separator className="" />
-            <CardContent>
-              <ScrollArea className="h-[500px] py-10">
-                {schools.length ? (
-                  schools?.map((school) => (
-                    <Button
-                      key={school._id}
-                      variant={
-                        selectedSchool === school._id ? "secondary" : "outline"
-                      }
-                      className="w-full justify-between mb-2 py-10 flex"
-                      onClick={() => {
-                        const currentUrl = new URL(window.location.href);
-                        const params = new URLSearchParams(currentUrl.search);
-                        params.delete("grade");
-                        params.set("school", school?._id || "");
-                        router.push(
-                          `${currentUrl.pathname}?${params.toString()}`
-                        );
-                      }}
-                    >
-                      <div className="flex justify-center w-full items-center">
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Avatar className="h-16 w-24">
-                                <AvatarImage
-                                  src={school.imageUrl}
-                                  alt={school.name}
-                                />
-                                <AvatarFallback>
-                                  {initialsParser(school?.name || "")}
-                                </AvatarFallback>
-                              </Avatar>
-                            </TooltipTrigger>
-                            <TooltipContent className="border border-black bg-background">
-                              <div className="min-w-14 overflow-hidden">
-                                <div className="font-semibold text-black">
-                                  {school.name}
-                                </div>
-                                <div className="text-sm text-muted-foreground">
-                                  {school.name}
-                                </div>
-                              </div>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                      <CustomDropDownMenu
-                        onEditClick={() => {}}
-                        onDeleteClick={() => {}}
-                        title={school?.name || ""}
-                      />
-                    </Button>
-                  ))
-                ) : (
-                  <div className="w-full h-60 flex items-center justify-center">
-                    <span className="mt-2 block text-sm font-medium text-muted-foreground">
-                      No hay colegios
-                    </span>
-                  </div>
-                )}
-              </ScrollArea>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between w-full">
                 <CardTitle>Cursos</CardTitle>
-                <Button
-                  variant="link"
-                  disabled={!selectedSchool}
-                  onClick={() => setGradeModal(true)}
-                >
+                <Button variant="link" onClick={() => setGradeModal(true)}>
                   Registrar curso
                 </Button>
               </div>
@@ -180,7 +131,7 @@ function StudentsClientSide({
                       variant={
                         selectedGrade === grade._id ? "secondary" : "outline"
                       }
-                      className="w-full justify-start text-left mb-2 py-10"
+                      className="w-full justify-start text-left mb-2 p-10 relative"
                       onClick={() => {
                         const currentUrl = new URL(window.location.href);
                         const params = new URLSearchParams(currentUrl.search);
@@ -190,27 +141,25 @@ function StudentsClientSide({
                         );
                       }}
                     >
-                      <div className="flex items-center justify-between w-full">
-                        <div className="flex items-center gap-5">
-                          <p className="font-semibold">{grade.grade}</p>
-                          <Badge variant="outline">
-                            <p className="text-sm text-gray-500 font-semibold">
-                              {nameParser(grade.division)}
-                            </p>
-                          </Badge>
-                        </div>
-                        <p className="text-muted-foreground">{grade.year}</p>
-                        <div className="flex gap-5">
-                          <CustomDropDownMenu
-                            onEditClick={() => {}}
-                            onDeleteClick={() => {
-                              setOpenDeleteGradeAlert(true);
-                            }}
-                            title={`${grade.grade} - ${nameParser(
-                              grade.division
-                            )}`}
-                          />
-                        </div>
+                      <div className="flex flex-col items-start w-full">
+                        <p className="font-semibold">{grade.grade}</p>
+                        <p className="text-sm text-gray-500 font-semibold">
+                          {nameParser(grade.division)}
+                        </p>
+                      </div>
+                      <div className="absolute top-1 right-1">
+                        <CustomDropDownMenu
+                          onEditClick={() => {
+                            setEditGrade(grade);
+                            setGradeModal(true);
+                          }}
+                          onDeleteClick={() => {
+                            setOpenDeleteGradeAlert(true);
+                          }}
+                          title={`${grade.grade} - ${nameParser(
+                            grade.division
+                          )}`}
+                        />
                       </div>
                     </Button>
                   ))
@@ -284,6 +233,11 @@ function StudentsClientSide({
                               className="rounded-full text-black"
                               size="icon"
                               variant="outline"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setEditStudent(student);
+                                setStudentModal(true);
+                              }}
                             >
                               <Pencil size={20} />
                             </Button>
@@ -355,17 +309,18 @@ function StudentsClientSide({
       <StudentModal
         open={studentModal}
         onClose={() => setStudentModal(false)}
-        school={selectedSchool}
+        school={school}
         grade={selectedGrade}
+        editStudent={editStudent}
       />
       <GradeModal
         open={gradeModal}
-        onClose={() => setGradeModal(false)}
-        school={selectedSchool}
-      />
-      <CreateSchoolModal
-        open={openSchoolModal}
-        onClose={() => setOpenSchoolModal(false)}
+        onClose={() => {
+          setGradeModal(false);
+          setEditGrade(null);
+        }}
+        school={school || null}
+        editGrade={editGrade}
       />
       <SeveralStudentsModal
         open={openSeveralStudentsModal}

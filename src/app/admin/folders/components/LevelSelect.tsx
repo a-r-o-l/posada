@@ -42,7 +42,7 @@ function LevelSelect({ url }: { url: string }) {
   return (
     <Select value={state} onValueChange={setState}>
       <SelectTrigger className="w-full">
-        <SelectValue placeholder="Seleccionar colegio" />
+        <SelectValue placeholder="Seleccionar nivel" />
       </SelectTrigger>
       <SelectContent>
         <SelectGroup>

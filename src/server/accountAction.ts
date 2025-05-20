@@ -10,7 +10,7 @@ export const createAccount = async (data: FormData, admin: boolean = false) => {
     await dbConnect();
     const formData = Object.fromEntries(data.entries());
     const accountExists = await models.Account.findOne({
-      email: formData.email,
+      email: String(formData.email).toLowerCase(),
     }).lean();
     if (accountExists) {
       return {
@@ -20,10 +20,10 @@ export const createAccount = async (data: FormData, admin: boolean = false) => {
       };
     }
     const newAccount = new models.Account({
-      name: formData.name,
-      lastname: formData.lastname,
+      name: String(formData.name).toLowerCase(),
+      lastname: String(formData.lastname).toLowerCase(),
       phone: formData.phone,
-      email: formData.email,
+      email: String(formData.email).toLowerCase(),
       password: formData.password,
       role: formData.role,
       imageUrl: formData.imageUrl,

@@ -10,7 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createStudent } from "@/server/studentAction";
+import { PartialSchool } from "@/models/School";
+import { IStudentWP } from "@/models/Student";
+import { createStudent, updateStudent } from "@/server/studentAction";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -24,35 +26,53 @@ function StudentModal({
   onClose,
   school,
   grade,
+  editStudent,
 }: {
   open: boolean;
   onClose: () => void;
-  school?: string;
+  school?: PartialSchool | null;
   grade?: string;
+  editStudent?: IStudentWP | null;
 }) {
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
 
   const handleSubmit = async () => {
     setLoading(true);
-    if (!school || !grade) {
+    if (!school?._id || !grade) {
       return;
     }
     try {
-      const formData = new FormData();
-      formData.append("name", values.name);
-      formData.append("lastname", values.lastname);
-      formData.append("displayName", `${values.lastname} ${values.name}`);
-      formData.append("schoolId", school);
-      formData.append("gradeId", grade);
-      const res = await createStudent(formData);
-      if (res.success) {
-        toast.success(res.message);
-        setLoading(false);
-        onClose();
+      if (editStudent) {
+        const formData = new FormData();
+        formData.append("name", values.name);
+        formData.append("lastname", values.lastname);
+        formData.append("displayName", `${values.lastname} ${values.name}`);
+        const res = await updateStudent(editStudent._id, formData);
+        if (res.success) {
+          toast.success(res.message);
+          setLoading(false);
+          onClose();
+        } else {
+          toast.error(res.message);
+          setLoading(false);
+        }
       } else {
-        toast.error(res.message);
-        setLoading(false);
+        const formData = new FormData();
+        formData.append("name", values.name);
+        formData.append("lastname", values.lastname);
+        formData.append("displayName", `${values.lastname} ${values.name}`);
+        formData.append("schoolId", school._id);
+        formData.append("gradeId", grade);
+        const res = await createStudent(formData);
+        if (res.success) {
+          toast.success(res.message);
+          setLoading(false);
+          onClose();
+        } else {
+          toast.error(res.message);
+          setLoading(false);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -64,14 +84,20 @@ function StudentModal({
     if (!open) {
       setValues(initialValues);
     }
-  }, [open]);
+    if (editStudent) {
+      setValues({
+        name: editStudent.name,
+        lastname: editStudent.lastname,
+      });
+    }
+  }, [open, editStudent]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Crear alumno</DialogTitle>
-          <DialogDescription>colegio:</DialogDescription>
+          <DialogTitle>{!!editStudent ? "Editar" : "Crear"} alumno</DialogTitle>
+          <DialogDescription>colegio: {school?.name}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-5">
           <div className="space-y-2">
@@ -94,7 +120,7 @@ function StudentModal({
 
         <div className="flex w-full justify-evenly mt-10 gap-5">
           <LoadingButton
-            title="Crear"
+            title={!!editStudent ? "Guardar" : "Crear"}
             loading={loading}
             onClick={handleSubmit}
             disabled={!values.name || !values.lastname}

@@ -10,48 +10,76 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { createGrade } from "@/server/gradeAction";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { IGrade } from "@/models/Grade";
+import { PartialSchool } from "@/models/School";
+import { createGrade, updateGrade } from "@/server/gradeAction";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const initialValues = {
   grade: "",
-  division: "",
+  division: "jardin",
   year: new Date().getFullYear().toString(),
 };
 
-function StudentModal({
+function GradeModal({
   open,
   onClose,
   school,
+  editGrade,
 }: {
   open: boolean;
   onClose: () => void;
-  school?: string;
+  school?: PartialSchool | null;
+  editGrade: IGrade | null;
 }) {
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
 
   const handleSubmit = async () => {
     setLoading(true);
-    if (!school) {
+    if (!school?._id) {
       return;
     }
     try {
-      const formData = new FormData();
-      formData.append("grade", values.grade);
-      formData.append("division", values.division);
-      formData.append("year", values.year);
-      formData.append("displayName", `${values.grade} ${values.division}`);
-      formData.append("schoolId", school);
-      const res = await createGrade(formData);
-      if (res.success) {
-        toast.success(res.message);
-        setLoading(false);
-        onClose();
+      if (editGrade) {
+        const formData = new FormData();
+        formData.append("grade", values.grade);
+        formData.append("division", values.division);
+        formData.append("displayName", `${values.grade} ${values.division}`);
+        formData.append("year", values.year);
+        const res = await updateGrade(formData, editGrade._id);
+        if (res.success) {
+          toast.success(res.message);
+          setLoading(false);
+          onClose();
+        } else {
+          toast.error(res.message);
+          setLoading(false);
+        }
       } else {
-        toast.error(res.message);
-        setLoading(false);
+        const formData = new FormData();
+        formData.append("grade", values.grade);
+        formData.append("division", values.division);
+        formData.append("year", values.year);
+        formData.append("displayName", `${values.grade} ${values.division}`);
+        formData.append("schoolId", school._id);
+        const res = await createGrade(formData);
+        if (res.success) {
+          toast.success(res.message);
+          setLoading(false);
+          onClose();
+        } else {
+          toast.error(res.message);
+          setLoading(false);
+        }
       }
     } catch (error) {
       console.log(error);
@@ -63,14 +91,21 @@ function StudentModal({
     if (!open) {
       setValues(initialValues);
     }
-  }, [open]);
+    if (editGrade) {
+      setValues({
+        grade: editGrade.grade,
+        division: editGrade.division,
+        year: editGrade.year.toString(),
+      });
+    }
+  }, [open, editGrade]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Crear Curso</DialogTitle>
-          <DialogDescription>colegio: </DialogDescription>
+          <DialogTitle>{!!editGrade ? "Editar" : "Crear"} Curso</DialogTitle>
+          <DialogDescription>colegio: {school?.name}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-5">
           <div className="space-y-2">
@@ -81,13 +116,20 @@ function StudentModal({
             />
           </div>
           <div className="space-y-2">
-            <Label>Division</Label>
-            <Input
+            <Label>Nivel</Label>
+            <Select
               value={values.division}
-              onChange={(e) =>
-                setValues({ ...values, division: e.target.value })
-              }
-            />
+              onValueChange={(e) => setValues({ ...values, division: e })}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Seleccionar nivel" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="jardin">Jardin</SelectItem>
+                <SelectItem value="primaria">Primaria</SelectItem>
+                <SelectItem value="secundaria">Secundaria</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-2">
             <Label>Año</Label>
@@ -100,7 +142,7 @@ function StudentModal({
 
         <div className="flex w-full justify-evenly mt-10 gap-5">
           <LoadingButton
-            title="Crear"
+            title={!!editGrade ? "Guardar" : "Crear"}
             loading={loading}
             onClick={handleSubmit}
             disabled={!values.grade || !values.division || !values.year}
@@ -115,4 +157,4 @@ function StudentModal({
   );
 }
 
-export default StudentModal;
+export default GradeModal;

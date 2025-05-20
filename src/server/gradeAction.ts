@@ -106,9 +106,9 @@ export const createGrade = async (data: FormData) => {
     const formData = Object.fromEntries(data.entries());
 
     const newGrade = new models.Grade({
-      grade: formData.grade,
+      grade: String(formData.grade).toLowerCase(),
       division: formData.division,
-      displayName: formData.displayName,
+      displayName: String(formData.displayName).toLowerCase(),
       year: formData.year,
       schoolId: formData.schoolId,
     });
@@ -124,6 +124,44 @@ export const createGrade = async (data: FormData) => {
     return {
       success: false,
       message: "Error al crear el curso",
+    };
+  }
+};
+
+export const updateGrade = async (data: FormData, id: string) => {
+  try {
+    await dbConnect();
+    const formData = Object.fromEntries(data.entries());
+
+    const updatedGrade = await models.Grade.findByIdAndUpdate(
+      id,
+      {
+        grade: String(formData.grade).toLowerCase(),
+        division: String(formData.division).toLowerCase(),
+        displayName: String(formData.displayName).toLowerCase(),
+        year: formData.year,
+      },
+      { new: true }
+    );
+
+    if (!updatedGrade) {
+      return {
+        success: false,
+        message: "Curso no encontrado",
+      };
+    }
+
+    revalidatePath(`/schools/${updatedGrade.schoolId}`);
+    return {
+      success: true,
+      message: "Curso actualizado",
+      grade: JSON.parse(JSON.stringify(updatedGrade)),
+    };
+  } catch (error) {
+    console.error("Error actualizando curso:", error);
+    return {
+      success: false,
+      message: "Error al actualizar el curso",
     };
   }
 };

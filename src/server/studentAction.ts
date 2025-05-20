@@ -73,10 +73,10 @@ export const createStudent = async (data: FormData) => {
     const formData = Object.fromEntries(data.entries());
 
     const newStudent = new models.Student({
-      name: formData.name,
-      lastname: formData.lastname,
+      name: String(formData.name).toLowerCase(),
+      lastname: String(formData.lastname).toLowerCase(),
+      displayName: String(formData.displayName).toLowerCase(),
       gradeId: formData.gradeId,
-      displayName: formData.displayName,
       schoolId: formData.schoolId,
     });
     revalidatePath(
@@ -131,6 +131,36 @@ export const deleteStudent = async (id: string) => {
     return {
       success: false,
       message: "Error al eliminar el estudiante",
+    };
+  }
+};
+
+export const updateStudent = async (id: string, data: FormData) => {
+  try {
+    await dbConnect();
+    const formData = Object.fromEntries(data.entries());
+
+    const sanitizedData = {
+      name: String(formData.name).toLowerCase(),
+      lastname: String(formData.lastname).toLowerCase(),
+      displayName: String(formData.displayName).toLowerCase(),
+    };
+
+    const student = await models.Student.findByIdAndUpdate(id, sanitizedData, {
+      new: true,
+    });
+
+    revalidatePath(`/admin/schools/${student?.schoolId}`);
+    return {
+      success: true,
+      message: "Estudiante actualizado",
+      student: JSON.parse(JSON.stringify(student)),
+    };
+  } catch (error) {
+    console.error("Error actualizando estudiante:", error);
+    return {
+      success: false,
+      message: "Error al actualizar el estudiante",
     };
   }
 };
