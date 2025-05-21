@@ -26,12 +26,15 @@ import StateSelect from "./StateSelect";
 import PaymentBadge from "@/app/store/purchases/components/PaymentBadge";
 import DeliveredSelect from "./DeliveredSelect";
 import { priceParserToString } from "@/lib/utilsFunctions";
+import { Input } from "@/components/ui/input";
+import { CircleX, Search } from "lucide-react";
 
 function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
   const router = useRouter();
   const [selectedSale, setSelectedSale] = useState<ISalePopulated | null>(null);
   const [openAlert, setOpenAlert] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [searchParams, setSearchParams] = useState("");
 
   useEffect(() => {
     if (selectedSale && selectedSale.isNewSale) {
@@ -41,23 +44,37 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
     }
   }, [selectedSale]);
 
+  const filteredSales = useMemo(() => {
+    if (!sales || !sales.length) return [];
+    if (!searchParams) return sales;
+    const filtered = sales.filter((sale) => {
+      const email = sale?.accountId?.email?.toLowerCase();
+      if (email && email.includes(searchParams.toLowerCase())) {
+        return true;
+      }
+      return false;
+    });
+    return filtered;
+  }, [searchParams, sales]);
+
   const salesQuantity = useMemo(() => {
-    if (!sales || !sales.length) return { totalSales: 0, newSales: 0 };
-    const totalSales = sales?.length;
-    const newSales = sales?.filter((sale) => !sale.isNewSale).length;
+    if (!filteredSales || !filteredSales.length)
+      return { totalSales: 0, newSales: 0 };
+    const totalSales = filteredSales?.length;
+    const newSales = filteredSales?.filter((sale) => !sale.isNewSale).length;
     return { totalSales, newSales };
-  }, [sales]);
+  }, [filteredSales]);
 
   const salesTotal = useMemo(() => {
-    if (!sales || !sales.length) return 0;
-    const total = sales?.reduce((acc, sale) => {
+    if (!filteredSales || !filteredSales.length) return 0;
+    const total = filteredSales?.reduce((acc, sale) => {
       if (sale.total) {
         return acc + sale.total;
       }
       return acc;
     }, 0);
     return total;
-  }, [sales]);
+  }, [filteredSales]);
 
   return (
     <Card>
@@ -86,6 +103,30 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
         </div>
       </CardHeader>
       <CardContent>
+        <div className="relative w-60">
+          <Search className="absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-500" />
+          {!!searchParams && (
+            <CircleX
+              className="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer text-red-500"
+              onClick={() => {
+                setSearchParams("");
+              }}
+            />
+          )}
+          <Input
+            placeholder="Buscar por email"
+            className="w-60 pl-10"
+            value={searchParams}
+            onKeyDown={(e) => {
+              if (e.key === "Escape") {
+                setSearchParams("");
+              }
+            }}
+            onChange={(e) => {
+              setSearchParams(e.target.value.toLowerCase());
+            }}
+          />
+        </div>
         <Table className="mt-10">
           <TableHeader>
             <TableRow>
@@ -100,8 +141,8 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {!!sales.length ? (
-              sales.map((sale) => (
+            {!!filteredSales.length ? (
+              filteredSales.map((sale) => (
                 <TableRow
                   key={sale._id}
                   className={`${

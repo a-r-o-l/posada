@@ -71,11 +71,13 @@ export const updateSale = async (id: string, data: FormData) => {
 export const getAllSales = async (
   start?: string,
   end?: string,
-  state?: string
+  state?: string,
+  delivered?: string
 ) => {
   try {
     const query: {
       status?: string;
+      delivered?: boolean;
       createdAt?: {
         $gte: Date;
         $lte: Date;
@@ -94,6 +96,10 @@ export const getAllSales = async (
     if (state) {
       query.status = state;
     }
+    if (delivered) {
+      query.delivered = delivered === "delivered";
+    }
+
     await dbConnect();
     const sales = await models.Sale.find(query)
       .populate("accountId")

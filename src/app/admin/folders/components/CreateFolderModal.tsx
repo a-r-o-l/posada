@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { IGrade } from "@/models/Grade";
 import { createFolder, updateFolder } from "@/server/folderAction";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import GradeSelect from "./GradeSelect";
 import { IFolder } from "@/models/Folder";
@@ -150,6 +150,15 @@ function CreateFolderModal({
     }
   }, [open]);
 
+  const filteredGrades = useMemo(() => {
+    if (!grades || !grades.length || !values.year) return [];
+    const filtered = grades.filter((grade) => {
+      const year = grade.year;
+      return year === values.year;
+    });
+    return filtered;
+  }, [grades, values.year]);
+
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
@@ -222,7 +231,7 @@ function CreateFolderModal({
             </div>
             <GradeSelect
               disabled={!isPrivate}
-              grades={grades}
+              grades={filteredGrades}
               state={gradeState}
               setState={setGradeState}
             />

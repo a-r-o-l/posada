@@ -9,10 +9,11 @@ export default async function page({
     state: string;
     start: string;
     end: string;
+    delivered: string;
   }>;
 }) {
-  const { start, end, state } = await searchParams;
-  const { sales } = await getAllSales(start, end, state);
+  const { start, end, state, delivered } = await searchParams;
+  const { sales } = await getAllSales(start, end, state, delivered);
 
   return (
     <div className="container mx-auto p-4">

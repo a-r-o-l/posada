@@ -56,10 +56,11 @@ function SchoolList({ schools }: { schools: ISchool[] }) {
             }
           }}
         >
-          <Avatar className="w-20 h-20 lg:w-28 lg:h-28">
+          <Avatar className="w-20 h-20 lg:w-40 lg:h-40">
             <AvatarImage
               src={school.imageUrl || "/placeholderimg.jpg"}
               alt={school.name}
+              className="object-contain !aspect-square p-1"
             />
             <AvatarFallback></AvatarFallback>
           </Avatar>

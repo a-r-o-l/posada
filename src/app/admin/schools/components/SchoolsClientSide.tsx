@@ -8,6 +8,7 @@ import SchoolButton from "./SchoolButton";
 
 function SchoolsClientSide({ schools }: { schools: PartialSchool[] }) {
   const [openSchoolModal, setOpenSchoolModal] = useState(false);
+  const [editSchool, setEditSchool] = useState<PartialSchool | null>(null);
 
   return (
     <Card className="w-full">
@@ -22,7 +23,14 @@ function SchoolsClientSide({ schools }: { schools: PartialSchool[] }) {
       <CardContent className="flex gap-5 flex-wrap">
         {schools?.length ? (
           schools?.map((school) => (
-            <SchoolButton key={school._id} school={school} />
+            <SchoolButton
+              key={school._id}
+              school={school}
+              onEdit={() => {
+                setEditSchool(school);
+                setOpenSchoolModal(true);
+              }}
+            />
           ))
         ) : (
           <div className="w-full h-60 flex items-center justify-center">
@@ -35,6 +43,7 @@ function SchoolsClientSide({ schools }: { schools: PartialSchool[] }) {
       <CreateSchoolModal
         open={openSchoolModal}
         onClose={() => setOpenSchoolModal(false)}
+        editSchool={editSchool}
       />
     </Card>
   );

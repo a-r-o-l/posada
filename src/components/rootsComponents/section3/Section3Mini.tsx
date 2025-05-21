@@ -10,7 +10,7 @@ const data = [
   {
     id: 1,
     title: "Archivos digitales",
-    text: "Al confirmar el pago le enviaremos el/los archivo elegidos a tu WhatsApp.",
+    text: "Al confirmar el pago te enviaremos el/los archivo elegidos a tu WhatsApp.",
     img: "/ui/products/13x18.jpeg",
   },
   {

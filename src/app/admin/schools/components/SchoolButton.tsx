@@ -14,7 +14,13 @@ import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 
-function SchoolButton({ school }: { school: PartialSchool }) {
+function SchoolButton({
+  school,
+  onEdit,
+}: {
+  school: PartialSchool;
+  onEdit: () => void;
+}) {
   const router = useRouter();
   return (
     <DropdownMenu>
@@ -38,12 +44,12 @@ function SchoolButton({ school }: { school: PartialSchool }) {
             <ExternalLink />
             Ver detalles
           </DropdownMenuItem>
-          <DropdownMenuItem className="">
+          <DropdownMenuItem className="" onClick={onEdit}>
             <Pencil />
             Editar
           </DropdownMenuItem>
           <DropdownMenuSeparator />
-          <DropdownMenuItem className=" text-red-500">
+          <DropdownMenuItem className=" text-red-500" disabled>
             <Trash2 />
             Eliminar
           </DropdownMenuItem>

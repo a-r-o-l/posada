@@ -10,11 +10,13 @@ function ImageViewer({
   setFile,
   file,
   imageUrl = "",
+  setExistingImage,
   classname = "",
 }: {
   setFile: React.Dispatch<React.SetStateAction<File | null>>;
   file: File | null;
-  imageUrl?: string;
+  imageUrl: string | null;
+  setExistingImage?: React.Dispatch<React.SetStateAction<string | null>>;
   classname?: string;
 }) {
   const imgSrc = useMemo(() => {
@@ -49,7 +51,16 @@ function ImageViewer({
       {imgSrc ? (
         <Button
           className="absolute bottom-2 right-2 p-2 bg-white rounded-full cursor-pointer hover:bg-gray-100"
-          onClick={() => setFile(null)}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            if (setExistingImage) {
+              setExistingImage(null);
+            }
+            if (file) {
+              setFile(null);
+            }
+          }}
         >
           <X className="h-6 w-6 text-gray-600" />
         </Button>

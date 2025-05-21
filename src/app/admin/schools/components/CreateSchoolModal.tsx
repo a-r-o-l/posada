@@ -14,8 +14,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { createSchool } from "@/server/schoolAction";
-import React, { useEffect, useState } from "react";
+import { PartialSchool } from "@/models/School";
+import { createSchool, updateSchool } from "@/server/schoolAction";
+import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 type FormValues = {
@@ -33,20 +34,60 @@ const initialValues = {
 function CreateSchoolModal({
   open,
   onClose,
+  editSchool,
 }: {
   open: boolean;
   onClose: () => void;
+  editSchool: PartialSchool | null;
 }) {
   const [loading, setLoading] = useState(false);
   const [withPassword, setWithPassword] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [values, setValues] = useState<FormValues>(initialValues);
+  const [existingImage, setExistingImage] = useState<string | null>(null);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
     let imageUrl = "";
     try {
+      if (!!editSchool) {
+        if (file) {
+          const formDataImage = new FormData();
+          formDataImage.append("file", file);
+          formDataImage.append("folder", "school");
+          const response = await fetch("/api/upload/folderImage", {
+            method: "POST",
+            body: formDataImage,
+          });
+          if (response.ok) {
+            const result = await response.json();
+            imageUrl = result.imageUrl;
+            console.log("File uploaded successfully", result);
+          } else {
+            console.error("File upload failed", await response.text());
+          }
+        } else {
+          imageUrl = existingImage || "";
+        }
+        const formData = new FormData();
+        formData.append("name", values.name);
+        formData.append("description", values.description);
+        formData.append("password", withPassword ? values.password : "");
+        formData.append("imageUrl", imageUrl);
+        formData.append("isPrivate", withPassword ? "true" : "false");
+        const response = await updateSchool(editSchool._id || "", formData);
+        if (response.success) {
+          toast.success("Colegio editado correctamente");
+          onClose();
+          setLoading(false);
+        } else {
+          toast.error(response.message);
+          console.error("Error al editar el colegio:", response.message);
+          setLoading(false);
+        }
+        return;
+      }
       if (file) {
         const formDataImage = new FormData();
         formDataImage.append("file", file);
@@ -91,16 +132,58 @@ function CreateSchoolModal({
       setValues(initialValues);
       setFile(null);
       setWithPassword(false);
+    } else {
+      if (!!editSchool) {
+        setValues({
+          name: editSchool?.name || "",
+          description: editSchool?.description || "",
+          password: editSchool?.password || "",
+        });
+        setWithPassword(!!editSchool?.password);
+        setExistingImage(editSchool?.imageUrl || null);
+        if (editSchool.isPrivate) {
+          setWithPassword(true);
+        }
+      }
     }
-  }, [open]);
+  }, [open, editSchool]);
+
+  const disabledSubmit = useMemo(() => {
+    if (editSchool) {
+      if (!values.name) return true;
+      if (
+        values.name === editSchool?.name &&
+        values.description === editSchool?.description &&
+        values.password === editSchool?.password &&
+        existingImage === editSchool?.imageUrl &&
+        editSchool?.isPrivate === withPassword
+      ) {
+        return true;
+      }
+      return false;
+    } else {
+      if (!values.name) return true;
+      return false;
+    }
+  }, [values, withPassword, editSchool, existingImage]);
+
+  useEffect(() => {
+    if (!withPassword) {
+      if (values.password) {
+        setValues({ ...values, password: "" });
+      }
+    }
+  }, [withPassword, values]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Crear un colegio</DialogTitle>
+          <DialogTitle>
+            {editSchool ? "Editar" : "Crear"} un colegio
+          </DialogTitle>
           <DialogDescription>
-            Formulario para crear un nuevo colegio
+            Formulario para {editSchool ? "editar" : "crear"} un colegio
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={(e) => handleSubmit(e)}>
@@ -109,6 +192,8 @@ function CreateSchoolModal({
               <ImageViewer
                 file={file}
                 setFile={setFile}
+                imageUrl={existingImage}
+                setExistingImage={setExistingImage}
                 classname="w-1/2 min-h-40"
               />
             </div>
@@ -153,10 +238,11 @@ function CreateSchoolModal({
           </div>
           <div className="mt-10 flex items-center justify-end gap-5">
             <LoadingButton
-              title="Crear colegio"
+              title={editSchool ? "Guardar" : "Crear"}
               classname="w-40"
               loading={loading}
               type="submit"
+              disabled={disabledSubmit}
             />
 
             <Button

@@ -212,10 +212,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                     </div>
                     <div className="space-y-2">
                       <Label>password</Label>
-                      <PasswordInput
-                        value={selectedAccount.password}
-                        disabled
-                      />
+                      <PasswordInput value={selectedAccount.password} />
                     </div>
                   </div>
                   {selectedAccount?.role !== "admin" && (

@@ -33,7 +33,7 @@ function Section6Mini() {
                   seguridad.
                 </li>
                 <li>
-                  Más fácil para padres separados. Facilita los pedidos por
+                  Más fácil para padres divorciados. Facilita los pedidos por
                   separado.
                 </li>
                 <li>
@@ -57,12 +57,12 @@ function Section6Mini() {
             </AccordionTrigger>
             <AccordionContent>
               <ul className="list-disc pl-5 text-sm">
-                <li>Combos disponibles: Carpeta o Foto Book.</li>
-                <li>Copias impresas en diferentes tamaños.</li>
                 <li>
                   Archivos digitales: ideales para imprimir, guardar en el
                   celular, enviar a familiares o compartir en redes sociales.
                 </li>
+                <li>Combos disponibles: Carpeta o Foto Book.</li>
+                <li>Copias impresas en diferentes tamaños.</li>
               </ul>
             </AccordionContent>
           </AccordionItem>
