@@ -4,7 +4,28 @@ import models from "@/models";
 import { PartialStudent } from "@/models/Student";
 import { revalidatePath } from "next/cache";
 
-export const getAllStudent = async (schoolId: string) => {
+export const getAllStudents = async () => {
+  try {
+    await dbConnect();
+    const students = await models.Student.find()
+      .populate("schoolId")
+      .populate("gradeId")
+      .lean();
+    return {
+      success: true,
+      message: "Estudiantes encontrados",
+      students: JSON.parse(JSON.stringify(students)),
+    };
+  } catch (error) {
+    console.error("Error buscando estudiantes:", error);
+
+    return {
+      success: false,
+      message: "Error al buscar los estudiantes",
+    };
+  }
+};
+export const getAllStudentsBySchool = async (schoolId: string) => {
   try {
     let query = {};
     if (schoolId) {

@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { IAccountPopulated, IChildrenPopulated } from "@/models/Account";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -24,28 +24,28 @@ import PasswordInput from "@/components/PasswordInput";
 import CreateAccountModal from "./CreateAccountModal";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { changeDisabled } from "@/server/accountAction";
+import {
+  changeDisabled,
+  removeChildFromAccount,
+  updateAccount,
+} from "@/server/accountAction";
 import { toast } from "sonner";
-import { CircleX, Search } from "lucide-react";
+import { CircleX, Search, Trash2 } from "lucide-react";
+import CreateChildren from "./CreateChildren";
+import { Checkbox } from "@/components/ui/checkbox";
+import CustomAlertDialog from "@/components/CustomAlertDialog";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const searchVal = searchParams.get("search") || "";
+
   const [selectedAccount, setSelectedAccount] =
     useState<IAccountPopulated | null>(null);
   const [openAccountModal, setOpenAccountModal] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-
-  const filteredAccounts = useMemo(() => {
-    if (searchValue === "") {
-      return accounts;
-    } else {
-      return accounts.filter(
-        (account) =>
-          account.name.toLowerCase().includes(searchValue) ||
-          account.lastname.toLowerCase().includes(searchValue) ||
-          account.email.toLowerCase().includes(searchValue)
-      );
-    }
-  }, [searchValue, accounts]);
+  const [openChildrenModal, setOpenChildrenModal] = useState(false);
+  const [openVerifiedDialog, setOpenVerifiedDialog] = useState(false);
 
   const RenderBadge = ({ role }: { role: string }) => {
     if (!role) {
@@ -80,6 +80,16 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
     }
   };
 
+  const updateSearchQuery = (term: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (term) {
+      params.set("search", term);
+    } else {
+      params.delete("search");
+    }
+    router.replace(`/admin/accounts?${params.toString()}`);
+  };
+
   return (
     <Card className="w-full">
       <CardHeader className="flex flex-row justify-between">
@@ -99,28 +109,28 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                 <CardDescription></CardDescription>
                 <div className="relative">
                   <Search className="absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-500" />
-                  {!!searchValue && (
+                  {!!searchVal && (
                     <CircleX
                       className="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer text-red-500"
                       onClick={() => {
-                        setSearchValue("");
+                        updateSearchQuery("");
                       }}
                     />
                   )}
                   <Input
                     placeholder="Buscar cuenta"
                     className="w-60 pl-10"
-                    value={searchValue}
+                    value={searchVal}
                     onKeyDown={(e) => {
                       if (selectedAccount) {
                         setSelectedAccount(null);
                       }
                       if (e.key === "Escape") {
-                        setSearchValue("");
+                        updateSearchQuery("");
                       }
                     }}
                     onChange={(e) => {
-                      setSearchValue(e.target.value.toLowerCase());
+                      updateSearchQuery(e.target.value);
                     }}
                   />
                 </div>
@@ -128,7 +138,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[500px]">
-                {filteredAccounts?.map((account) => (
+                {accounts?.map((account) => (
                   <div
                     role="button"
                     key={account._id}
@@ -182,7 +192,17 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
           </Card>
           <Card>
             <CardHeader>
-              <CardTitle>Detalles de la cuenta</CardTitle>
+              <div className="flex items-center justify-between gap-5">
+                <CardTitle>Detalles de la cuenta</CardTitle>
+                <CardDescription></CardDescription>
+                <div className="flex items-center gap-2">
+                  <Label>Verificada</Label>
+                  <Checkbox
+                    checked={selectedAccount?.verified}
+                    onClick={() => setOpenVerifiedDialog(true)}
+                  />
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
               {selectedAccount ? (
@@ -212,12 +232,26 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                     </div>
                     <div className="space-y-2">
                       <Label>password</Label>
-                      <PasswordInput value={selectedAccount.password} />
+                      <PasswordInput
+                        value={selectedAccount.password}
+                        onChange={() => {}}
+                      />
                     </div>
                   </div>
                   {selectedAccount?.role !== "admin" && (
                     <div className="w-full">
-                      <p className="font-black text-base">Menores a cargo</p>
+                      <div className="flex w-full justify-between items-center">
+                        <p className="font-black text-base">Menores a cargo</p>
+                        <Button
+                          onClick={() => {
+                            setOpenChildrenModal(true);
+                          }}
+                          variant="link"
+                        >
+                          Agregar menor
+                        </Button>
+                      </div>
+
                       <Table>
                         <TableHeader>
                           <TableRow>
@@ -225,6 +259,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                             <TableHead>apellido</TableHead>
                             <TableHead>Escuela</TableHead>
                             <TableHead>curso</TableHead>
+                            <TableHead></TableHead>
                           </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -238,6 +273,28 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                                 <TableCell>{child.schoolId.name}</TableCell>
                                 <TableCell>
                                   {child.gradeId.grade} {child.gradeId.division}
+                                </TableCell>
+                                <TableCell>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    onClick={async () => {
+                                      const res = await removeChildFromAccount(
+                                        selectedAccount._id,
+                                        child
+                                      );
+                                      if (res.success) {
+                                        toast.success(res.message);
+                                      } else {
+                                        toast.error(
+                                          res.message ||
+                                            "Error al eliminar el menor de la cuenta"
+                                        );
+                                      }
+                                    }}
+                                  >
+                                    <Trash2 />
+                                  </Button>
                                 </TableCell>
                               </TableRow>
                             )
@@ -258,9 +315,37 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
           </Card>
         </div>
       </CardContent>
+      <CreateChildren
+        open={openChildrenModal}
+        onClose={() => setOpenChildrenModal(false)}
+        accountId={selectedAccount?._id || ""}
+      />
       <CreateAccountModal
         open={openAccountModal}
         onClose={() => setOpenAccountModal(false)}
+      />
+      <CustomAlertDialog
+        title="Verificacion de cuenta"
+        description="¿Estás seguro de que quieres cambiar la verificacion de esta cuenta?"
+        open={openVerifiedDialog}
+        onClose={() => setOpenVerifiedDialog(false)}
+        onAccept={async () => {
+          if (!selectedAccount) {
+            toast.error("No hay una cuenta seleccionada");
+            return;
+          }
+          const formData = new FormData();
+          formData.append("verified", String(!selectedAccount.verified));
+          const res = await updateAccount(selectedAccount._id, formData);
+          if (res.success) {
+            toast.success(res.message);
+            setOpenVerifiedDialog(false);
+            router.push("/admin/accounts");
+            router.refresh();
+          } else {
+            toast.error(res.message || "Error al actualizar la cuenta");
+          }
+        }}
       />
     </Card>
   );

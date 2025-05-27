@@ -1,5 +1,6 @@
 import { Schema, Document, model, models } from "mongoose";
 import { IGrade } from "./Grade";
+import { ISchool } from "./School";
 
 export interface IStudent extends Document {
   _id: string;
@@ -12,6 +13,10 @@ export interface IStudent extends Document {
 
 export type PartialStudent = Partial<IStudent>;
 export type IStudentWP = Omit<IStudent, "gradeId"> & { gradeId: IGrade };
+export type IStudentPopulated = Omit<IStudent, "gradeId" | "schoolId"> & {
+  gradeId: IGrade;
+  schoolId: ISchool;
+};
 
 const StudentSchema: Schema = new Schema(
   {

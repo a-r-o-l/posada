@@ -2,7 +2,7 @@
 
 import dbConnect from "@/lib/mongoose";
 import models from "@/models";
-import { PartialChildren } from "@/models/Account";
+import { IChildrenPopulated, PartialChildren } from "@/models/Account";
 import { revalidatePath } from "next/cache";
 
 export const createAccount = async (data: FormData, admin: boolean = false) => {
@@ -115,6 +115,37 @@ export const getAllAccounts = async () => {
   }
 };
 
+export const searchAccounts = async (search: string = "") => {
+  try {
+    await dbConnect();
+
+    const query = search
+      ? {
+          $or: [
+            { name: { $regex: search, $options: "i" } },
+            { lastname: { $regex: search, $options: "i" } },
+            { email: { $regex: search, $options: "i" } },
+          ],
+        }
+      : {};
+    const accounts = await models.Account.find(query)
+      .populate([{ path: "children", populate: ["schoolId", "gradeId"] }])
+      .lean();
+    return {
+      success: true,
+      message: "Cuentas encontradas",
+      accounts: JSON.parse(JSON.stringify(accounts)),
+    };
+  } catch (error) {
+    console.error("Error searching accounts:", error);
+    return {
+      success: false,
+      message: "Error al buscar las cuentas, intente nuevamente",
+      accounts: null,
+    };
+  }
+};
+
 export const getAccount = async (id: string, parsed: boolean = false) => {
   try {
     await dbConnect();
@@ -185,7 +216,7 @@ export const updateAccount = async (id: string, data: FormData) => {
     ).lean();
 
     const plainUpdatedAccount = JSON.parse(JSON.stringify(updatedAccount));
-
+    revalidatePath("/admin/accounts");
     return {
       success: true,
       message: "Cuenta actualizada correctamente.",
@@ -274,6 +305,110 @@ export const updateChildren = async (id: string, data: FormData) => {
     return {
       success: false,
       message: "Error al actualizar la cuenta, intente nuevamente.",
+      account: null,
+    };
+  }
+};
+
+export const addChildToAccount = async (id: string, studentId: string) => {
+  try {
+    await dbConnect();
+    const currentAccount = await models.Account.findById(id).lean();
+    if (!currentAccount) {
+      return {
+        success: false,
+        message: "Cuenta no encontrada",
+        account: null,
+      };
+    }
+    const student = await models.Student.findById(studentId);
+    if (!student) {
+      return {
+        success: false,
+        message: "Estudiante no encontrado",
+        account: null,
+      };
+    }
+    const newChild = {
+      name: student.name,
+      lastname: student.lastname,
+      schoolId: student.schoolId,
+      gradeId: student.gradeId,
+    };
+
+    const updatedAccount = await models.Account.findByIdAndUpdate(
+      id,
+      {
+        verified: true,
+        $addToSet: {
+          children: newChild,
+          availableGrades: student.gradeId,
+        },
+      },
+      { new: true }
+    ).lean();
+    const plainUpdatedAccount = JSON.parse(JSON.stringify(updatedAccount));
+    revalidatePath("/admin/accounts");
+    return {
+      success: true,
+      message: "Menor agregado correctamente.",
+      account: plainUpdatedAccount,
+    };
+  } catch (error) {
+    console.error("Error getting account:", error);
+    return {
+      success: false,
+      message: "Error al obtener la cuenta, intente nuevamente",
+      account: null,
+    };
+  }
+};
+
+export const removeChildFromAccount = async (
+  accountId: string,
+  childToRemove: IChildrenPopulated
+) => {
+  try {
+    await dbConnect();
+
+    const currentAccount = await models.Account.findById(accountId);
+    if (!currentAccount) {
+      return {
+        success: false,
+        message: "Cuenta no encontrada",
+        account: null,
+      };
+    }
+
+    // Actualizar la cuenta - removemos el hijo que coincida con todos los campos
+    const updatedAccount = await models.Account.findByIdAndUpdate(
+      accountId,
+      {
+        $pull: {
+          children: {
+            name: childToRemove.name,
+            lastname: childToRemove.lastname,
+            schoolId: childToRemove.schoolId,
+            gradeId: childToRemove.gradeId,
+          },
+        },
+      },
+      { new: true }
+    ).lean();
+
+    const plainUpdatedAccount = JSON.parse(JSON.stringify(updatedAccount));
+    revalidatePath("/admin/accounts");
+
+    return {
+      success: true,
+      message: "Menor eliminado correctamente.",
+      account: plainUpdatedAccount,
+    };
+  } catch (error) {
+    console.error("Error removing child from account:", error);
+    return {
+      success: false,
+      message: "Error al eliminar el menor de la cuenta, intente nuevamente",
       account: null,
     };
   }
