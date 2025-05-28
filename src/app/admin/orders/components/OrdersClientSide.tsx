@@ -43,6 +43,7 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
   const [selectedSale, setSelectedSale] = useState<ISalePopulated | null>(null);
   const [openAlert, setOpenAlert] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [searchParams, setSearchParams] = useState("");
 
   useEffect(() => {
@@ -203,20 +204,21 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                         <DropdownMenuLabel>{sale.order}</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                          <DropdownMenuItem className="flex items-center gap-2">
+                          <DropdownMenuItem
+                            className="flex items-center gap-2"
+                            onClick={() => {
+                              setSelectedSale(sale);
+                              router.push(`/admin/orders/${sale._id}`);
+                            }}
+                          >
                             <ExternalLink />
                             <span>Ver detalles</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-red-500"
                             onClick={async () => {
-                              const res = await deleteSale(sale._id);
-                              if (res.success) {
-                                toast.success(res.message);
-                                router.refresh();
-                              } else {
-                                toast.error(res.message);
-                              }
+                              setSelectedSale(sale);
+                              setOpenDeleteDialog(true);
                             }}
                           >
                             <Trash2 />
@@ -225,16 +227,6 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                         </DropdownMenuGroup>
                       </DropdownMenuContent>
                     </DropdownMenu>
-                    {/* <Button
-                      variant="outline"
-                      className="text-black dark:text-white"
-                      onClick={() => {
-                        setSelectedSale(sale);
-                        router.push(`/admin/orders/${sale._id}`);
-                      }}
-                    >
-                      Ver detalles
-                    </Button> */}
                   </TableCell>
                 </TableRow>
               ))
@@ -292,6 +284,24 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
           }
         }}
         loading={updateLoading}
+      />
+      <CustomAlertDialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+        title="Eliminar orden"
+        description="Estas seguro de eliminar esta orden? Esta accion no se puede deshacer."
+        onAccept={async () => {
+          if (!selectedSale) return;
+          const res = await deleteSale(selectedSale._id);
+          if (res.success) {
+            toast.success(res.message);
+            setOpenDeleteDialog(false);
+            setSelectedSale(null);
+            router.refresh();
+          } else {
+            toast.error(res.message);
+          }
+        }}
       />
     </Card>
   );
