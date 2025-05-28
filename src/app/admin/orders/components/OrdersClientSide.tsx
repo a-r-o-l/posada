@@ -19,7 +19,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import DatePicker from "./DatePicker";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
-import { updateSaleStatus } from "@/server/saleAction";
+import { deleteSale, updateSaleStatus } from "@/server/saleAction";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import StateSelect from "./StateSelect";
@@ -27,7 +27,16 @@ import PaymentBadge from "@/app/store/purchases/components/PaymentBadge";
 import DeliveredSelect from "./DeliveredSelect";
 import { priceParserToString } from "@/lib/utilsFunctions";
 import { Input } from "@/components/ui/input";
-import { CircleX, Search } from "lucide-react";
+import { CircleX, Ellipsis, ExternalLink, Search, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
   const router = useRouter();
@@ -87,15 +96,15 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
             </Badge>
           </div>
           <div className="flex flex-1 justify-around">
-            <div className="flex flex-col space-y-2 justify-center items-center w-80">
+            <div className="flex flex-col space-y-2 justify-center items-center w-60">
               <Label>Filtrar por fecha</Label>
               <DatePicker url="/admin/orders" />
             </div>
-            <div className="flex flex-col space-y-2 justify-center items-center w-80">
+            <div className="flex flex-col space-y-2 justify-center items-center w-60">
               <Label>Filtrar por estado de pago</Label>
               <StateSelect url="/admin/orders" />
             </div>
-            <div className="flex flex-col space-y-2 justify-center items-center w-80">
+            <div className="flex flex-col space-y-2 justify-center items-center w-60">
               <Label>Filtrar por estado de entrega</Label>
               <DeliveredSelect url="/admin/orders" />
             </div>
@@ -180,7 +189,43 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                     />
                   </TableCell>
                   <TableCell align="right">
-                    <Button
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="rounded-full"
+                        >
+                          <Ellipsis className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-40">
+                        <DropdownMenuLabel>{sale.order}</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem className="flex items-center gap-2">
+                            <ExternalLink />
+                            <span>Ver detalles</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="text-red-500"
+                            onClick={async () => {
+                              const res = await deleteSale(sale._id);
+                              if (res.success) {
+                                toast.success(res.message);
+                                router.refresh();
+                              } else {
+                                toast.error(res.message);
+                              }
+                            }}
+                          >
+                            <Trash2 />
+                            <span>Eliminar orden</span>
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    {/* <Button
                       variant="outline"
                       className="text-black dark:text-white"
                       onClick={() => {
@@ -189,7 +234,7 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                       }}
                     >
                       Ver detalles
-                    </Button>
+                    </Button> */}
                   </TableCell>
                 </TableRow>
               ))
@@ -212,7 +257,7 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
               </TableCell>
               <TableCell colSpan={1} className="" align="right">
                 <Badge className="text-xl">
-                  ${priceParserToString(salesTotal)}
+                  $ {priceParserToString(salesTotal)}
                 </Badge>
               </TableCell>
             </TableRow>

@@ -242,3 +242,23 @@ export const updateSaleStatus = async (
     };
   }
 };
+
+export const deleteSale = async (id: string) => {
+  try {
+    await dbConnect();
+    const deletedSale = await models.Sale.findByIdAndDelete(id);
+    revalidatePath("/admin/orders");
+    return {
+      success: true,
+      message: "Venta eliminada correctamente",
+      sale: JSON.parse(JSON.stringify(deletedSale)),
+    };
+  } catch (error) {
+    console.error("Error eliminando la venta:", error);
+    return {
+      success: false,
+      message: "Error al eliminar la venta, intente nuevamente",
+      sale: null,
+    };
+  }
+};

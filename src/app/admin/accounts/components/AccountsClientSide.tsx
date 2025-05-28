@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { IAccountPopulated, IChildrenPopulated } from "@/models/Account";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -34,18 +34,30 @@ import { CircleX, Search, Trash2 } from "lucide-react";
 import CreateChildren from "./CreateChildren";
 import { Checkbox } from "@/components/ui/checkbox";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
-import { useRouter, useSearchParams } from "next/navigation";
+import { IStudentPopulated } from "@/models/Student";
 
-function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const searchVal = searchParams.get("search") || "";
-
+function AccountsClientSide({
+  accounts,
+  students,
+}: {
+  accounts: IAccountPopulated[];
+  students: IStudentPopulated[];
+}) {
   const [selectedAccount, setSelectedAccount] =
     useState<IAccountPopulated | null>(null);
   const [openAccountModal, setOpenAccountModal] = useState(false);
   const [openChildrenModal, setOpenChildrenModal] = useState(false);
   const [openVerifiedDialog, setOpenVerifiedDialog] = useState(false);
+  const [searchValue, setSearchValue] = useState("");
+
+  const filteredAccounts = useMemo(() => {
+    if (!accounts || !accounts.length) return [];
+    if (!searchValue) return accounts;
+    return accounts.filter((account: IAccountPopulated) => {
+      const fullName = `${account.name} ${account.lastname}`.toLowerCase();
+      return fullName.includes(searchValue.toLowerCase());
+    });
+  }, [accounts, searchValue]);
 
   const RenderBadge = ({ role }: { role: string }) => {
     if (!role) {
@@ -80,18 +92,8 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
     }
   };
 
-  const updateSearchQuery = (term: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (term) {
-      params.set("search", term);
-    } else {
-      params.delete("search");
-    }
-    router.replace(`/admin/accounts?${params.toString()}`);
-  };
-
   return (
-    <Card className="w-full">
+    <Card className="w-full" key={accounts.map((a) => a._id).join(",")}>
       <CardHeader className="flex flex-row justify-between">
         <div>
           <CardTitle>Cuentas</CardTitle>
@@ -109,28 +111,28 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
                 <CardDescription></CardDescription>
                 <div className="relative">
                   <Search className="absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-500" />
-                  {!!searchVal && (
+                  {!!searchValue && (
                     <CircleX
                       className="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer text-red-500"
                       onClick={() => {
-                        updateSearchQuery("");
+                        setSearchValue("");
                       }}
                     />
                   )}
                   <Input
                     placeholder="Buscar cuenta"
                     className="w-60 pl-10"
-                    value={searchVal}
+                    value={searchValue}
                     onKeyDown={(e) => {
                       if (selectedAccount) {
                         setSelectedAccount(null);
                       }
                       if (e.key === "Escape") {
-                        updateSearchQuery("");
+                        setSearchValue("");
                       }
                     }}
                     onChange={(e) => {
-                      updateSearchQuery(e.target.value);
+                      setSearchValue(e.target.value);
                     }}
                   />
                 </div>
@@ -138,7 +140,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
             </CardHeader>
             <CardContent>
               <ScrollArea className="h-[500px]">
-                {accounts?.map((account) => (
+                {filteredAccounts?.map((account) => (
                   <div
                     role="button"
                     key={account._id}
@@ -195,13 +197,15 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
               <div className="flex items-center justify-between gap-5">
                 <CardTitle>Detalles de la cuenta</CardTitle>
                 <CardDescription></CardDescription>
-                <div className="flex items-center gap-2">
-                  <Label>Verificada</Label>
-                  <Checkbox
-                    checked={selectedAccount?.verified}
-                    onClick={() => setOpenVerifiedDialog(true)}
-                  />
-                </div>
+                {selectedAccount && (
+                  <div className="flex items-center gap-2">
+                    <Label>Verificada</Label>
+                    <Checkbox
+                      checked={selectedAccount?.verified}
+                      onClick={() => setOpenVerifiedDialog(true)}
+                    />
+                  </div>
+                )}
               </div>
             </CardHeader>
             <CardContent>
@@ -319,6 +323,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
         open={openChildrenModal}
         onClose={() => setOpenChildrenModal(false)}
         accountId={selectedAccount?._id || ""}
+        students={students}
       />
       <CreateAccountModal
         open={openAccountModal}
@@ -326,7 +331,7 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
       />
       <CustomAlertDialog
         title="Verificacion de cuenta"
-        description="¿Estás seguro de que quieres cambiar la verificacion de esta cuenta?"
+        description="¿Estás seguro de que quieres cambiar la verificación de esta cuenta?"
         open={openVerifiedDialog}
         onClose={() => setOpenVerifiedDialog(false)}
         onAccept={async () => {
@@ -340,8 +345,6 @@ function AccountsClientSide({ accounts }: { accounts: IAccountPopulated[] }) {
           if (res.success) {
             toast.success(res.message);
             setOpenVerifiedDialog(false);
-            router.push("/admin/accounts");
-            router.refresh();
           } else {
             toast.error(res.message || "Error al actualizar la cuenta");
           }

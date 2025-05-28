@@ -18,49 +18,54 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IStudentPopulated, PartialStudent } from "@/models/Student";
+import { IStudentPopulated } from "@/models/Student";
 import { addChildToAccount } from "@/server/accountAction";
-import { getAllStudents } from "@/server/studentAction";
 import { Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 function CreateChildren({
   open,
   onClose,
   accountId,
+  students,
 }: {
   open: boolean;
   onClose: () => void;
   accountId: string;
+  students?: IStudentPopulated[];
 }) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [children, setChildren] = useState([]);
   const [searchParam, setSearchParam] = useState("");
 
   const filteredChildren = useMemo(() => {
-    if (!searchParam) return children;
-    return children.filter((child: PartialStudent) => {
+    if (!students || !students.length) return [];
+    if (!searchParam) return students;
+    return students.filter((child: IStudentPopulated) => {
       const fullName = `${child.name} ${child.lastname}`.toLowerCase();
       return fullName.includes(searchParam.toLowerCase());
     });
-  }, [children, searchParam]);
+  }, [students, searchParam]);
 
-  useEffect(() => {
-    if (open) {
-      const getStudents = async () => {
-        const { students, success } = await getAllStudents();
-        if (success) {
-          setChildren(students);
-        } else {
-          console.error("Error fetching students");
-        }
-      };
-      getStudents();
+  const handleAddChild = async (child: IStudentPopulated) => {
+    try {
+      setLoading(true);
+      const res = await addChildToAccount(accountId, child._id);
+
+      if (res.success) {
+        toast.success(res.message);
+        setLoading(false);
+        onClose();
+      } else {
+        toast.error(res.message || "Error al agregar el menor");
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error("Error adding child:", error);
+      toast.error("Error inesperado");
+      setLoading(false);
     }
-  }, [open]);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -107,29 +112,7 @@ function CreateChildren({
                         <Button
                           variant="link"
                           disabled={loading}
-                          onClick={async () => {
-                            setLoading(true);
-                            const res = await addChildToAccount(
-                              accountId,
-                              child._id
-                            );
-                            if (res.success) {
-                              toast.success(res.message);
-                              setLoading(false);
-                              onClose();
-                              // Primero hacemos el refresh
-                              router.refresh();
-                              // Esperamos un tick para asegurar que los datos se actualizaron
-                              setTimeout(() => {
-                                router.replace("/admin/accounts");
-                              }, 0);
-                            } else {
-                              toast.error(
-                                res.message || "Error al agregar el menor"
-                              );
-                              setLoading(false);
-                            }
-                          }}
+                          onClick={() => handleAddChild(child)}
                         >
                           agregar
                         </Button>

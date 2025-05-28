@@ -4,7 +4,10 @@ export function priceParserToString(price: number): string {
   if (!price || price === 0) {
     return "0.00";
   } else {
-    return price.toFixed(2);
+    return price.toLocaleString("es-AR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    });
   }
 }
 
