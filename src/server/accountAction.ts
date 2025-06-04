@@ -3,6 +3,7 @@
 import dbConnect from "@/lib/mongoose";
 import models from "@/models";
 import { IChildrenPopulated, PartialChildren } from "@/models/Account";
+import mongoose from "mongoose";
 import { revalidatePath } from "next/cache";
 
 export const createAccount = async (data: FormData, admin: boolean = false) => {
@@ -393,6 +394,98 @@ export const removeChildFromAccount = async (
       success: false,
       message: "Error al eliminar el menor de la cuenta, intente nuevamente",
       account: null,
+    };
+  }
+};
+
+export const filterAccountEmails = async (filters: {
+  verified?: boolean;
+  emptyChildren?: boolean;
+  pendingOrders?: boolean;
+}) => {
+  try {
+    await dbConnect();
+
+    // Almacenaremos los IDs de cuenta que queremos incluir/excluir
+    let accountIdsWithPendingOrders: string[] = [];
+
+    // Si necesitamos filtrar por pedidos pendientes o fallados
+    if (filters.pendingOrders) {
+      // Primero, obtenemos todos los pedidos no aprobados
+      const pendingSales = await models.Sale.find({
+        status: { $ne: "approved" },
+      })
+        .select("accountId")
+        .lean();
+
+      // Extraemos los IDs de cuenta únicos
+      accountIdsWithPendingOrders = [
+        ...new Set(
+          pendingSales
+            .map((sale) => sale.accountId?.toString())
+            .filter((id) => id) // Filtra nulls/undefined
+        ),
+      ];
+    }
+
+    // Construimos la query base para las cuentas
+    const query: any = {};
+
+    // Filtro de verificación si está especificado
+    if (filters.verified !== undefined) {
+      query.verified = filters.verified;
+    }
+
+    // Filtro para cuentas sin hijos
+    if (filters.emptyChildren) {
+      query.$or = [
+        { children: { $exists: false } },
+        { children: { $size: 0 } },
+      ];
+    }
+
+    // Agregamos filtro de pedidos pendientes si corresponde
+    if (filters.pendingOrders && accountIdsWithPendingOrders.length > 0) {
+      query._id = {
+        $in: accountIdsWithPendingOrders.map(
+          (id) => new mongoose.Types.ObjectId(id)
+        ),
+      };
+    } else if (
+      filters.pendingOrders &&
+      accountIdsWithPendingOrders.length === 0
+    ) {
+      // Si queremos cuentas con pedidos pendientes pero no hay ninguna, devolvemos vacío
+      return {
+        success: true,
+        message: "No hay cuentas con pedidos pendientes",
+        emails: [],
+      };
+    }
+
+    // Obtenemos las cuentas que cumplen con los criterios
+    const accounts = await models.Account.find(query)
+      .select("email name lastname")
+      .lean();
+
+    const emails = accounts.map((account) => account.email);
+
+    return {
+      success: true,
+      message: `Se encontraron ${emails.length} emails`,
+      emails,
+      accounts: accounts.map((acc) => ({
+        email: acc.email,
+        name: `${acc.name} ${acc.lastname}`,
+      })),
+    };
+  } catch (error) {
+    console.error("Error filtrando emails:", error);
+    return {
+      success: false,
+      message: "Error al filtrar emails, intente nuevamente",
+      emails: [],
+      accounts: [],
     };
   }
 };

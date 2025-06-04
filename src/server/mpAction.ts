@@ -27,8 +27,7 @@ export const createPayment = async (data: FormData) => {
       const preference = {
         items: parsedProds,
         metadata: {
-          products: prods,
-          sale: res.sale,
+          sale: res.sale._id.toString(),
         },
         back_urls: {
           success: MERCADOPAGO_SUCCESS,
