@@ -166,9 +166,7 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                   className={`${
                     sale.isNewSale ? "opacity-30" : ""
                   } cursor-pointer ${
-                    selectedSale?._id === sale._id
-                      ? "bg-blue-950 text-white"
-                      : ""
+                    selectedSale?._id === sale._id ? "bg-gray-200" : ""
                   }`}
                   onClick={() => setSelectedSale(sale)}
                 >

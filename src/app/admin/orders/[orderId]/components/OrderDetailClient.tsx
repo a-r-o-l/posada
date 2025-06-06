@@ -191,7 +191,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       });
 
       // Obtener posición final de la tabla
-      const finalY = doc.lastAutoTable.finalY || startY + 100;
+      const finalY = startY + 100;
 
       // Agregar un espacio de 100px debajo de la tabla
       const lineY = finalY + 50;
