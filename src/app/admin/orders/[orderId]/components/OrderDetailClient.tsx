@@ -42,6 +42,20 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
     return sale.products;
   }, [sale]);
 
+  const uniqueSchools = useMemo(() => {
+    if (!sale?.accountId?.children?.length) {
+      return [];
+    }
+
+    // Extraer todos los nombres de colegios
+    const schoolNames = sale.accountId.children.map(
+      (child) => child.schoolId.name
+    );
+
+    // Eliminar duplicados usando Set
+    return [...new Set(schoolNames)];
+  }, [sale]);
+
   if (!sale) {
     return <></>;
   }
@@ -88,7 +102,6 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       doc.text("Detalles de la Orden", 10, startY);
 
       // Agregar detalles de la orden
-
       doc.setFontSize(12);
       doc.text(`Orden: ${sale.order}`, 10, startY + 10);
       doc.text(
@@ -112,16 +125,38 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         startY + 70
       );
 
-      let childStartY = 10 + 10;
-      doc.setFontSize(16);
-      doc.text("Menores a cargo:", 110, childStartY);
+      let schoolStartY = 10 + 10;
+      doc.setFontSize(12);
+      doc.text("Colegios:", 110, schoolStartY); // Vuelto a "Colegios:"
+      const colegiosTextWidth = doc.getTextWidth("Colegios:");
+      doc.line(
+        110,
+        schoolStartY + 2,
+        110 + colegiosTextWidth,
+        schoolStartY + 2
+      );
+      // Mostrar colegios en la parte superior
+      uniqueSchools.forEach((schoolName) => {
+        schoolStartY += 8;
+        doc.text(schoolName, 110, schoolStartY);
+      });
+
+      // Agregar menores en la parte superior (después de los colegios)
+      schoolStartY += 10; // Espacio adicional antes de menores
+      doc.text("Menores:", 110, schoolStartY);
+      const menoresTextWidth = doc.getTextWidth("Menores:");
+      doc.line(110, schoolStartY + 2, 110 + menoresTextWidth, schoolStartY + 2);
+
+      schoolStartY += 8;
+
+      // Mostrar cada niño en la parte superior
       sale.accountId.children.forEach((child) => {
-        childStartY += 8;
         doc.text(
-          `${child.name} ${child.lastname} - ${child.gradeId.grade} ${child.gradeId.division} - ${child.schoolId.name}`,
+          `${child.name} ${child.lastname} - ${child.gradeId.grade} ${child.gradeId.division}`,
           110,
-          childStartY
+          schoolStartY
         );
+        schoolStartY += 8;
       });
 
       // Agregar productos en una tabla
@@ -155,7 +190,68 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         body: tableRows,
       });
 
-      doc.save(`orden_${sale.transactionId}.pdf`);
+      // Obtener posición final de la tabla
+      const finalY = doc.lastAutoTable.finalY || startY + 100;
+
+      // Agregar un espacio de 100px debajo de la tabla
+      const lineY = finalY + 50;
+
+      // Dibujar línea horizontal punteada (línea de corte)
+      const pageWidth = doc.internal.pageSize.width;
+      doc.setLineDashPattern([3, 3], 0); // Línea punteada
+      doc.setDrawColor(0, 0, 0); // Color negro
+      doc.line(10, lineY, pageWidth - 10, lineY); // Línea de un extremo a otro
+
+      // Volver a línea sólida para otros elementos
+      doc.setLineDashPattern([], 0);
+
+      // Espacio después de la línea
+      const textY = lineY + 20;
+
+      // Calcular el centro de la página para centrar el texto
+      const centerX = pageWidth / 2;
+
+      // Agregar sección de colegios centrada
+      doc.setFontSize(12);
+      doc.text("Colegios", centerX, textY, { align: "center" });
+      doc.line(
+        centerX - colegiosTextWidth / 2,
+        textY + 2,
+        centerX + colegiosTextWidth / 2,
+        textY + 2
+      );
+
+      // Mostrar colegios centrados
+      let yPos = textY + 8;
+      uniqueSchools.forEach((schoolName) => {
+        doc.text(schoolName, centerX, yPos, { align: "center" });
+        yPos += 8;
+      });
+
+      // Agregar menores centrados
+      yPos += 10;
+      doc.setFontSize(12);
+      doc.text("Menores:", centerX, yPos, { align: "center" }); // Cambiado de "Menores a cargo:" a "Menores:"
+      doc.line(
+        centerX - menoresTextWidth / 2,
+        yPos + 2,
+        centerX + menoresTextWidth / 2,
+        yPos + 2
+      );
+      yPos += 8;
+
+      // Mostrar cada niño centrado
+      sale.accountId.children.forEach((child) => {
+        doc.text(
+          `${child.name} ${child.lastname} - ${child.gradeId.grade} ${child.gradeId.division}`,
+          centerX,
+          yPos,
+          { align: "center" }
+        );
+        yPos += 8;
+      });
+
+      doc.save(`orden_${sale.order}.pdf`);
     } catch (error) {
       console.error("Error al generar el PDF:", error);
     }

@@ -26,6 +26,7 @@ export const createPayment = async (data: FormData) => {
       }));
       const preference = {
         items: parsedProds,
+        external_reference: res.sale.order,
         metadata: {
           sale: res.sale._id.toString(),
         },

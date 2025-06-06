@@ -27,7 +27,14 @@ import PaymentBadge from "@/app/store/purchases/components/PaymentBadge";
 import DeliveredSelect from "./DeliveredSelect";
 import { priceParserToString } from "@/lib/utilsFunctions";
 import { Input } from "@/components/ui/input";
-import { CircleX, Ellipsis, ExternalLink, Search, Trash2 } from "lucide-react";
+import {
+  CircleX,
+  Ellipsis,
+  ExternalLink,
+  FileCheck,
+  Search,
+  Trash2,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -45,6 +52,7 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
   const [updateLoading, setUpdateLoading] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [searchParams, setSearchParams] = useState("");
+  const [openEditOrderModal, setOpenEditOrderModal] = useState(false);
 
   useEffect(() => {
     if (selectedSale && selectedSale.isNewSale) {
@@ -201,7 +209,9 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="w-40">
-                        <DropdownMenuLabel>{sale.order}</DropdownMenuLabel>
+                        <DropdownMenuLabel>
+                          Orden {sale.order}
+                        </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                           <DropdownMenuItem
@@ -213,6 +223,17 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                           >
                             <ExternalLink />
                             <span>Ver detalles</span>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            className="flex items-center gap-2"
+                            disabled={sale.status === "approved"}
+                            onClick={() => {
+                              setSelectedSale(sale);
+                              setOpenEditOrderModal(true);
+                            }}
+                          >
+                            <FileCheck />
+                            <span>Cambiar estado de pago</span>
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             className="text-red-500"
@@ -302,6 +323,34 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
             toast.error(res.message);
           }
         }}
+      />
+      <CustomAlertDialog
+        open={openEditOrderModal}
+        onClose={() => {
+          setOpenEditOrderModal(false);
+          setSelectedSale(null);
+        }}
+        title="Actualizar orden"
+        description="Estas seguro de actualizar el estado de pago de este pedido?"
+        onAccept={async () => {
+          if (!selectedSale) return;
+          setUpdateLoading(true);
+          const res = await updateSaleStatus(
+            selectedSale._id,
+            "status",
+            "approved"
+          );
+          if (res.success) {
+            toast.success(res.message);
+            setOpenEditOrderModal(false);
+            setSelectedSale(null);
+            setUpdateLoading(false);
+          } else {
+            toast.error(res.message);
+            setUpdateLoading(false);
+          }
+        }}
+        loading={updateLoading}
       />
     </Card>
   );
