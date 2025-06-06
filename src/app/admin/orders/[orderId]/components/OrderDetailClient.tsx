@@ -125,29 +125,20 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         startY + 70
       );
 
-      let schoolStartY = 10 + 10;
+      let schoolStartY = 20;
       doc.setFontSize(12);
       doc.text("Colegios:", 110, schoolStartY); // Vuelto a "Colegios:"
-      const colegiosTextWidth = doc.getTextWidth("Colegios:");
-      doc.line(
-        110,
-        schoolStartY + 2,
-        110 + colegiosTextWidth,
-        schoolStartY + 2
-      );
       // Mostrar colegios en la parte superior
       uniqueSchools.forEach((schoolName) => {
-        schoolStartY += 8;
+        schoolStartY += 5;
         doc.text(schoolName, 110, schoolStartY);
       });
 
       // Agregar menores en la parte superior (después de los colegios)
       schoolStartY += 10; // Espacio adicional antes de menores
-      doc.text("Menores:", 110, schoolStartY);
-      const menoresTextWidth = doc.getTextWidth("Menores:");
-      doc.line(110, schoolStartY + 2, 110 + menoresTextWidth, schoolStartY + 2);
+      doc.text("Alumno/s:", 110, schoolStartY);
 
-      schoolStartY += 8;
+      schoolStartY += 5;
 
       // Mostrar cada niño en la parte superior
       sale.accountId.children.forEach((child) => {
@@ -156,7 +147,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
           110,
           schoolStartY
         );
-        schoolStartY += 8;
+        schoolStartY += 5;
       });
 
       // Agregar productos en una tabla
@@ -190,8 +181,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         body: tableRows,
       });
 
-      // Obtener posición final de la tabla
-      const finalY = startY + 100;
+      const finalY = startY + 150;
 
       // Agregar un espacio de 100px debajo de la tabla
       const lineY = finalY + 50;
@@ -206,49 +196,38 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       doc.setLineDashPattern([], 0);
 
       // Espacio después de la línea
-      const textY = lineY + 20;
+      const textY = lineY + 10; // Aumentado de 10 a 20 para más espacio
 
-      // Calcular el centro de la página para centrar el texto
-      const centerX = pageWidth / 2;
+      // Definir posiciones X para las dos columnas
+      const leftX = 40; // Posición para "Colegios" (izquierda)
+      const rightX = pageWidth - 80; // Posición para "Alumnos" (derecha)
 
-      // Agregar sección de colegios centrada
+      // COLUMNA IZQUIERDA - COLEGIOS
+      // --------------------------
       doc.setFontSize(12);
-      doc.text("Colegios", centerX, textY, { align: "center" });
-      doc.line(
-        centerX - colegiosTextWidth / 2,
-        textY + 2,
-        centerX + colegiosTextWidth / 2,
-        textY + 2
-      );
+      doc.text("Colegios:", leftX, textY);
 
-      // Mostrar colegios centrados
-      let yPos = textY + 8;
+      // Listar colegios
+      let leftYPos = textY + 5;
       uniqueSchools.forEach((schoolName) => {
-        doc.text(schoolName, centerX, yPos, { align: "center" });
-        yPos += 8;
+        doc.text(schoolName, leftX, leftYPos);
+        leftYPos += 5;
       });
 
-      // Agregar menores centrados
-      yPos += 10;
+      // COLUMNA DERECHA - ALUMNOS
+      // --------------------------
       doc.setFontSize(12);
-      doc.text("Menores:", centerX, yPos, { align: "center" }); // Cambiado de "Menores a cargo:" a "Menores:"
-      doc.line(
-        centerX - menoresTextWidth / 2,
-        yPos + 2,
-        centerX + menoresTextWidth / 2,
-        yPos + 2
-      );
-      yPos += 8;
+      doc.text("Alumno/s:", rightX, textY);
 
-      // Mostrar cada niño centrado
+      // Listar alumnos
+      let rightYPos = textY + 5;
       sale.accountId.children.forEach((child) => {
         doc.text(
           `${child.name} ${child.lastname} - ${child.gradeId.grade} ${child.gradeId.division}`,
-          centerX,
-          yPos,
-          { align: "center" }
+          rightX,
+          rightYPos
         );
-        yPos += 8;
+        rightYPos += 5;
       });
 
       doc.save(`orden_${sale.order}.pdf`);
