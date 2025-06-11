@@ -47,10 +47,10 @@ function page() {
             <p className="text-xs text-gray-400 underline whitespace-nowrap font-bold">
               Contacto:
             </p>
-            <div className="flex items-center gap-2">
+            {/* <div className="flex items-center gap-2">
               <Mail className="w-5 h-5 text-white" />
               <p className="text-white text-xs">contacto@fotosposada.com.ar</p>
-            </div>
+            </div> */}
             <div className="flex items-center gap-2">
               <WhatsAppLogo className="w-5 h-5" />
               <p className="text-white text-xs">+54 9 11 5403-2747</p>

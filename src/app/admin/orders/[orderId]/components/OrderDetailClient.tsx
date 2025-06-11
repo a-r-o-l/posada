@@ -127,7 +127,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
 
       let schoolStartY = 20;
       doc.setFontSize(12);
-      doc.text("Colegios:", 110, schoolStartY); // Vuelto a "Colegios:"
+      doc.text("Colegio:", 110, schoolStartY); // Vuelto a "Colegios:"
       // Mostrar colegios en la parte superior
       uniqueSchools.forEach((schoolName) => {
         schoolStartY += 5;
@@ -142,11 +142,37 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
 
       // Mostrar cada niño en la parte superior
       sale.accountId.children.forEach((child) => {
-        doc.text(
-          `${child.name} ${child.lastname} - ${child.gradeId.grade} ${child.gradeId.division}`,
-          110,
-          schoolStartY
+        // Divide el texto en dos partes
+        const nombreApellido = `${child.name} ${child.lastname} - `;
+        const gradoDivision = `${child.gradeId.grade} ${child.gradeId.division}`;
+
+        // Calcula el ancho del nombre y apellido
+        const nombreApellidoWidth = doc.getTextWidth(nombreApellido);
+
+        // Calcula el ancho del grado y división para el rectángulo
+        const gradoDivisionWidth = doc.getTextWidth(gradoDivision);
+
+        // Establece el color de fondo amarillo claro
+        doc.setFillColor(255, 255, 150); // RGB para amarillo claro
+
+        // Dibuja un rectángulo para el fondo de grado y división
+        // El rectángulo es ligeramente más alto y ancho que el texto
+        doc.rect(
+          110 + nombreApellidoWidth, // Posición X después del nombre
+          schoolStartY - 4, // Posición Y (un poco más arriba para que cubra todo el texto)
+          gradoDivisionWidth + 2, // Ancho del texto + margen
+          6, // Alto suficiente para cubrir el texto
+          "F" // 'F' significa rellenar (fill)
         );
+
+        // Restaura el color de texto a negro
+        doc.setTextColor(0, 0, 0);
+
+        // Ahora escribe el texto completo
+        doc.text(nombreApellido, 110, schoolStartY);
+        doc.text(gradoDivision, 110 + nombreApellidoWidth, schoolStartY);
+
+        // Incrementa la posición Y para el siguiente niño
         schoolStartY += 5;
       });
 
@@ -181,7 +207,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         body: tableRows,
       });
 
-      const finalY = startY + 150;
+      const finalY = startY + 160;
 
       // Agregar un espacio de 100px debajo de la tabla
       const lineY = finalY + 50;
@@ -199,13 +225,13 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       const textY = lineY + 10; // Aumentado de 10 a 20 para más espacio
 
       // Definir posiciones X para las dos columnas
-      const leftX = 40; // Posición para "Colegios" (izquierda)
-      const rightX = pageWidth - 80; // Posición para "Alumnos" (derecha)
+      const leftX = 20; // Posición para "Colegios" (izquierda)
+      const rightX = 100; // Posición para "Alumnos" (derecha)
 
       // COLUMNA IZQUIERDA - COLEGIOS
       // --------------------------
       doc.setFontSize(12);
-      doc.text("Colegios:", leftX, textY);
+      doc.text("Colegio:", leftX, textY);
 
       // Listar colegios
       let leftYPos = textY + 5;
@@ -222,11 +248,36 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       // Listar alumnos
       let rightYPos = textY + 5;
       sale.accountId.children.forEach((child) => {
-        doc.text(
-          `${child.name} ${child.lastname} - ${child.gradeId.grade} ${child.gradeId.division}`,
-          rightX,
-          rightYPos
+        // Divide el texto en dos partes
+        const nombreApellido = `${child.name} ${child.lastname} - `;
+        const gradoDivision = `${child.gradeId.grade} ${child.gradeId.division}`;
+
+        // Calcula el ancho del nombre y apellido
+        const nombreApellidoWidth = doc.getTextWidth(nombreApellido);
+
+        // Calcula el ancho del grado y división para el rectángulo
+        const gradoDivisionWidth = doc.getTextWidth(gradoDivision);
+
+        // Establece el color de fondo amarillo claro
+        doc.setFillColor(255, 255, 150); // RGB para amarillo claro
+
+        // Dibuja un rectángulo para el fondo de grado y división
+        doc.rect(
+          rightX + nombreApellidoWidth, // Posición X después del nombre
+          rightYPos - 4, // Posición Y (un poco más arriba para que cubra todo el texto)
+          gradoDivisionWidth + 2, // Ancho del texto + margen
+          6, // Alto suficiente para cubrir el texto
+          "F" // 'F' significa rellenar (fill)
         );
+
+        // Restaura el color de texto a negro
+        doc.setTextColor(0, 0, 0);
+
+        // Ahora escribe el texto completo
+        doc.text(nombreApellido, rightX, rightYPos);
+        doc.text(gradoDivision, rightX + nombreApellidoWidth, rightYPos);
+
+        // Incrementa la posición Y para el siguiente niño
         rightYPos += 5;
       });
 

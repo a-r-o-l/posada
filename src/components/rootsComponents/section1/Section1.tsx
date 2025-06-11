@@ -31,7 +31,7 @@ function Section1() {
             </p>
             <p className="text-lg whitespace-pre-line leading-none">
               {`
-              Escribinos por WhatsApp al +54 911 5403-2747\n 
+              Escribinos por Whatsapp al +54 911 5403-2747\n 
   indicando:\n
   • Tu nombre\n
   • Nombre del colegio\n
