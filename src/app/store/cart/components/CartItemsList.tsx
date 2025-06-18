@@ -19,6 +19,7 @@ import SmallCartItemsTable from "./SmallCartItemsTable";
 function CartItemsList() {
   const account = useUser();
   const cartItems = useCartStore((state) => state.products);
+  const cleanCart = useCartStore((state) => state.clearCart);
   const [loading, setLoading] = useState(false);
 
   const total = useMemo(() => {
@@ -56,6 +57,7 @@ function CartItemsList() {
                 const res = await createPayment(formData);
                 if (res.success && res.url) {
                   setLoading(false);
+                  cleanCart();
                   redirect(res.url);
                 } else {
                   console.error("Error:", res.message);
