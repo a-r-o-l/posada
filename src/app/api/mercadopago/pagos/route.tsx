@@ -40,7 +40,6 @@ export async function POST(request: Request) {
 
       // Si la actualización fue exitosa, enviar email
       if (res.success) {
-        const updatedSale = res.sale;
         await sendEmail({
           subject: "Compra Exitosa",
           to: [
@@ -49,7 +48,7 @@ export async function POST(request: Request) {
               email: foundSale.accountId.email,
             },
           ],
-          htmlContent: tahnksEmailTemplate(updatedSale),
+          htmlContent: tahnksEmailTemplate(foundSale),
         });
 
         return new Response(null, { status: 200 });
