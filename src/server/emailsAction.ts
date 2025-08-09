@@ -1,6 +1,9 @@
 "use server";
 
 import { sendEmail, sendEmailFromUser } from "@/lib/brevo";
+import { ISalePopulated } from "@/models/Sale";
+import { sendEmail as sendEmailFromServer } from "@/lib/brevo";
+import { tahnksEmailTemplate } from "@/templates/thanksEmail";
 
 export const handleSendEmail = async (formdata: FormData, template: string) => {
   const subject = formdata.get("subject") as string;
@@ -26,6 +29,22 @@ export const handleSendEmailFromUser = async (formdata: FormData) => {
     senderEmail,
     title,
     content,
+  });
+  return { success: true, message: "Email enviado" };
+};
+
+export const sendEmailToUserAfterApproveTransfer = async (
+  sale: ISalePopulated
+) => {
+  await sendEmailFromServer({
+    subject: "Compra Exitosa",
+    to: [
+      {
+        name: sale.accountId.name,
+        email: sale.accountId.email,
+      },
+    ],
+    htmlContent: tahnksEmailTemplate(sale),
   });
   return { success: true, message: "Email enviado" };
 };

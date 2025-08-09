@@ -1,5 +1,4 @@
 "use client";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -37,12 +36,14 @@ import TransferProofModal from "./TransferProofModal";
 import { updateSale } from "@/server/saleAction";
 import { toast } from "sonner";
 import PaymentBadge from "@/app/store/purchases/components/PaymentBadge";
+import { sendEmailToUserAfterApproveTransfer } from "@/server/emailsAction";
 
 function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
   const [proofModalOpen, setProofModalOpen] = React.useState(false);
   const [approving, setApproving] = React.useState(false);
   const [proofUrl, setProofUrl] = React.useState<string>("");
 
+  console.log(sale);
   // Función para aprobar la orden
   const approveOrder = async () => {
     setApproving(true);
@@ -53,7 +54,8 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       if (!res.success) {
         throw new Error(res.message);
       }
-      await new Promise((r) => setTimeout(r, 1000)); // Simulación
+      await sendEmailToUserAfterApproveTransfer(sale);
+      await new Promise((r) => setTimeout(r, 1000));
       toast.success("Orden aprobada correctamente");
       setProofModalOpen(false);
     } catch (err) {

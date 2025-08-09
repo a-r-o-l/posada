@@ -62,6 +62,20 @@ export default async function RootLayout({
             </div>
           </div>
         </nav>
+        {/* Fila de enlaces principales solo mobile */}
+        <nav className="flex flex-row items-center justify-evenly gap-4 px-2 pb-2 pt-0 text-xs text-gray-700 font-medium lg:hidden mt-3">
+          <Link href="/store" className="hover:underline">
+            Tienda
+          </Link>
+          <span className="text-gray-300">|</span>
+          <Link href="/store/account" className="hover:underline">
+            Mi cuenta
+          </Link>
+          <span className="text-gray-300">|</span>
+          <Link href="/store/purchases" className="hover:underline">
+            Mis compras
+          </Link>
+        </nav>
       </header>
       <main className="flex flex-col w-full">{children}</main>
     </UserProvider>

@@ -22,6 +22,24 @@ function MiniRootHeader() {
           </Button>
         </div>
       </nav>
+      {/* Fila de enlaces secundarios solo mobile */}
+      <nav className="mt-3 flex flex-row items-center justify-evenly gap-3 px-2 pb-2 pt-0 text-xs text-gray-700 font-medium lg:hidden">
+        <Link href="#quienes-somos" className="hover:underline">
+          Quienes somos
+        </Link>
+        <span className="text-gray-300">|</span>
+        <Link href="#servicio" className="hover:underline">
+          Servicios
+        </Link>
+        <span className="text-gray-300">|</span>
+        <Link href="#productos" className="hover:underline">
+          Productos
+        </Link>
+        <span className="text-gray-300">|</span>
+        <Link href="#nuestro-trabajo" className="hover:underline">
+          Clientes
+        </Link>
+      </nav>
     </header>
   );
 }
