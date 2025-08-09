@@ -34,6 +34,7 @@ import {
   FileCheck,
   Search,
   Trash2,
+  School as School2,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -44,8 +45,15 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ISchool } from "@/models/School";
 
-function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
+function OrdersClientSide({
+  sales = [],
+  schools = [],
+}: {
+  sales?: ISalePopulated[] | [];
+  schools?: ISchool[] | [];
+}) {
   const router = useRouter();
   const [selectedSale, setSelectedSale] = useState<ISalePopulated | null>(null);
   const [openAlert, setOpenAlert] = useState(false);
@@ -53,6 +61,19 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [searchParams, setSearchParams] = useState("");
   const [openEditOrderModal, setOpenEditOrderModal] = useState(false);
+  const [selectedSchools, setSelectedSchools] = useState<string[]>([]);
+
+  // Mostrar todos los colegios disponibles
+  const allSchools = useMemo(() => {
+    return schools || [];
+  }, [schools]);
+
+  // Inicializar con todos los colegios seleccionados
+  useEffect(() => {
+    if (allSchools.length > 0 && selectedSchools.length === 0) {
+      setSelectedSchools(allSchools.map((school) => school._id));
+    }
+  }, [allSchools, selectedSchools.length]);
 
   useEffect(() => {
     if (selectedSale && selectedSale.isNewSale) {
@@ -64,16 +85,25 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
 
   const filteredSales = useMemo(() => {
     if (!sales || !sales.length) return [];
-    if (!searchParams) return sales;
-    const filtered = sales.filter((sale) => {
-      const email = sale?.accountId?.email?.toLowerCase();
-      if (email && email.includes(searchParams.toLowerCase())) {
-        return true;
-      }
-      return false;
-    });
+    let filtered = sales;
+    // Filtro por email
+    if (searchParams) {
+      filtered = filtered.filter((sale) => {
+        const email = sale?.accountId?.email?.toLowerCase();
+        return email && email.includes(searchParams.toLowerCase());
+      });
+    }
+    // Filtro por colegios seleccionados
+    if (selectedSchools.length > 0) {
+      filtered = filtered.filter((sale) => {
+        const schoolId = sale.products?.[0]?.productId?.schoolId;
+        return (
+          typeof schoolId === "string" && selectedSchools.includes(schoolId)
+        );
+      });
+    }
     return filtered;
-  }, [searchParams, sales]);
+  }, [searchParams, sales, selectedSchools]);
 
   const salesQuantity = useMemo(() => {
     if (!filteredSales || !filteredSales.length)
@@ -93,6 +123,23 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
     }, 0);
     return total;
   }, [filteredSales]);
+
+  // Funciones para seleccionar/deseleccionar colegios
+  const toggleSchoolSelection = (schoolId: string) => {
+    setSelectedSchools((prev) => {
+      if (prev.includes(schoolId)) {
+        return prev.filter((id) => id !== schoolId);
+      } else {
+        return [...prev, schoolId];
+      }
+    });
+  };
+
+  const selectAllSchools = () => {
+    setSelectedSchools(allSchools.map((school) => school._id));
+  };
+
+  // Eliminar la función de deseleccionar todos
 
   return (
     <Card>
@@ -121,31 +168,70 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="relative w-60">
-          <Search className="absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-500" />
-          {!!searchParams && (
-            <CircleX
-              className="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer text-red-500"
-              onClick={() => {
-                setSearchParams("");
+        <div className="flex items-center gap-5 mt-2">
+          <div className="relative w-60">
+            <Search className="absolute top-1/2 left-2 transform -translate-y-1/2 text-gray-500" />
+            {!!searchParams && (
+              <CircleX
+                className="absolute top-1/2 right-2 transform -translate-y-1/2 cursor-pointer text-red-500"
+                onClick={() => {
+                  setSearchParams("");
+                }}
+              />
+            )}
+            <Input
+              placeholder="Buscar por email"
+              className="w-60 pl-10"
+              value={searchParams}
+              onKeyDown={(e) => {
+                if (e.key === "Escape") {
+                  setSearchParams("");
+                }
+              }}
+              onChange={(e) => {
+                setSearchParams(e.target.value.toLowerCase());
               }}
             />
-          )}
-          <Input
-            placeholder="Buscar por email"
-            className="w-60 pl-10"
-            value={searchParams}
-            onKeyDown={(e) => {
-              if (e.key === "Escape") {
-                setSearchParams("");
-              }
-            }}
-            onChange={(e) => {
-              setSearchParams(e.target.value.toLowerCase());
-            }}
-          />
+          </div>
+          <div className="flex">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm" className="h-9 w-9 p-0">
+                  <School2 className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56" align="end">
+                <DropdownMenuLabel>Filtrar colegios</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuGroup>
+                  <DropdownMenuItem onClick={selectAllSchools}>
+                    <span>Seleccionar todos</span>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+                <DropdownMenuSeparator />
+                {allSchools.map((school) => (
+                  <div
+                    key={school._id}
+                    className="flex items-center gap-2 px-2 py-1"
+                  >
+                    <Checkbox
+                      checked={selectedSchools.includes(school._id)}
+                      onCheckedChange={() => toggleSchoolSelection(school._id)}
+                      className="cursor-pointer"
+                    />
+                    <span
+                      className="flex-1 cursor-pointer"
+                      onClick={() => toggleSchoolSelection(school._id)}
+                    >
+                      {school.name}
+                    </span>
+                  </div>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
         </div>
-        <Table className="mt-10">
+        <Table className="mt-8">
           <TableHeader>
             <TableRow>
               <TableHead>Orden</TableHead>
@@ -174,6 +260,8 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                   <TableCell>
                     {sale.paymentTypeId === "account_money"
                       ? "Efectivo"
+                      : sale.paymentTypeId === "transfer"
+                      ? "Transferencia"
                       : "Tarjeta"}
                   </TableCell>
                   <TableCell>
@@ -184,7 +272,11 @@ function OrdersClientSide({ sales = [] }: { sales?: ISalePopulated[] | [] }) {
                   <TableCell>{sale?.accountId?.email}</TableCell>
                   <TableCell>${sale?.total?.toFixed(2)}</TableCell>
                   <TableCell>
-                    <PaymentBadge state={sale?.status || ""} />
+                    <PaymentBadge
+                      state={sale?.status || ""}
+                      paymentTypeId={sale?.paymentTypeId || ""}
+                      transferProofUrl={sale?.transferProofUrl || ""}
+                    />
                   </TableCell>
                   <TableCell>
                     <Checkbox

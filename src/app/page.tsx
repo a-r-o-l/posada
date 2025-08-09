@@ -4,14 +4,13 @@ import Section3 from "../components/rootsComponents/section3/Section3";
 import RootHeader from "../components/rootsComponents/RootHeader";
 import Section1 from "../components/rootsComponents/section1/Section1";
 import Section4 from "../components/rootsComponents/section4/Section4";
-import Section5 from "../components/rootsComponents/section5/Section5";
+// import Section5 from "../components/rootsComponents/section5/Section5";
 import Section3Mini from "@/components/rootsComponents/section3/Section3Mini";
 import MiniRootHeader from "@/components/rootsComponents/MiniRootHeader";
 import Section1Mini from "@/components/rootsComponents/section1/Section1Mini";
 import Section2Mini from "@/components/rootsComponents/section2/Section2Mini";
-import Section5Mini from "@/components/rootsComponents/section5/Section5Mini";
+// import Section5Mini from "@/components/rootsComponents/section5/Section5Mini";
 import WhatsAppLogo from "@/icons/whatsappsvg";
-import { Mail } from "lucide-react";
 import Section6 from "@/components/rootsComponents/section6/Section6";
 import Section6Mini from "@/components/rootsComponents/section6/Section6Mini";
 
@@ -33,8 +32,8 @@ function page() {
           <Section4 />
           <Section6 />
           <Section6Mini />
-          <Section5 />
-          <Section5Mini />
+          {/* <Section5 />
+          <Section5Mini /> */}
         </div>
         <div className="w-full bg-black p-5 flex flex-col mt-auto">
           <div className="w-full flex items-center justify-start">
@@ -62,6 +61,16 @@ function page() {
             </p>
           </div>
         </div>
+        {/* Botón flotante de WhatsApp */}
+        <a
+          href="https://wa.me/5491154032747?text=Hola!%20Quiero%20hacer%20una%20consulta"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center p-4 transition-all"
+          style={{ boxShadow: "0 4px 16px #0003" }}
+        >
+          <WhatsAppLogo className="w-8 h-8" />
+        </a>
       </main>
     );
   }

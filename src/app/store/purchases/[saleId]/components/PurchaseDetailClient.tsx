@@ -53,7 +53,7 @@ function PurchaseDetailClient({ sale }: { sale: ISalePopulated }) {
           >
             <ArrowLeft />
           </Button>
-          {sale.status !== "approved" && (
+          {sale.status !== "approved" && sale.paymentTypeId !== "transfer" && (
             <Button
               className="flex items-center justify-center gap-2 rounded-md p-2 px-4"
               variant="secondary"
@@ -97,7 +97,11 @@ function PurchaseDetailClient({ sale }: { sale: ISalePopulated }) {
                     <TableCell>{sale?.accountId?.email}</TableCell>
                     <TableCell>${sale?.total?.toFixed(2)}</TableCell>
                     <TableCell>
-                      <PaymentBadge state={sale?.status} />
+                      <PaymentBadge
+                        state={sale?.status}
+                        paymentTypeId={sale?.paymentTypeId}
+                        transferProofUrl={sale?.transferProofUrl}
+                      />
                     </TableCell>
                     <TableCell>
                       <DeliveryBadge state={sale?.delivered} />

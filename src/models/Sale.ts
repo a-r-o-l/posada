@@ -14,6 +14,10 @@ export interface ISale extends Document {
   delivered: boolean;
   products: ISaleProduct[];
   transactionId?: string;
+  // Campos para transferencias
+  transferProofUrl?: string;
+  transferStatus?: "pending" | "uploaded" | "approved" | "rejected";
+  transferNote?: string;
   dateCreated?: Date;
   dateApproved?: Date;
   paymentMethodId?: string;
@@ -95,6 +99,13 @@ const SaleSchema: Schema = new Schema(
     delivered: { type: Boolean, default: false },
     products: { type: [SaleProductSchema], default: [] },
     transactionId: { type: String },
+    // Campos para transferencias
+    transferProofUrl: { type: String },
+    transferStatus: {
+      type: String,
+      enum: ["pending", "uploaded", "approved", "rejected"],
+    },
+    transferNote: { type: String },
     dateCreated: { type: Date },
     dateApproved: { type: Date },
     paymentMethodId: { type: String },

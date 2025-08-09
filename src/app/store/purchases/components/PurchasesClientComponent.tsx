@@ -35,12 +35,16 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import PaymentModal from "./PaymentModal";
+import UploadProofModal from "./UploadProofModal";
+import { toast } from "sonner";
 
 function PurchasesClientComponent() {
   const router = useRouter();
   const { user } = useUser();
   const [sales, setSales] = useState([]);
   const [selectedSale, setSelectedSale] = useState<ISalePopulated | null>(null);
+  const [openProofModal, setOpenProofModal] = useState(false);
+  const [saleToUpload, setSaleToUpload] = useState<ISalePopulated | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -68,7 +72,7 @@ function PurchasesClientComponent() {
             <TableRow>
               <TableHead>Fecha</TableHead>
               <TableHead>Orden</TableHead>
-              <TableHead>Transaccion</TableHead>
+              <TableHead>Tipo de pago</TableHead>
               <TableHead>Total</TableHead>
               <TableHead>Estado de pago</TableHead>
               <TableHead>Estado de entrega</TableHead>
@@ -78,6 +82,7 @@ function PurchasesClientComponent() {
           <TableBody>
             {!!sales.length ? (
               sales.map((sale: ISalePopulated, index) => {
+                const isTransfer = sale.paymentTypeId === "transfer";
                 return (
                   <TableRow key={index}>
                     <TableCell className="truncate max-w-20">
@@ -86,14 +91,20 @@ function PurchasesClientComponent() {
                     <TableCell className="truncate max-w-32">
                       {sale.order}
                     </TableCell>
-                    <TableCell className="truncate max-w-32">
-                      {sale.transactionId}
+                    <TableCell className="truncate max-w-24">
+                      {sale.paymentTypeId === "transfer"
+                        ? "Transferencia"
+                        : "MercadoPago"}
                     </TableCell>
                     <TableCell className="truncate max-w-20">
                       $ {priceParserToString(sale.total)}
                     </TableCell>
                     <TableCell>
-                      <PaymentBadge state={sale.status} />
+                      <PaymentBadge
+                        state={sale.status}
+                        paymentTypeId={sale.paymentTypeId}
+                        transferProofUrl={sale.transferProofUrl}
+                      />
                     </TableCell>
                     <TableCell>
                       <DeliveryBadge state={sale.delivered} />
@@ -122,13 +133,32 @@ function PurchasesClientComponent() {
                               Ver detalles
                               <ReceiptText />
                             </DropdownMenuItem>
-                            <DropdownMenuItem
-                              disabled={sale.status !== "pending"}
-                              onClick={() => setSelectedSale(sale)}
-                            >
-                              Pagar ahora
-                              <Banknote />
-                            </DropdownMenuItem>
+                            {!isTransfer && (
+                              <DropdownMenuItem
+                                disabled={sale.status !== "pending"}
+                                onClick={() => setSelectedSale(sale)}
+                              >
+                                Pagar ahora
+                                <Banknote />
+                              </DropdownMenuItem>
+                            )}
+                            {isTransfer && (
+                              <DropdownMenuItem
+                                onClick={() => {
+                                  setSaleToUpload(sale);
+                                  setOpenProofModal(true);
+                                }}
+                                disabled={
+                                  sale.transferStatus === "approved" ||
+                                  !!sale.transferProofUrl
+                                }
+                              >
+                                {sale.transferProofUrl
+                                  ? "Actualizar comprobante de transferencia"
+                                  : "Subir comprobante de transferencia"}
+                                <Banknote />
+                              </DropdownMenuItem>
+                            )}
                           </DropdownMenuGroup>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -153,6 +183,32 @@ function PurchasesClientComponent() {
         open={!!selectedSale}
         onClose={() => setSelectedSale(null)}
         sale={selectedSale}
+      />
+      <UploadProofModal
+        open={openProofModal}
+        onClose={() => {
+          setOpenProofModal(false);
+          setSaleToUpload(null);
+        }}
+        onUpload={async (file: File) => {
+          if (!saleToUpload) return;
+          const formData = new FormData();
+          formData.append("transferProof", file);
+          // Puedes crear un endpoint updateTransferProof en saleAction
+          const res = await (
+            await import("@/server/saleAction")
+          ).updateTransferProof(saleToUpload._id, formData);
+          if (res.success) {
+            toast.success(
+              "¡Comprobante enviado! Tu compra estará pendiente hasta que el administrador la apruebe."
+            );
+            // Opcional: refrescar ventas
+            const updatedSales = await getSalesByAccount(user?.id || "");
+            if (updatedSales.success) setSales(updatedSales.sales);
+          } else {
+            toast.error(res.message || "Error al subir el comprobante");
+          }
+        }}
       />
     </Card>
   );

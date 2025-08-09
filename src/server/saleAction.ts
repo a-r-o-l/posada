@@ -5,6 +5,7 @@ import models from "@/models";
 import { revalidatePath } from "next/cache";
 import { toDate } from "date-fns-tz";
 import { generateRandomNumber } from "@/lib/utilsFunctions";
+import { uploadFileToS3 } from "@/lib/uploadFileToS3";
 export const createSale = async (data: FormData) => {
   try {
     await dbConnect();
@@ -258,6 +259,84 @@ export const deleteSale = async (id: string) => {
     return {
       success: false,
       message: "Error al eliminar la venta, intente nuevamente",
+      sale: null,
+    };
+  }
+};
+
+export const createTransferSale = async (data: FormData) => {
+  try {
+    await dbConnect();
+    const formData = Object.fromEntries(data.entries());
+    const parsedProducts = JSON.parse(formData.products as string);
+    let transferProofUrl = "";
+    if (data.get("transferProof")) {
+      const file = data.get("transferProof") as File;
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      // Carpeta para comprobantes de transferencia
+      const folder = "transferProofs";
+      // Nombre único para el archivo
+      const filename = `${Date.now()}_${file.name}`;
+      transferProofUrl = await uploadFileToS3(buffer, filename, folder);
+    }
+    const newSale = new models.Sale({
+      accountId: formData.accountId,
+      total: formData.total,
+      status: "pending",
+      delivered: false,
+      products: parsedProducts,
+      paymentTypeId: "transfer",
+      transferProofUrl: transferProofUrl || undefined,
+      transferStatus: transferProofUrl ? "uploaded" : "pending",
+      order: generateRandomNumber(12),
+    });
+    await newSale.save();
+    return {
+      success: true,
+      message: "Venta por transferencia creada correctamente",
+      sale: JSON.parse(JSON.stringify(newSale)),
+    };
+  } catch (error) {
+    console.error("Error creando venta por transferencia:", error);
+    return {
+      success: false,
+      message: "Error al crear la venta por transferencia, intente nuevamente",
+      sale: null,
+    };
+  }
+};
+
+export const updateTransferProof = async (saleId: string, data: FormData) => {
+  try {
+    await dbConnect();
+    let transferProofUrl = "";
+    if (data.get("transferProof")) {
+      const file = data.get("transferProof") as File;
+      const arrayBuffer = await file.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      const folder = "transferProofs";
+      const filename = `${Date.now()}_${file.name}`;
+      transferProofUrl = await uploadFileToS3(buffer, filename, folder);
+    }
+    const updatedSale = await models.Sale.findByIdAndUpdate(
+      saleId,
+      {
+        transferProofUrl,
+        transferStatus: transferProofUrl ? "uploaded" : "pending",
+      },
+      { new: true }
+    );
+    return {
+      success: true,
+      message: "Comprobante actualizado correctamente",
+      sale: JSON.parse(JSON.stringify(updatedSale)),
+    };
+  } catch (error) {
+    console.error("Error actualizando comprobante de transferencia:", error);
+    return {
+      success: false,
+      message: "Error al actualizar el comprobante, intente nuevamente",
       sale: null,
     };
   }

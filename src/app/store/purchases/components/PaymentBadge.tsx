@@ -1,7 +1,17 @@
 import { Badge } from "@/components/ui/badge";
 import React from "react";
 
-function PaymentBadge({ state }: { state: string }) {
+interface PaymentBadgeProps {
+  state: string;
+  paymentTypeId?: string;
+  transferProofUrl?: string;
+}
+
+function PaymentBadge({
+  state,
+  paymentTypeId,
+  transferProofUrl,
+}: PaymentBadgeProps) {
   if (!state) {
     return <></>;
   }
@@ -13,6 +23,17 @@ function PaymentBadge({ state }: { state: string }) {
         variant="outline"
       >
         Pagado
+      </Badge>
+    );
+  }
+  // Estado especial para transferencias con comprobante subido pero aún pendiente
+  if (state === "pending" && paymentTypeId === "transfer" && transferProofUrl) {
+    return (
+      <Badge
+        className="w-24 justify-center border-yellow-500 text-yellow-500"
+        variant="outline"
+      >
+        En proceso
       </Badge>
     );
   }

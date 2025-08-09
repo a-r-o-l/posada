@@ -33,7 +33,36 @@ import React, { useMemo } from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
+import TransferProofModal from "./TransferProofModal";
+import { updateSale } from "@/server/saleAction";
+import { toast } from "sonner";
+import PaymentBadge from "@/app/store/purchases/components/PaymentBadge";
+
 function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
+  const [proofModalOpen, setProofModalOpen] = React.useState(false);
+  const [approving, setApproving] = React.useState(false);
+  const [proofUrl, setProofUrl] = React.useState<string>("");
+
+  // Función para aprobar la orden
+  const approveOrder = async () => {
+    setApproving(true);
+    try {
+      const formData = new FormData();
+      formData.append("status", "approved");
+      const res = await updateSale(sale._id, formData);
+      if (!res.success) {
+        throw new Error(res.message);
+      }
+      await new Promise((r) => setTimeout(r, 1000)); // Simulación
+      toast.success("Orden aprobada correctamente");
+      setProofModalOpen(false);
+    } catch (err) {
+      console.log(err);
+      alert("Error al aprobar la orden");
+    } finally {
+      setApproving(false);
+    }
+  };
   const router = useRouter();
   const products = useMemo(() => {
     if (!sale) {
@@ -390,16 +419,27 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Orden</TableHead>
+                    <TableHead>Tipo</TableHead>
                     <TableHead>Fecha</TableHead>
                     <TableHead>Cliente</TableHead>
                     <TableHead>Total</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead className="text-center">Entrega</TableHead>
+                    {sale.paymentTypeId === "transfer" && (
+                      <TableHead>Comprobante</TableHead>
+                    )}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow>
                     <TableCell>{sale.order}</TableCell>
+                    <TableCell>
+                      {sale.paymentTypeId === "account_money"
+                        ? "Efectivo"
+                        : sale.paymentTypeId === "transfer"
+                        ? "Transferencia"
+                        : "Tarjeta"}
+                    </TableCell>
                     <TableCell>
                       {format(sale.createdAt!, "dd / MM / yyyy", {
                         locale: es,
@@ -408,17 +448,41 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                     <TableCell>{sale?.accountId?.email}</TableCell>
                     <TableCell>${sale?.total?.toFixed(2)}</TableCell>
                     <TableCell>
-                      <Badge
-                        className={`w-24 text-center justify-center ${
-                          paymentStateParser(sale?.status).color
-                        } hover:${paymentStateParser(sale?.status).color}`}
-                      >
-                        {paymentStateParser(sale?.status).text}
-                      </Badge>
+                      <PaymentBadge
+                        state={sale?.status || ""}
+                        paymentTypeId={sale?.paymentTypeId || ""}
+                        transferProofUrl={sale?.transferProofUrl || ""}
+                      />
                     </TableCell>
                     <TableCell align="center">
                       <Checkbox checked={sale?.delivered} />
                     </TableCell>
+                    {sale.paymentTypeId === "transfer" && (
+                      <TableCell>
+                        {sale.transferProofUrl ? (
+                          <NextImage
+                            src={sale.transferProofUrl || "/placeholderimg.jpg"}
+                            alt="Comprobante de transferencia"
+                            width={48}
+                            height={48}
+                            style={{
+                              objectFit: "cover",
+                              cursor: "pointer",
+                              borderRadius: 8,
+                              border: "1px solid #eee",
+                            }}
+                            onClick={() => {
+                              setProofUrl(sale.transferProofUrl || "");
+                              setProofModalOpen(true);
+                            }}
+                          />
+                        ) : (
+                          <span className="text-gray-400 text-lg font-bold">
+                            -
+                          </span>
+                        )}
+                      </TableCell>
+                    )}
                   </TableRow>
                 </TableBody>
               </Table>
@@ -468,6 +532,14 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
           </Card>
         </div>
       </CardContent>
+      <TransferProofModal
+        isaproved={sale.status === "approved"}
+        open={proofModalOpen}
+        proofUrl={proofUrl}
+        onClose={() => setProofModalOpen(false)}
+        onApprove={approveOrder}
+        approving={approving}
+      />
     </Card>
   );
 }
