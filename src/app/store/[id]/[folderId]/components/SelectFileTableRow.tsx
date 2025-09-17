@@ -49,11 +49,10 @@ function SelectFileTableRow({
         )}
       </TableCell>
       <TableCell>{item.name}</TableCell>
-      <TableCell>
-        ${" "}
-        {item.price.toLocaleString("es-ES", {
-          minimumFractionDigits: 0,
-        })}
+      <TableCell className="whitespace-nowrap">
+        <span className="inline-flex items-center gap-1">
+          $ {item.price.toLocaleString("es-ES", { minimumFractionDigits: 0 })}
+        </span>
       </TableCell>
       <TableCell className="flex justify-between items-center">
         <Button

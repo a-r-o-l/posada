@@ -33,11 +33,12 @@ import { IAccount } from "@/models/Account";
 import { IGrade } from "@/models/Grade";
 import { ISchool } from "@/models/School";
 import { updateChildren } from "@/server/accountAction";
-import { HelpCircle, Info, Save, Trash2, UserPlus } from "lucide-react";
+import { Info, Save, Trash2, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import NeedHelpModal from "./NeedHelpModal";
+import WhatsAppLogo from "@/icons/whatsappsvg";
 
 interface Child {
   name: string;
@@ -130,7 +131,7 @@ function ExtraUserDataForm({
       <CardHeader>
         <div className="mb-5">
           <CardTitle className="text-2xl font-bold text-center">
-            Bienvenido {user.name}! 🎉
+            Bienvenido/a {user.name}! 🎉
           </CardTitle>
           <CardDescription className="text-center">
             Ya casi terminamos, solo necesitamos un poco más de información para
@@ -161,14 +162,16 @@ function ExtraUserDataForm({
                   </li>
                 </ul>
                 <div className="w-full flex justify-end">
-                  <Button
-                    variant="outline"
-                    onClick={() => setNeedHelp(true)}
-                    className="w-full sm:w-40"
+                  <a
+                    href="https://wa.me/5491154032747?text=Hola!%20Quiero%20hacer%20una%20consulta"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-between gap-5 px-4 py-1 transition-all mt-10"
+                    style={{ boxShadow: "0 4px 16px #0003" }}
                   >
-                    <HelpCircle />
-                    Solicitar ayuda
-                  </Button>
+                    <span className="lg:text-base">Solicitar ayuda</span>
+                    <WhatsAppLogo className="w-6 h-6 lg:w-8 lg:h-8" />
+                  </a>
                 </div>
               </AlertDescription>
             </div>

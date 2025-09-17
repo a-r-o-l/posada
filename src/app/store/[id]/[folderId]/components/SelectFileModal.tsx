@@ -124,44 +124,52 @@ function SelectFileModal({
             </div>
           </div>
           <div className="pb-5">
-            <Table className="max-w-[700px]">
-              <TableHeader>
-                <TableRow>
-                  <TableHead></TableHead>
-                  <TableHead>Productos</TableHead>
-                  <TableHead>Precio</TableHead>
-                  <TableHead align="center" className="text-center">
-                    Cantidad
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((item) => (
-                  <SelectFileTableRow
-                    item={item}
-                    key={item._id}
-                    onPlus={() => handlePlus(item._id)}
-                    onMinus={() => handleMinus(item._id)}
-                  />
-                ))}
-              </TableBody>
-              <TableFooter>
-                <TableRow className="bg-gray-100">
-                  <TableCell colSpan={3} className="font-bold text-lg px-5">
-                    Total
-                  </TableCell>
-                  <TableCell align="right" className="">
-                    <Badge className="min-w-28 justify-start text-lg bg-black">
-                      ${" "}
-                      {data
-                        .map((item) => item.price * item.quantity)
-                        .reduce((acc, curr) => acc + curr, 0)
-                        .toLocaleString("es-ES", { minimumFractionDigits: 0 })}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
+            <div className="max-w-[700px] h-[540px] overflow-y-auto rounded-md border border-gray-200 bg-white">
+              <Table className="w-full">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead></TableHead>
+                    <TableHead>Productos</TableHead>
+                    <TableHead>Precio</TableHead>
+                    <TableHead align="center" className="text-center">
+                      Cantidad
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.map((item) => (
+                    <SelectFileTableRow
+                      item={item}
+                      key={item._id}
+                      onPlus={() => handlePlus(item._id)}
+                      onMinus={() => handleMinus(item._id)}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <div className="sticky bottom-0 z-10 bg-white border-x border-b border-gray-200 rounded-b-md">
+              <Table className="w-full">
+                <TableFooter>
+                  <TableRow className="bg-gray-100">
+                    <TableCell colSpan={3} className="font-bold text-lg px-5">
+                      Total
+                    </TableCell>
+                    <TableCell align="right" className="">
+                      <Badge className="min-w-28 justify-start text-lg bg-black">
+                        ${" "}
+                        {data
+                          .map((item) => item.price * item.quantity)
+                          .reduce((acc, curr) => acc + curr, 0)
+                          .toLocaleString("es-ES", {
+                            minimumFractionDigits: 0,
+                          })}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </div>
             <div className="flex justify-evenly mt-10">
               <Button className="w-40" onClick={addHandler}>
                 Agregar
@@ -187,47 +195,55 @@ function SelectFileModal({
             )}
           </div>
           <div className="pb-5">
-            <Table className="max-w-[450px] text-xs">
-              <TableHeader>
-                <TableRow>
-                  <TableHead></TableHead>
-                  <TableHead>Productos</TableHead>
-                  <TableHead>Precio</TableHead>
-                  <TableHead align="center" className="text-center">
-                    Cantidad
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {data.map((item) => (
-                  <SelectFileTableRow
-                    item={item}
-                    key={item._id}
-                    onPlus={() => handlePlus(item._id)}
-                    onMinus={() => handleMinus(item._id)}
-                  />
-                ))}
-              </TableBody>
-              <TableFooter>
-                <TableRow className="">
-                  <TableCell colSpan={3} className="font-bold text-xs px-5">
-                    Total
-                  </TableCell>
-                  <TableCell align="right" className="">
-                    <Badge
-                      className="min-w-28 justify-start text-xs"
-                      variant="outline"
-                    >
-                      ${" "}
-                      {data
-                        .map((item) => item.price * item.quantity)
-                        .reduce((acc, curr) => acc + curr, 0)
-                        .toLocaleString("es-ES", { minimumFractionDigits: 0 })}
-                    </Badge>
-                  </TableCell>
-                </TableRow>
-              </TableFooter>
-            </Table>
+            <div className="max-w-[450px] h-[260px] overflow-y-auto rounded-md border border-gray-200 bg-white">
+              <Table className="w-full text-xs">
+                <TableHeader>
+                  <TableRow>
+                    <TableHead></TableHead>
+                    <TableHead>Productos</TableHead>
+                    <TableHead>Precio</TableHead>
+                    <TableHead align="center" className="text-center">
+                      Cantidad
+                    </TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {data.map((item) => (
+                    <SelectFileTableRow
+                      item={item}
+                      key={item._id}
+                      onPlus={() => handlePlus(item._id)}
+                      onMinus={() => handleMinus(item._id)}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            <div className="sticky bottom-0 z-10 bg-white border-x border-b border-gray-200 rounded-b-md">
+              <Table className="w-full text-xs">
+                <TableFooter>
+                  <TableRow className="">
+                    <TableCell colSpan={3} className="font-bold text-xs px-5">
+                      Total
+                    </TableCell>
+                    <TableCell align="right" className="">
+                      <Badge
+                        className="min-w-28 justify-start text-xs"
+                        variant="outline"
+                      >
+                        ${" "}
+                        {data
+                          .map((item) => item.price * item.quantity)
+                          .reduce((acc, curr) => acc + curr, 0)
+                          .toLocaleString("es-ES", {
+                            minimumFractionDigits: 0,
+                          })}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                </TableFooter>
+              </Table>
+            </div>
             <div className="flex justify-evenly mt-5">
               <Button className="w-32 text-xs" onClick={addHandler}>
                 Agregar
