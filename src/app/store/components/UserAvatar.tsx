@@ -1,7 +1,5 @@
 "use client";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
-import { ThemeButton } from "@/components/ThemeButton";
-import { Avatar } from "@/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,7 +40,7 @@ function UserAvatar({ user }: { user?: IUser }) {
           <DropdownMenuGroup>
             <DropdownMenuItem
               className="flex items-center justify-between"
-              disabled
+              onClick={() => router.push("/store/account")}
             >
               Cuenta
               <User />

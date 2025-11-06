@@ -1,6 +1,12 @@
 "use client";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { format } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import { ISalePopulated } from "@/models/Sale";
@@ -60,6 +66,7 @@ function OrdersClientSide({
   const [updateLoading, setUpdateLoading] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [searchParams, setSearchParams] = useState("");
+  const [order, setOrder] = useState("");
   const [openEditOrderModal, setOpenEditOrderModal] = useState(false);
   const [selectedSchools, setSelectedSchools] = useState<string[]>([]);
 
@@ -86,6 +93,11 @@ function OrdersClientSide({
   const filteredSales = useMemo(() => {
     if (!sales || !sales.length) return [];
     let filtered = sales;
+
+    if (order) {
+      filtered = filtered.filter((sale) => sale.order.includes(order));
+    }
+
     // Filtro por email
     if (searchParams) {
       filtered = filtered.filter((sale) => {
@@ -103,7 +115,7 @@ function OrdersClientSide({
       });
     }
     return filtered;
-  }, [searchParams, sales, selectedSchools]);
+  }, [searchParams, sales, selectedSchools, order]);
 
   const salesQuantity = useMemo(() => {
     if (!filteredSales || !filteredSales.length)
@@ -143,15 +155,29 @@ function OrdersClientSide({
 
   return (
     <Card>
+      <div className="w-full flex justify-end">
+        <Badge variant="outline" className="ml-2">
+          {salesQuantity.newSales} / {salesQuantity.totalSales}
+        </Badge>
+      </div>
       <CardHeader>
         <div className="flex items-center w-full">
           <div className="flex items-center gap-5">
-            <CardTitle>Pedidos</CardTitle>
-            <Badge variant="outline" className="ml-2">
-              {salesQuantity.newSales} / {salesQuantity.totalSales}
-            </Badge>
+            <CardTitle className="hidden"></CardTitle>
+            <CardDescription className="hidden"></CardDescription>
           </div>
           <div className="flex flex-1 justify-around">
+            <div className="flex flex-col space-y-2 justify-center items-center w-60">
+              <Label>Filtrar por numero de orden</Label>
+              <Input
+                type="number"
+                placeholder="Numero de orden"
+                value={order}
+                onChange={(e) => {
+                  setOrder(e.target.value);
+                }}
+              />
+            </div>
             <div className="flex flex-col space-y-2 justify-center items-center w-60">
               <Label>Filtrar por fecha</Label>
               <DatePicker url="/admin/orders" />
@@ -193,6 +219,7 @@ function OrdersClientSide({
               }}
             />
           </div>
+
           <div className="flex">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
