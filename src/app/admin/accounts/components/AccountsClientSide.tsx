@@ -158,30 +158,30 @@ function AccountsClientSide({
                     <div className="flex items-center space-x-2 w-full justify-between">
                       <div className="flex items-center gap-5">
                         <div className="flex flex-col items-center">
-                          <RenderBadge role={account.role} />
+                          <RenderBadge role={account?.role} />
                         </div>
 
                         <div>
                           <div className="font-semibold">
-                            {account.name} {account.lastname}
+                            {account?.name} {account?.lastname}
                           </div>
                           <div className="text-sm text-gray-500">
-                            {account.email}
+                            {account?.email}
                           </div>
                         </div>
                       </div>
                       <div className="w-full h-full flex items-center justify-end"></div>
                     </div>
-                    {account.role !== "admin" && (
+                    {account?.role !== "admin" && (
                       <Switch
-                        checked={!account.disabled}
+                        checked={!account?.disabled}
                         onCheckedChange={async () => {
                           const response = await changeDisabled(
                             account._id,
-                            !account.disabled
+                            !account?.disabled
                           );
-                          if (response.success) {
-                            toast.success(response.message);
+                          if (response?.success) {
+                            toast.success(response?.message);
                           }
                         }}
                         onClick={(e) => e.stopPropagation()}
@@ -216,28 +216,28 @@ function AccountsClientSide({
                       <Label onClick={() => console.log(selectedAccount)}>
                         Nombre
                       </Label>
-                      <Input value={selectedAccount.name} disabled readOnly />
+                      <Input value={selectedAccount?.name} disabled readOnly />
                     </div>
                     <div className="space-y-2">
                       <Label>Apellido</Label>
                       <Input
-                        value={selectedAccount.lastname}
+                        value={selectedAccount?.lastname}
                         disabled
                         readOnly
                       />
                     </div>
                     <div className="space-y-2">
                       <Label>Telefono</Label>
-                      <Input value={selectedAccount.phone} disabled readOnly />
+                      <Input value={selectedAccount?.phone} disabled readOnly />
                     </div>
                     <div className="space-y-2">
                       <Label>email</Label>
-                      <Input value={selectedAccount.email} disabled readOnly />
+                      <Input value={selectedAccount?.email} disabled readOnly />
                     </div>
                     <div className="space-y-2">
                       <Label>password</Label>
                       <PasswordInput
-                        value={selectedAccount.password}
+                        value={selectedAccount?.password}
                         onChange={() => {}}
                       />
                     </div>
@@ -270,13 +270,14 @@ function AccountsClientSide({
                           {selectedAccount.children.map(
                             (child: IChildrenPopulated) => (
                               <TableRow
-                                key={`${child.name}${child.lastname}${child.gradeId}`}
+                                key={`${child?.name}${child?.lastname}${child?.gradeId}`}
                               >
-                                <TableCell>{child.name}</TableCell>
-                                <TableCell>{child.lastname}</TableCell>
-                                <TableCell>{child.schoolId.name}</TableCell>
+                                <TableCell>{child?.name}</TableCell>
+                                <TableCell>{child?.lastname}</TableCell>
+                                <TableCell>{child?.schoolId?.name}</TableCell>
                                 <TableCell>
-                                  {child.gradeId.grade} {child.gradeId.division}
+                                  {child?.gradeId?.grade}{" "}
+                                  {child?.gradeId?.division}
                                 </TableCell>
                                 <TableCell>
                                   <Button
