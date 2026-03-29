@@ -80,7 +80,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
 
     // Extraer todos los nombres de colegios
     const schoolNames = sale.accountId.children.map(
-      (child) => child.schoolId.name
+      (child) => child.schoolId.name,
     );
 
     // Eliminar duplicados usando Set
@@ -140,12 +140,12 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
           locale: es,
         })}`,
         10,
-        startY + 20
+        startY + 20,
       );
       doc.text(
         `Cliente: ${sale.accountId.lastname} ${sale.accountId.name}`,
         10,
-        startY + 30
+        startY + 30,
       );
       doc.text(`Email: ${sale.accountId.email}`, 10, startY + 40);
       doc.text(`Telefono: ${sale.accountId.phone}`, 10, startY + 50);
@@ -153,7 +153,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       doc.text(
         `Estado: ${paymentStateParser(sale.status).text}`,
         10,
-        startY + 70
+        startY + 70,
       );
 
       let schoolStartY = 20;
@@ -193,7 +193,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
           schoolStartY - 4, // Posición Y (un poco más arriba para que cubra todo el texto)
           gradoDivisionWidth + 2, // Ancho del texto + margen
           6, // Alto suficiente para cubrir el texto
-          "F" // 'F' significa rellenar (fill)
+          "F", // 'F' significa rellenar (fill)
         );
 
         // Restaura el color de texto a negro
@@ -209,6 +209,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
 
       // Agregar productos en una tabla
       const tableColumn = [
+        "Imagen",
         "Archivo",
         "Producto",
         "Colegio",
@@ -217,10 +218,27 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         "Cantidad",
         "Importe",
       ];
-      const tableRows: string[][] = [];
 
-      products.forEach((product) => {
-        const productData: string[] = [
+      // Convertir todas las imágenes a base64 primero
+      const imagePromises = products.map(async (product) => {
+        if (product?.fileImageUrl) {
+          try {
+            return await getImageBase64(product.fileImageUrl);
+          } catch (error) {
+            console.error("Error loading image:", error);
+            return null;
+          }
+        }
+        return null;
+      });
+
+      const images = await Promise.all(imagePromises);
+
+      const tableRows: (string | { content: string; styles: { cellPadding: number } })[][] = [];
+
+      products.forEach((product, index) => {
+        const productData = [
+          images[index] ? { content: "", styles: { cellPadding: 2 } } : "", // Espacio para imagen
           product?.fileTitle,
           product?.productId?.name,
           product?.fileId?.folderId?.schoolId?.name,
@@ -236,6 +254,32 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         startY: startY + 80,
         head: [tableColumn],
         body: tableRows,
+        didDrawCell: function (data) {
+          // Si es la columna de imagen (índice 0) y hay una imagen
+          if (data.column.index === 0 && data.section === "body") {
+            const productIndex = data.row.index;
+            const imageData = images[productIndex];
+
+            if (imageData) {
+              try {
+                // Agregar la imagen en la celda
+                doc.addImage(
+                  imageData as string,
+                  "JPEG",
+                  data.cell.x + 2, // x position with padding
+                  data.cell.y + 2, // y position with padding
+                  data.cell.width - 4, // width minus padding
+                  data.cell.height - 4, // height minus padding
+                );
+              } catch (error) {
+                console.error("Error adding image to PDF:", error);
+              }
+            }
+          }
+        },
+        columnStyles: {
+          0: { cellWidth: 20 }, // Ancho fijo para la columna de imagen
+        },
       });
 
       const finalY = startY + 160;
@@ -298,7 +342,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
           rightYPos - 4, // Posición Y (un poco más arriba para que cubra todo el texto)
           gradoDivisionWidth + 2, // Ancho del texto + margen
           6, // Alto suficiente para cubrir el texto
-          "F" // 'F' significa rellenar (fill)
+          "F", // 'F' significa rellenar (fill)
         );
 
         // Restaura el color de texto a negro
@@ -439,8 +483,8 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                       {sale.paymentTypeId === "account_money"
                         ? "Efectivo"
                         : sale.paymentTypeId === "transfer"
-                        ? "Transferencia"
-                        : "Tarjeta"}
+                          ? "Transferencia"
+                          : "Tarjeta"}
                     </TableCell>
                     <TableCell>
                       {format(sale.createdAt!, "dd / MM / yyyy", {
