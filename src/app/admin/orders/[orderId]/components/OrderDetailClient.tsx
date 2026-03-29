@@ -73,6 +73,8 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
     return sale.products;
   }, [sale]);
 
+  console.log("prods -> ", products);
+
   const uniqueSchools = useMemo(() => {
     if (!sale?.accountId?.children?.length) {
       return [];
@@ -95,26 +97,55 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
     const doc = new jsPDF();
     autoTable(doc, {});
 
-    // Función para convertir la imagen a base64
-    const getImageBase64 = (url: string) => {
-      return new Promise((resolve, reject) => {
-        const img = new Image();
-        img.crossOrigin = "Anonymous";
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          canvas.width = img.width;
-          canvas.height = img.height;
-          const ctx = canvas.getContext("2d");
-          if (ctx) {
-            ctx.drawImage(img, 0, 0);
-            const dataURL = canvas.toDataURL("image/png");
-            resolve(dataURL);
-          } else {
-            reject(new Error("Failed to get 2D context"));
-          }
-        };
-        img.onerror = (error) => reject(error);
-        img.src = url;
+    // Función para convertir imagen a base64 (maneja CORS silenciosamente)
+    const getImageBase64 = (url: string): Promise<string | null> => {
+      return new Promise((resolve) => {
+        // Si es una imagen local (del dominio), debería funcionar
+        if (url.startsWith("/") || url.includes(window.location.hostname)) {
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const canvas = document.createElement("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext("2d");
+              if (ctx) {
+                ctx.drawImage(img, 0, 0);
+                const dataURL = canvas.toDataURL("image/png");
+                resolve(dataURL);
+              } else {
+                resolve(null);
+              }
+            } catch (error) {
+              resolve(null);
+              console.log(error);
+            }
+          };
+          img.onerror = () => resolve(null);
+          img.src = url;
+        } else {
+          // Para imágenes externas (S3), intentamos sin mostrar errores
+          const img = new Image();
+          img.onload = () => {
+            try {
+              const canvas = document.createElement("canvas");
+              canvas.width = img.width;
+              canvas.height = img.height;
+              const ctx = canvas.getContext("2d");
+              if (ctx) {
+                ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+              } else {
+                resolve(null);
+              }
+            } catch (error) {
+              resolve(null); // Fallo silencioso para CORS
+              console.log(error);
+            }
+          };
+          img.onerror = () => resolve(null); // Fallo silencioso para CORS
+          img.src = url;
+        }
       });
     };
 
@@ -219,20 +250,36 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         "Importe",
       ];
 
-      // Convertir todas las imágenes a base64 primero
-      const imagePromises = products.map(async (product) => {
-        if (product?.fileId?.imageUrl) {
-          try {
-            return await getImageBase64(product?.fileId?.imageUrl);
-          } catch (error) {
-            console.error("Error loading image:", error);
-            return null;
-          }
+      // Intentar cargar imágenes de productos
+      console.log(
+        "Productos con imágenes:",
+        products.map((p) => ({
+          title: p?.fileTitle,
+          imageUrl: p?.fileImageUrl,
+        })),
+      );
+
+      const imagePromises = products.map(async (product, index) => {
+        if (product?.fileImageUrl) {
+          console.log(
+            `Intentando cargar imagen ${index + 1}:`,
+            product.fileImageUrl,
+          );
+          const result = await getImageBase64(product.fileImageUrl);
+          console.log(
+            `Imagen ${index + 1}:`,
+            result ? "Cargada exitosamente" : "Falló (probablemente CORS)",
+          );
+          return result;
         }
         return null;
       });
 
       const images = await Promise.all(imagePromises);
+      const successfulImages = images.filter((img) => img !== null).length;
+      console.log(
+        `Se cargaron ${successfulImages} de ${products.length} imágenes`,
+      );
 
       const tableRows: (
         | string
@@ -240,15 +287,18 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       )[][] = [];
 
       products.forEach((product, index) => {
+        const hasImage = images[index] !== null;
         const productData = [
-          images[index] ? { content: "", styles: { cellPadding: 2 } } : "", // Espacio para imagen
-          product?.fileTitle,
-          product?.productId?.name,
-          product?.fileId?.folderId?.schoolId?.name,
-          product?.fileId?.folderId?.title,
-          priceParserToString(product?.price),
-          (product?.quantity).toString(),
-          priceParserToString(product?.total),
+          hasImage
+            ? { content: "", styles: { cellPadding: 2 } }
+            : `🖼️ ${product?.fileTitle || "Imagen"}`, // Mostrar nombre del archivo con ícono
+          product?.fileTitle || "",
+          product?.productId?.name || "",
+          product?.fileId?.folderId?.schoolId?.name || "",
+          product?.fileId?.folderId?.title || "",
+          priceParserToString(product?.price) || "",
+          (product?.quantity || 0).toString(),
+          priceParserToString(product?.total) || "",
         ];
         tableRows.push(productData);
       });
@@ -258,30 +308,49 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         head: [tableColumn],
         body: tableRows,
         didDrawCell: function (data) {
-          // Si es la columna de imagen (índice 0) y hay una imagen
+          // Si es la columna de imagen (índice 0) y hay una imagen cargada
           if (data.column.index === 0 && data.section === "body") {
             const productIndex = data.row.index;
             const imageData = images[productIndex];
 
             if (imageData) {
               try {
-                // Agregar la imagen en la celda
+                console.log(`Dibujando imagen para fila ${productIndex + 1}`);
                 doc.addImage(
                   imageData as string,
-                  "JPEG",
-                  data.cell.x + 2, // x position with padding
-                  data.cell.y + 2, // y position with padding
-                  data.cell.width - 4, // width minus padding
-                  data.cell.height - 4, // height minus padding
+                  "PNG",
+                  data.cell.x + 2,
+                  data.cell.y + 2,
+                  data.cell.width - 4,
+                  data.cell.height - 4,
                 );
               } catch (error) {
-                console.error("Error adding image to PDF:", error);
+                console.error(
+                  `Error al dibujar imagen en fila ${productIndex + 1}:`,
+                  error,
+                );
               }
             }
           }
         },
+        styles: {
+          cellPadding: 5,
+          fontSize: 10,
+          minCellHeight: 20, // Altura mínima para mostrar imágenes
+        },
+        headStyles: {
+          fillColor: [100, 100, 100],
+          textColor: 255,
+        },
         columnStyles: {
-          0: { cellWidth: 20 }, // Ancho fijo para la columna de imagen
+          0: { cellWidth: 20 }, // Imagen
+          1: { cellWidth: 30 }, // Archivo
+          2: { cellWidth: 25 }, // Producto
+          3: { cellWidth: 30 }, // Colegio
+          4: { cellWidth: 25 }, // Carpeta
+          5: { cellWidth: 20 }, // Precio
+          6: { cellWidth: 15 }, // Cantidad
+          7: { cellWidth: 20 }, // Importe
         },
       });
 
