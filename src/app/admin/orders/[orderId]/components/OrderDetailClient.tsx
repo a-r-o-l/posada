@@ -221,9 +221,9 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
 
       // Convertir todas las imágenes a base64 primero
       const imagePromises = products.map(async (product) => {
-        if (product?.fileImageUrl) {
+        if (product?.fileId?.imageUrl) {
           try {
-            return await getImageBase64(product.fileImageUrl);
+            return await getImageBase64(product?.fileId?.imageUrl);
           } catch (error) {
             console.error("Error loading image:", error);
             return null;
@@ -234,7 +234,10 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
 
       const images = await Promise.all(imagePromises);
 
-      const tableRows: (string | { content: string; styles: { cellPadding: number } })[][] = [];
+      const tableRows: (
+        | string
+        | { content: string; styles: { cellPadding: number } }
+      )[][] = [];
 
       products.forEach((product, index) => {
         const productData = [
