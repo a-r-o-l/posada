@@ -119,14 +119,14 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
     };
 
     try {
-      // Cargar la imagen del logo desde la carpeta public
+      // Cargar la imagen desde la carpeta public y convertirla a base64
       const imgData = await getImageBase64("/logoposada.png");
 
       // Agregar imagen de la empresa
       doc.addImage(imgData as string, "PNG", 10, 10, 50, 30);
 
       // Ajustar la posición del título y otros elementos
-      const startY = 50;
+      const startY = 50; // Ajusta este valor según sea necesario
 
       // Agregar título
       doc.setFontSize(18);
@@ -158,7 +158,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
 
       let schoolStartY = 20;
       doc.setFontSize(12);
-      doc.text("Colegio:", 110, schoolStartY);
+      doc.text("Colegio:", 110, schoolStartY); // Vuelto a "Colegios:"
       // Mostrar colegios en la parte superior
       uniqueSchools.forEach((schoolName) => {
         schoolStartY += 5;
@@ -166,54 +166,49 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       });
 
       // Agregar menores en la parte superior (después de los colegios)
-      schoolStartY += 10;
+      schoolStartY += 10; // Espacio adicional antes de menores
       doc.text("Alumno/s:", 110, schoolStartY);
 
       schoolStartY += 5;
 
       // Mostrar cada niño en la parte superior
       sale.accountId.children.forEach((child) => {
+        // Divide el texto en dos partes
         const nombreApellido = `${child.name} ${child.lastname} - `;
         const gradoDivision = `${child.gradeId.grade} ${child.gradeId.division}`;
+
+        // Calcula el ancho del nombre y apellido
         const nombreApellidoWidth = doc.getTextWidth(nombreApellido);
+
+        // Calcula el ancho del grado y división para el rectángulo
         const gradoDivisionWidth = doc.getTextWidth(gradoDivision);
 
-        doc.setFillColor(255, 255, 150);
+        // Establece el color de fondo amarillo claro
+        doc.setFillColor(255, 255, 150); // RGB para amarillo claro
+
+        // Dibuja un rectángulo para el fondo de grado y división
+        // El rectángulo es ligeramente más alto y ancho que el texto
         doc.rect(
-          110 + nombreApellidoWidth,
-          schoolStartY - 4,
-          gradoDivisionWidth + 2,
-          6,
-          "F",
+          110 + nombreApellidoWidth, // Posición X después del nombre
+          schoolStartY - 4, // Posición Y (un poco más arriba para que cubra todo el texto)
+          gradoDivisionWidth + 2, // Ancho del texto + margen
+          6, // Alto suficiente para cubrir el texto
+          "F", // 'F' significa rellenar (fill)
         );
 
+        // Restaura el color de texto a negro
         doc.setTextColor(0, 0, 0);
+
+        // Ahora escribe el texto completo
         doc.text(nombreApellido, 110, schoolStartY);
         doc.text(gradoDivision, 110 + nombreApellidoWidth, schoolStartY);
+
+        // Incrementa la posición Y para el siguiente niño
         schoolStartY += 5;
       });
 
-      // Cargar todas las imágenes de los productos ANTES de crear la tabla
-      const imagesBase64 = await Promise.all(
-        products.map(async (product) => {
-          if (product?.fileImageUrl) {
-            try {
-              return await getImageBase64(product.fileImageUrl);
-            } catch (error) {
-              console.error(
-                `Error cargando imagen para ${product.fileTitle}:`,
-                error,
-              );
-              return null;
-            }
-          }
-          return null;
-        }),
-      );
-
-      // Definir columnas de la tabla (IMAGEN agregada al principio)
+      // Agregar productos en una tabla
       const tableColumn = [
-        "Imagen",
         "Archivo",
         "Producto",
         "Colegio",
@@ -222,134 +217,54 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         "Cantidad",
         "Importe",
       ];
-
-      // Crear filas de la tabla (la primera columna va vacía porque la imagen se dibuja aparte)
       const tableRows: string[][] = [];
 
       products.forEach((product) => {
         const productData: string[] = [
-          "", // Celda vacía para la imagen (se dibujará manualmente)
-          product?.fileTitle || "",
-          product?.productId?.name || "",
-          product?.fileId?.folderId?.schoolId?.name || "",
-          product?.fileId?.folderId?.title || "",
-          priceParserToString(product?.price) || "",
-          (product?.quantity || 0).toString(),
-          priceParserToString(product?.total) || "",
+          product?.fileTitle,
+          product?.productId?.name,
+          product?.fileId?.folderId?.schoolId?.name,
+          product?.fileId?.folderId?.title,
+          priceParserToString(product?.price),
+          (product?.quantity).toString(),
+          priceParserToString(product?.total),
         ];
         tableRows.push(productData);
       });
 
-      // Variable para guardar la posición Y final de la tabla
-      let finalY = startY + 160;
-
-      // Generar tabla con la función didDrawCell para dibujar las imágenes
       autoTable(doc, {
         startY: startY + 80,
         head: [tableColumn],
         body: tableRows,
-        didDrawCell: function (data) {
-          // Solo para la columna de imagen (índice 0) y en el cuerpo de la tabla
-          if (data.column.index === 0 && data.section === "body") {
-            const rowIndex = data.row.index;
-            const imageData = imagesBase64[rowIndex];
-
-            if (imageData) {
-              try {
-                // Calcular dimensiones para que la imagen quepa en la celda
-                const cellWidth = data.cell.width;
-                const cellHeight = data.cell.height;
-                const padding = 2;
-                const maxWidth = cellWidth - padding * 2;
-                const maxHeight = cellHeight - padding * 2;
-
-                // Crear imagen temporal para obtener dimensiones reales
-                const tempImg = new Image();
-                tempImg.onload = () => {
-                  const imgWidth = tempImg.width;
-                  const imgHeight = tempImg.height;
-
-                  // Calcular la proporción para que la imagen no se deforme
-                  const ratio = Math.min(
-                    maxWidth / imgWidth,
-                    maxHeight / imgHeight,
-                  );
-                  const drawWidth = imgWidth * ratio;
-                  const drawHeight = imgHeight * ratio;
-
-                  // Centrar la imagen en la celda
-                  const x = data.cell.x + (cellWidth - drawWidth) / 2;
-                  const y = data.cell.y + (cellHeight - drawHeight) / 2;
-
-                  doc.addImage(
-                    imageData as string,
-                    "PNG",
-                    x,
-                    y,
-                    drawWidth,
-                    drawHeight,
-                  );
-                };
-                tempImg.src = imageData as string;
-              } catch (error) {
-                console.error("Error al dibujar imagen:", error);
-              }
-            }
-          }
-        },
-        // Estilos de la tabla
-        styles: {
-          cellPadding: 5,
-          fontSize: 10,
-          minCellHeight: 30, // Altura mínima para que se vean bien las imágenes
-        },
-        headStyles: {
-          fillColor: [100, 100, 100],
-          textColor: 255,
-        },
-        columnStyles: {
-          0: { cellWidth: 25 }, // Columna de imagen más angosta
-          1: { cellWidth: 30 }, // Archivo
-          2: { cellWidth: 25 }, // Producto
-          3: { cellWidth: 30 }, // Colegio
-          4: { cellWidth: 25 }, // Carpeta
-          5: { cellWidth: 20 }, // Precio
-          6: { cellWidth: 15 }, // Cantidad
-          7: { cellWidth: 20 }, // Importe
-        },
-        // Callback para obtener la posición final después de dibujar la tabla
-        didDrawPage: function (data) {
-          // Actualizar finalY con la posición Y actual + la altura de la página si es necesario
-          if (data.cursor) {
-            finalY = data.cursor.y;
-          }
-        },
       });
 
-      // Si no se actualizó finalY en didDrawPage, usar el valor por defecto
-      // La línea de corte va después de la tabla
-      const lineY = (finalY > startY + 160 ? finalY : startY + 160) + 30;
+      const finalY = startY + 160;
+
+      // Agregar un espacio de 100px debajo de la tabla
+      const lineY = finalY + 50;
 
       // Dibujar línea horizontal punteada (línea de corte)
       const pageWidth = doc.internal.pageSize.width;
-      doc.setLineDashPattern([3, 3], 0);
-      doc.setDrawColor(0, 0, 0);
-      doc.line(10, lineY, pageWidth - 10, lineY);
+      doc.setLineDashPattern([3, 3], 0); // Línea punteada
+      doc.setDrawColor(0, 0, 0); // Color negro
+      doc.line(10, lineY, pageWidth - 10, lineY); // Línea de un extremo a otro
 
       // Volver a línea sólida para otros elementos
       doc.setLineDashPattern([], 0);
 
       // Espacio después de la línea
-      const textY = lineY + 10;
+      const textY = lineY + 10; // Aumentado de 10 a 20 para más espacio
 
       // Definir posiciones X para las dos columnas
-      const leftX = 20;
-      const rightX = 100;
+      const leftX = 20; // Posición para "Colegios" (izquierda)
+      const rightX = 100; // Posición para "Alumnos" (derecha)
 
       // COLUMNA IZQUIERDA - COLEGIOS
+      // --------------------------
       doc.setFontSize(12);
       doc.text("Colegio:", leftX, textY);
 
+      // Listar colegios
       let leftYPos = textY + 5;
       uniqueSchools.forEach((schoolName) => {
         doc.text(schoolName, leftX, leftYPos);
@@ -357,28 +272,43 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       });
 
       // COLUMNA DERECHA - ALUMNOS
+      // --------------------------
       doc.setFontSize(12);
       doc.text("Alumno/s:", rightX, textY);
 
+      // Listar alumnos
       let rightYPos = textY + 5;
       sale.accountId.children.forEach((child) => {
+        // Divide el texto en dos partes
         const nombreApellido = `${child.name} ${child.lastname} - `;
         const gradoDivision = `${child.gradeId.grade} ${child.gradeId.division}`;
+
+        // Calcula el ancho del nombre y apellido
         const nombreApellidoWidth = doc.getTextWidth(nombreApellido);
+
+        // Calcula el ancho del grado y división para el rectángulo
         const gradoDivisionWidth = doc.getTextWidth(gradoDivision);
 
-        doc.setFillColor(255, 255, 150);
+        // Establece el color de fondo amarillo claro
+        doc.setFillColor(255, 255, 150); // RGB para amarillo claro
+
+        // Dibuja un rectángulo para el fondo de grado y división
         doc.rect(
-          rightX + nombreApellidoWidth,
-          rightYPos - 4,
-          gradoDivisionWidth + 2,
-          6,
-          "F",
+          rightX + nombreApellidoWidth, // Posición X después del nombre
+          rightYPos - 4, // Posición Y (un poco más arriba para que cubra todo el texto)
+          gradoDivisionWidth + 2, // Ancho del texto + margen
+          6, // Alto suficiente para cubrir el texto
+          "F", // 'F' significa rellenar (fill)
         );
 
+        // Restaura el color de texto a negro
         doc.setTextColor(0, 0, 0);
+
+        // Ahora escribe el texto completo
         doc.text(nombreApellido, rightX, rightYPos);
         doc.text(gradoDivision, rightX + nombreApellidoWidth, rightYPos);
+
+        // Incrementa la posición Y para el siguiente niño
         rightYPos += 5;
       });
 
