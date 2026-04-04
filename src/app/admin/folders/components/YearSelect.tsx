@@ -47,7 +47,7 @@ function YearSelect({ url }: { url: string }) {
       <SelectContent>
         <SelectGroup>
           <SelectItem value="all">Todos</SelectItem>
-          {["2024", "2025"].map((year) => (
+          {["2024", "2025", "2026"].map((year) => (
             <SelectItem key={year} value={year}>
               {year}
             </SelectItem>

@@ -43,6 +43,8 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
   const [approving, setApproving] = React.useState(false);
   const [proofUrl, setProofUrl] = React.useState<string>("");
 
+  console.log(sale);
+  // Función para aprobar la orden
   const approveOrder = async () => {
     setApproving(true);
     try {
@@ -71,8 +73,6 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
     return sale.products;
   }, [sale]);
 
-  console.log("sale -> ", sale);
-
   const uniqueSchools = useMemo(() => {
     if (!sale?.accountId?.children?.length) {
       return [];
@@ -95,61 +95,44 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
     const doc = new jsPDF();
     autoTable(doc, {});
 
-    // Función para convertir imagen a base64
-    const getImageBase64 = (url: string): Promise<string | null> => {
-      return new Promise((resolve) => {
-        if (!url || url.trim() === "") {
-          resolve(null);
-          return;
-        }
-
+    // Función para convertir la imagen a base64
+    const getImageBase64 = (url: string) => {
+      return new Promise((resolve, reject) => {
         const img = new Image();
         img.crossOrigin = "Anonymous";
-
         img.onload = () => {
-          try {
-            const canvas = document.createElement("canvas");
-            canvas.width = img.width;
-            canvas.height = img.height;
-            const ctx = canvas.getContext("2d");
-            if (ctx) {
-              ctx.drawImage(img, 0, 0);
-              const dataURL = canvas.toDataURL("image/png");
-              resolve(dataURL);
-            } else {
-              resolve(null);
-            }
-          } catch (error) {
-            console.error("Error convirtiendo imagen:", error);
-            resolve(null);
+          const canvas = document.createElement("canvas");
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext("2d");
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            const dataURL = canvas.toDataURL("image/png");
+            resolve(dataURL);
+          } else {
+            reject(new Error("Failed to get 2D context"));
           }
         };
-
-        img.onerror = (error) => {
-          console.error("Error cargando imagen:", url, error);
-          resolve(null);
-        };
-
+        img.onerror = (error) => reject(error);
         img.src = url;
       });
     };
 
     try {
-      // Cargar logo
-      const logoData = await getImageBase64("/logoposada.png");
+      // Cargar la imagen del logo desde la carpeta public
+      const imgData = await getImageBase64("/logoposada.png");
 
-      // Agregar logo si existe
-      if (logoData) {
-        doc.addImage(logoData, "PNG", 10, 10, 50, 30);
-      }
+      // Agregar imagen de la empresa
+      doc.addImage(imgData as string, "PNG", 10, 10, 50, 30);
 
+      // Ajustar la posición del título y otros elementos
       const startY = 50;
 
-      // Título
+      // Agregar título
       doc.setFontSize(18);
       doc.text("Detalles de la Orden", 10, startY);
 
-      // Detalles de la orden
+      // Agregar detalles de la orden
       doc.setFontSize(12);
       doc.text(`Orden: ${sale.order}`, 10, startY + 10);
       doc.text(
@@ -165,7 +148,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         startY + 30,
       );
       doc.text(`Email: ${sale.accountId.email}`, 10, startY + 40);
-      doc.text(`Teléfono: ${sale.accountId.phone}`, 10, startY + 50);
+      doc.text(`Telefono: ${sale.accountId.phone}`, 10, startY + 50);
       doc.text(`Total: $${sale.total.toFixed(2)}`, 10, startY + 60);
       doc.text(
         `Estado: ${paymentStateParser(sale.status).text}`,
@@ -173,27 +156,22 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         startY + 70,
       );
 
-      // Colegios y alumnos (parte superior derecha)
       let schoolStartY = 20;
       doc.setFontSize(12);
       doc.text("Colegio:", 110, schoolStartY);
-
-      const uniqueSchools = [
-        ...new Set(
-          sale.accountId.children.map(
-            (c) => c.schoolId?.name || c.gradeId?.schoolId?.name,
-          ),
-        ),
-      ];
+      // Mostrar colegios en la parte superior
       uniqueSchools.forEach((schoolName) => {
         schoolStartY += 5;
         doc.text(schoolName, 110, schoolStartY);
       });
 
+      // Agregar menores en la parte superior (después de los colegios)
       schoolStartY += 10;
       doc.text("Alumno/s:", 110, schoolStartY);
+
       schoolStartY += 5;
 
+      // Mostrar cada niño en la parte superior
       sale.accountId.children.forEach((child) => {
         const nombreApellido = `${child.name} ${child.lastname} - `;
         const gradoDivision = `${child.gradeId.grade} ${child.gradeId.division}`;
@@ -215,7 +193,25 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         schoolStartY += 5;
       });
 
-      // Preparar tabla
+      // Cargar todas las imágenes de los productos ANTES de crear la tabla
+      const imagesBase64 = await Promise.all(
+        products.map(async (product) => {
+          if (product?.fileImageUrl) {
+            try {
+              return await getImageBase64(product.fileImageUrl);
+            } catch (error) {
+              console.error(
+                `Error cargando imagen para ${product.fileTitle}:`,
+                error,
+              );
+              return null;
+            }
+          }
+          return null;
+        }),
+      );
+
+      // Definir columnas de la tabla (IMAGEN agregada al principio)
       const tableColumn = [
         "Imagen",
         "Archivo",
@@ -227,28 +223,11 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
         "Importe",
       ];
 
-      // Cargar TODAS las imágenes ANTES de crear la tabla
-      console.log("Cargando imágenes de productos...");
-      const imagesBase64 = await Promise.all(
-        products.map(async (product, index) => {
-          if (product?.fileImageUrl && product.fileImageUrl.trim() !== "") {
-            console.log(`Cargando imagen ${index + 1}:`, product.fileImageUrl);
-            const base64 = await getImageBase64(product.fileImageUrl);
-            if (base64) {
-              console.log(`✅ Imagen ${index + 1} cargada correctamente`);
-            } else {
-              console.log(`❌ Imagen ${index + 1} NO se pudo cargar`);
-            }
-            return base64;
-          }
-          console.log(`❌ Producto ${index + 1} no tiene URL de imagen`);
-          return null;
-        }),
-      );
+      // Crear filas de la tabla (la primera columna va vacía porque la imagen se dibuja aparte)
+      const tableRows: string[][] = [];
 
-      // Crear filas de la tabla
-      const tableRows = products.map((product, index) => {
-        return [
+      products.forEach((product) => {
+        const productData: string[] = [
           "", // Celda vacía para la imagen (se dibujará manualmente)
           product?.fileTitle || "",
           product?.productId?.name || "",
@@ -258,27 +237,26 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
           (product?.quantity || 0).toString(),
           priceParserToString(product?.total) || "",
         ];
+        tableRows.push(productData);
       });
 
-      // Generar tabla
+      // Variable para guardar la posición Y final de la tabla
+      let finalY = startY + 160;
+
+      // Generar tabla con la función didDrawCell para dibujar las imágenes
       autoTable(doc, {
         startY: startY + 80,
         head: [tableColumn],
         body: tableRows,
         didDrawCell: function (data) {
-          // Solo procesar la columna de imágenes (índice 0)
+          // Solo para la columna de imagen (índice 0) y en el cuerpo de la tabla
           if (data.column.index === 0 && data.section === "body") {
             const rowIndex = data.row.index;
             const imageData = imagesBase64[rowIndex];
 
-            // Limpiar el contenido de la celda (evitar texto extraño)
-            if (data.cell.raw && typeof data.cell.raw === "string") {
-              data.cell.text = [""];
-            }
-
             if (imageData) {
               try {
-                // Calcular dimensiones para la imagen
+                // Calcular dimensiones para que la imagen quepa en la celda
                 const cellWidth = data.cell.width;
                 const cellHeight = data.cell.height;
                 const padding = 2;
@@ -291,7 +269,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                   const imgWidth = tempImg.width;
                   const imgHeight = tempImg.height;
 
-                  // Calcular proporción
+                  // Calcular la proporción para que la imagen no se deforme
                   const ratio = Math.min(
                     maxWidth / imgWidth,
                     maxHeight / imgHeight,
@@ -299,77 +277,114 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                   const drawWidth = imgWidth * ratio;
                   const drawHeight = imgHeight * ratio;
 
-                  // Centrar en la celda
+                  // Centrar la imagen en la celda
                   const x = data.cell.x + (cellWidth - drawWidth) / 2;
                   const y = data.cell.y + (cellHeight - drawHeight) / 2;
 
-                  try {
-                    doc.addImage(imageData, "PNG", x, y, drawWidth, drawHeight);
-                  } catch (err) {
-                    console.error(
-                      `Error dibujando imagen fila ${rowIndex + 1}:`,
-                      err,
-                    );
-                  }
+                  doc.addImage(
+                    imageData as string,
+                    "PNG",
+                    x,
+                    y,
+                    drawWidth,
+                    drawHeight,
+                  );
                 };
-                tempImg.src = imageData;
+                tempImg.src = imageData as string;
               } catch (error) {
-                console.error(
-                  `Error procesando imagen fila ${rowIndex + 1}:`,
-                  error,
-                );
+                console.error("Error al dibujar imagen:", error);
               }
             }
           }
         },
+        // Estilos de la tabla
         styles: {
           cellPadding: 5,
           fontSize: 10,
-          minCellHeight: 40, // Altura mínima para que se vean bien las imágenes
-          valign: "middle",
+          minCellHeight: 30, // Altura mínima para que se vean bien las imágenes
         },
         headStyles: {
           fillColor: [100, 100, 100],
           textColor: 255,
-          fontStyle: "bold",
-          halign: "center",
         },
         columnStyles: {
-          0: { cellWidth: 30, halign: "center", valign: "middle" }, // Imagen
-          1: { cellWidth: 35 }, // Archivo
+          0: { cellWidth: 25 }, // Columna de imagen más angosta
+          1: { cellWidth: 30 }, // Archivo
           2: { cellWidth: 25 }, // Producto
           3: { cellWidth: 30 }, // Colegio
           4: { cellWidth: 25 }, // Carpeta
-          5: { cellWidth: 20, halign: "right" }, // Precio
-          6: { cellWidth: 15, halign: "center" }, // Cantidad
-          7: { cellWidth: 20, halign: "right" }, // Importe
+          5: { cellWidth: 20 }, // Precio
+          6: { cellWidth: 15 }, // Cantidad
+          7: { cellWidth: 20 }, // Importe
         },
-        alternateRowStyles: {
-          fillColor: [245, 245, 245],
+        // Callback para obtener la posición final después de dibujar la tabla
+        didDrawPage: function (data) {
+          // Actualizar finalY con la posición Y actual + la altura de la página si es necesario
+          if (data.cursor) {
+            finalY = data.cursor.y;
+          }
         },
       });
 
-      // Obtener posición final de la tabla
-      const finalY = (doc as any).lastAutoTable?.finalY || startY + 200;
+      // Si no se actualizó finalY en didDrawPage, usar el valor por defecto
+      // La línea de corte va después de la tabla
+      const lineY = (finalY > startY + 160 ? finalY : startY + 160) + 30;
 
-      // Línea de corte
-      const lineY = finalY + 30;
+      // Dibujar línea horizontal punteada (línea de corte)
       const pageWidth = doc.internal.pageSize.width;
       doc.setLineDashPattern([3, 3], 0);
       doc.setDrawColor(0, 0, 0);
       doc.line(10, lineY, pageWidth - 10, lineY);
+
+      // Volver a línea sólida para otros elementos
       doc.setLineDashPattern([], 0);
 
-      // Información adicional
-      const textY = lineY + 15;
+      // Espacio después de la línea
+      const textY = lineY + 10;
 
-      // Guardar PDF
+      // Definir posiciones X para las dos columnas
+      const leftX = 20;
+      const rightX = 100;
+
+      // COLUMNA IZQUIERDA - COLEGIOS
+      doc.setFontSize(12);
+      doc.text("Colegio:", leftX, textY);
+
+      let leftYPos = textY + 5;
+      uniqueSchools.forEach((schoolName) => {
+        doc.text(schoolName, leftX, leftYPos);
+        leftYPos += 5;
+      });
+
+      // COLUMNA DERECHA - ALUMNOS
+      doc.setFontSize(12);
+      doc.text("Alumno/s:", rightX, textY);
+
+      let rightYPos = textY + 5;
+      sale.accountId.children.forEach((child) => {
+        const nombreApellido = `${child.name} ${child.lastname} - `;
+        const gradoDivision = `${child.gradeId.grade} ${child.gradeId.division}`;
+        const nombreApellidoWidth = doc.getTextWidth(nombreApellido);
+        const gradoDivisionWidth = doc.getTextWidth(gradoDivision);
+
+        doc.setFillColor(255, 255, 150);
+        doc.rect(
+          rightX + nombreApellidoWidth,
+          rightYPos - 4,
+          gradoDivisionWidth + 2,
+          6,
+          "F",
+        );
+
+        doc.setTextColor(0, 0, 0);
+        doc.text(nombreApellido, rightX, rightYPos);
+        doc.text(gradoDivision, rightX + nombreApellidoWidth, rightYPos);
+        rightYPos += 5;
+      });
+
       doc.save(`orden_${sale.order}.pdf`);
-
-      console.log("✅ PDF generado exitosamente");
     } catch (error) {
-      console.error("❌ Error al generar el PDF:", error);
-      alert("Error al generar el PDF. Por favor, intente nuevamente.");
+      console.error("Error al generar el PDF:", error);
     }
   };
 
