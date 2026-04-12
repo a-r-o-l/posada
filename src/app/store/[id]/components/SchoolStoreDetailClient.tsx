@@ -1,7 +1,7 @@
 "use client";
 import { ISchool } from "@/models/School";
 import { useCacheSchools } from "@/zustand/useCacheSchools";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import SchoolPasswordModal from "./SchoolPasswordModal";
 import { IFolder } from "@/models/Folder";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -50,6 +50,44 @@ function SchoolStoreDetailClient({
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "");
   };
+
+  const handleFolderClick = useCallback(
+    async (folder: IFolder) => {
+      if (user?.role !== "user") {
+        router.push(`/store/${school._id}/${folder._id}`);
+        return;
+      }
+      const folderGrades = folder.grades || [];
+      const children = user?.children || [];
+      if (folderGrades.length === 0) {
+        router.push(`/store/${school._id}/${folder._id}`);
+        return;
+      }
+      const { students } = await getAllStudentByGrade(folderGrades[0]);
+      const hasAccess = children.some((child) =>
+        students.some((student: IStudent) => {
+          const normalizedChildName = normalizeString(child.name);
+          const normalizedChildLastname = normalizeString(child.lastname);
+          const normalizedStudentName = normalizeString(student.name);
+          const normalizedStudentLastname = normalizeString(student.lastname);
+          const nameMatches =
+            normalizedStudentName.includes(normalizedChildName) ||
+            normalizedChildName.includes(normalizedStudentName);
+          const lastnameMatches =
+            normalizedStudentLastname.includes(normalizedChildLastname) ||
+            normalizedChildLastname.includes(normalizedStudentLastname);
+          return nameMatches && lastnameMatches;
+        }),
+      );
+
+      if (!hasAccess) {
+        toast.error("No tienes acceso a esta carpeta");
+        return;
+      }
+      router.push(`/store/${school._id}/${folder._id}`);
+    },
+    [user, school._id, router],
+  );
 
   return (
     <div className="flex flex-col lg:flex-row h-full">
@@ -110,46 +148,7 @@ function SchoolStoreDetailClient({
                   isOpened={false}
                   height={130}
                   width={130}
-                  onClick={async () => {
-                    if (user?.role !== "user") {
-                      router.push(`/store/${school._id}/${folder._id}`);
-                      return;
-                    }
-                    const folderGrades = folder.grades || [];
-                    const children = user?.children || [];
-                    if (folderGrades.length === 0) {
-                      router.push(`/store/${school._id}/${folder._id}`);
-                      return;
-                    }
-                    const { students } = await getAllStudentByGrade(
-                      folderGrades[0]
-                    );
-                    const hasAccess = children.some((child) =>
-                      students.some((student: IStudent) => {
-                        const normalizedChildName = normalizeString(child.name);
-                        const normalizedChildLastname = normalizeString(
-                          child.lastname
-                        );
-                        const normalizedStudentName = normalizeString(
-                          student.name
-                        );
-                        const normalizedStudentLastname = normalizeString(
-                          student.lastname
-                        );
-
-                        return (
-                          normalizedChildName === normalizedStudentName &&
-                          normalizedChildLastname === normalizedStudentLastname
-                        );
-                      })
-                    );
-
-                    if (!hasAccess) {
-                      toast.error("No tienes acceso a esta carpeta");
-                      return;
-                    }
-                    router.push(`/store/${school._id}/${folder._id}`);
-                  }}
+                  onClick={() => handleFolderClick(folder)}
                 />
               ))
             ) : (

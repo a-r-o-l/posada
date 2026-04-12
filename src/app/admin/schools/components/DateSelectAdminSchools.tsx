@@ -43,6 +43,7 @@ function DateSelectAdminSchools({ url }: { url: string }) {
               <SelectGroup>
                 <SelectItem value="2024">2024</SelectItem>
                 <SelectItem value="2025">2025</SelectItem>
+                <SelectItem value="2026">2026</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
