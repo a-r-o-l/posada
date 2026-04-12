@@ -50,10 +50,13 @@ export default async function RootLayout({
                 Tienda
               </Link>
               <Link href="/store/account" className="">
-                Mi cuenta
+                Mi Cuenta
               </Link>
               <Link href="/store/purchases" className="">
-                Mis compras
+                Mis Compras
+              </Link>
+              <Link href="/store/pictures" className="">
+                Mis Fotos
               </Link>
             </div>
             <div className="w-full flex items-center justify-end gap-10">
@@ -69,11 +72,15 @@ export default async function RootLayout({
           </Link>
           <span className="text-gray-300">|</span>
           <Link href="/store/account" className="hover:underline">
-            Mi cuenta
+            Mi Cuenta
           </Link>
           <span className="text-gray-300">|</span>
           <Link href="/store/purchases" className="hover:underline">
-            Mis compras
+            Mis Compras
+          </Link>
+          <span className="text-gray-300">|</span>
+          <Link href="/store/pictures" className="hover:underline">
+            Mis Fotos
           </Link>
         </nav>
       </header>

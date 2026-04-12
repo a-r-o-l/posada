@@ -32,6 +32,8 @@ function CartItemsList() {
       .reduce((acc, curr) => acc + curr, 0);
   }, [cartItems]);
 
+  console.log(cartItems);
+
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -117,11 +119,11 @@ function CartItemsList() {
               cleanCart();
               if (proofFile) {
                 toast.success(
-                  "Venta creada correctamente con comprobante subido. Espera la aprobación del administrador."
+                  "Venta creada correctamente con comprobante subido. Espera la aprobación del administrador.",
                 );
               } else {
                 toast.success(
-                  "Venta creada correctamente. Puedes subir el comprobante desde Mis Compras."
+                  "Venta creada correctamente. Puedes subir el comprobante desde Mis Compras.",
                 );
               }
             } else {

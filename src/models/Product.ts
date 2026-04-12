@@ -7,6 +7,7 @@ export interface IProduct {
   description: string;
   price: number;
   schoolId: string;
+  isDownloadable: boolean; // ← nuevo campo
   createdAt: Date;
   updatedAt: Date;
 }
@@ -22,11 +23,12 @@ const ProductSchema: Schema = new Schema(
     description: { type: String },
     price: { type: Number, required: true },
     schoolId: { type: Schema.Types.ObjectId, ref: "School", required: true },
+    isDownloadable: { type: Boolean, default: false }, // ← nuevo campo con default false
   },
   {
     timestamps: true,
     versionKey: false,
-  }
+  },
 );
 
 const ProductModel =

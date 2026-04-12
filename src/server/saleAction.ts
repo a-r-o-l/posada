@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { toDate } from "date-fns-tz";
 import { generateRandomNumber } from "@/lib/utilsFunctions";
 import { uploadFileToS3 } from "@/lib/uploadFileToS3";
+
 export const createSale = async (data: FormData) => {
   try {
     await dbConnect();
@@ -73,7 +74,7 @@ export const getAllSales = async (
   start?: string,
   end?: string,
   state?: string,
-  delivered?: string
+  delivered?: string,
 ) => {
   try {
     const query: {
@@ -219,7 +220,7 @@ export const getNewSalesCount = async () => {
 export const updateSaleStatus = async (
   id: string,
   field: string,
-  value: string | boolean
+  value: string | boolean,
 ) => {
   try {
     const condition: { [key: string]: string | boolean } = {};
@@ -325,7 +326,7 @@ export const updateTransferProof = async (saleId: string, data: FormData) => {
         transferProofUrl,
         transferStatus: transferProofUrl ? "uploaded" : "pending",
       },
-      { new: true }
+      { new: true },
     );
     return {
       success: true,
