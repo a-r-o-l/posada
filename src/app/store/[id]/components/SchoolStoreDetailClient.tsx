@@ -122,26 +122,33 @@ function SchoolStoreDetailClient({
                       return;
                     }
                     const { students } = await getAllStudentByGrade(
-                      folderGrades[0]
+                      folderGrades[0],
                     );
                     const hasAccess = children.some((child) =>
                       students.some((student: IStudent) => {
                         const normalizedChildName = normalizeString(child.name);
                         const normalizedChildLastname = normalizeString(
-                          child.lastname
+                          child.lastname,
                         );
                         const normalizedStudentName = normalizeString(
-                          student.name
+                          student.name,
                         );
                         const normalizedStudentLastname = normalizeString(
-                          student.lastname
+                          student.lastname,
                         );
+
+                        console.log(`
+                          ncn = ${normalizedChildName}
+                          ncl = ${normalizedChildLastname}
+                          nsn = ${normalizedStudentName}
+                          nsl = ${normalizedStudentLastname}
+                        `);
 
                         return (
                           normalizedChildName === normalizedStudentName &&
                           normalizedChildLastname === normalizedStudentLastname
                         );
-                      })
+                      }),
                     );
 
                     if (!hasAccess) {
