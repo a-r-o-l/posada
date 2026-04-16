@@ -8,7 +8,9 @@ export interface IFile extends Document {
   description: string;
   folderId?: string;
   imageUrl?: string;
+  originalImageUrl?: string;
   price: number;
+  isNew: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -24,13 +26,15 @@ const FileSchema: Schema = new Schema(
     title: { type: String, required: true },
     description: { type: String },
     imageUrl: { type: String },
+    originalImageUrl: { type: String },
     folderId: { type: Schema.Types.ObjectId, ref: "Folder" },
     price: { type: Number, default: 0 },
+    isNew: { type: Boolean, default: true },
   },
   {
     timestamps: true,
     versionKey: false,
-  }
+  },
 );
 
 const FileModel = models.File || model<IFile>("File", FileSchema);

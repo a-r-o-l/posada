@@ -2,13 +2,28 @@
 import { Button } from "@/components/ui/button";
 import React, { useState } from "react";
 import ServiceAccordion from "./ServiceAccordion";
+import { useRouter } from "next/navigation";
 
 function ServicesClientSide() {
+  const router = useRouter();
   const [firstEnter, setFirstEnter] = useState(true);
 
   if (firstEnter) {
     return (
       <div className="p-4 w-full mx-auto container flex flex-col gap-2">
+        <Button onClick={() => router.push("services/files")}>files</Button>
+        <Button onClick={() => router.push("services/folders")}>folders</Button>
+        <Button onClick={() => router.push("services/grades")}>grades</Button>
+        <Button onClick={() => router.push("services/products")}>
+          products
+        </Button>
+        <Button onClick={() => router.push("services/profile")}>profile</Button>
+        <Button onClick={() => router.push("services/sales")}>sales</Button>
+        <Button onClick={() => router.push("services/schools")}>schools</Button>
+        <Button onClick={() => router.push("services/students")}>
+          students
+        </Button>
+
         <h1 className="text-2xl font-bold">Servicios</h1>
         <p className="text-sm text-muted-foreground">
           Servicios usados en la web

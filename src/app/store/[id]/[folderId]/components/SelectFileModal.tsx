@@ -55,8 +55,8 @@ function SelectFileModal({
   const handlePlus = (id: string) => {
     setData((prev) =>
       prev.map((item) =>
-        item._id === id ? { ...item, quantity: item.quantity + 1 } : item
-      )
+        item._id === id ? { ...item, quantity: item.quantity + 1 } : item,
+      ),
     );
   };
 
@@ -65,8 +65,8 @@ function SelectFileModal({
       prev.map((item) =>
         item._id === id && item.quantity > 0
           ? { ...item, quantity: item.quantity - 1 }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
@@ -83,6 +83,7 @@ function SelectFileModal({
           productId: it._id,
           fileTitle: file?.title,
           fileImageUrl: file.imageUrl || "",
+          fileOriginalImageUrl: file.originalImageUrl || "",
           quantity: it.quantity,
           name: it.name,
           price: it.price,
