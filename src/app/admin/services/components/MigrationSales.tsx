@@ -5,7 +5,7 @@ import { useUser } from "@/context/UserContext";
 import { supabase } from "@/supabase/supabase";
 import React, { useEffect, useState } from "react";
 import { ISale, ISaleProduct } from "@/models/Sale";
-import { getAllSales } from "@/server/saleAction";
+import { getAllSalesMigration } from "@/server/saleAction";
 
 function MigrationSales() {
   const { user } = useUser();
@@ -19,7 +19,7 @@ function MigrationSales() {
   useEffect(() => {
     if (user) {
       const fetchSales = async () => {
-        const res = await getAllSales();
+        const res = await getAllSalesMigration();
         if (res.success) {
           setMongoSales(res.sales);
         }

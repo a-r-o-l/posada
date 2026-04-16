@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
 import { Profile } from "@/supabase/models/profile";
-import { getAllAccounts } from "@/server/accountAction";
+import { getAllAccountsMigration } from "@/server/accountAction";
 import { supabase } from "@/supabase/supabase";
 
 import React, { useEffect, useState } from "react";
@@ -21,7 +21,7 @@ function MigrationProfiles() {
   useEffect(() => {
     if (user) {
       const fetchAccounts = async () => {
-        const res = await getAllAccounts();
+        const res = await getAllAccountsMigration();
         if (res.success) {
           setMongoUsers(res.accounts);
         }
@@ -40,10 +40,14 @@ function MigrationProfiles() {
   const migrateUsers = async () => {
     setMigrating(true);
     for (const user of mongoUsers) {
-      const response = await fetch("/api/migrate/profiles", {
+      const response = await fetch("/api/migrate/profiles/edit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ user }),
+        body: JSON.stringify({
+          userId: user._id,
+          availableGrades: user.availableGrades,
+          children: user.children,
+        }),
       });
 
       const result = await response.json();

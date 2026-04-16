@@ -101,7 +101,7 @@ export const createStudent = async (data: FormData) => {
       schoolId: formData.schoolId,
     });
     revalidatePath(
-      `/schools/students?school=${formData.schoolId}&grade=${formData.gradeId}`
+      `/schools/students?school=${formData.schoolId}&grade=${formData.gradeId}`,
     );
     await newStudent.save();
     return {
@@ -123,7 +123,7 @@ export const createManyStudents = async (students: PartialStudent[]) => {
     await dbConnect();
     await models.Student.insertMany(students);
     revalidatePath(
-      `/admin/schools?school=${students[0].schoolId}&grade=${students[0].gradeId}`
+      `/admin/schools?school=${students[0].schoolId}&grade=${students[0].gradeId}`,
     );
     return {
       success: true,
@@ -182,6 +182,25 @@ export const updateStudent = async (id: string, data: FormData) => {
     return {
       success: false,
       message: "Error al actualizar el estudiante",
+    };
+  }
+};
+
+export const getAllStudentsMigration = async () => {
+  try {
+    await dbConnect();
+    const students = await models.Student.find().lean();
+    return {
+      success: true,
+      message: "Estudiantes encontrados",
+      students: JSON.parse(JSON.stringify(students)),
+    };
+  } catch (error) {
+    console.error("Error buscando estudiantes:", error);
+
+    return {
+      success: false,
+      message: "Error al buscar los estudiantes",
     };
   }
 };

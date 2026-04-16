@@ -196,7 +196,7 @@ export const updateAccount = async (id: string, data: FormData) => {
     const updatedAccount = await models.Account.findByIdAndUpdate(
       id,
       formData,
-      { new: true }
+      { new: true },
     ).lean();
 
     const plainUpdatedAccount = JSON.parse(JSON.stringify(updatedAccount));
@@ -329,7 +329,7 @@ export const addChildToAccount = async (id: string, studentId: string) => {
           availableGrades: student.gradeId,
         },
       },
-      { new: true }
+      { new: true },
     ).lean();
     const plainUpdatedAccount = JSON.parse(JSON.stringify(updatedAccount));
     revalidatePath("/admin/accounts");
@@ -350,7 +350,7 @@ export const addChildToAccount = async (id: string, studentId: string) => {
 
 export const removeChildFromAccount = async (
   accountId: string,
-  childToRemove: IChildrenPopulated
+  childToRemove: IChildrenPopulated,
 ) => {
   try {
     await dbConnect();
@@ -377,7 +377,7 @@ export const removeChildFromAccount = async (
           },
         },
       },
-      { new: true }
+      { new: true },
     ).lean();
 
     const plainUpdatedAccount = JSON.parse(JSON.stringify(updatedAccount));
@@ -423,7 +423,7 @@ export const filterAccountEmails = async (filters: {
         ...new Set(
           pendingSales
             .map((sale) => sale.accountId?.toString())
-            .filter((id) => id) // Filtra nulls/undefined
+            .filter((id) => id), // Filtra nulls/undefined
         ),
       ];
     }
@@ -448,7 +448,7 @@ export const filterAccountEmails = async (filters: {
     if (filters.pendingOrders && accountIdsWithPendingOrders.length > 0) {
       query._id = {
         $in: accountIdsWithPendingOrders.map(
-          (id) => new mongoose.Types.ObjectId(id)
+          (id) => new mongoose.Types.ObjectId(id),
         ),
       };
     } else if (
@@ -486,6 +486,25 @@ export const filterAccountEmails = async (filters: {
       message: "Error al filtrar emails, intente nuevamente",
       emails: [],
       accounts: [],
+    };
+  }
+};
+
+export const getAllAccountsMigration = async () => {
+  try {
+    await dbConnect();
+    const accounts = await models.Account.find().lean();
+    return {
+      success: true,
+      message: "Cuentas encontradas",
+      accounts: JSON.parse(JSON.stringify(accounts)),
+    };
+  } catch (error) {
+    console.error("Error getting accounts:", error);
+    return {
+      success: false,
+      message: "Error al obtener las cuentas, intente nuevamente",
+      accounts: null,
     };
   }
 };

@@ -9,7 +9,7 @@ export const getAllFolders = async (
   level?: string,
   year?: string,
   estrict: boolean = false,
-  type: string = ""
+  type: string = "",
 ) => {
   try {
     await dbConnect();
@@ -65,10 +65,11 @@ export const getAllFolders = async (
     };
   }
 };
+
 export const getFoldersByLvlAndYear = async (
   schoolId?: string,
   level?: string,
-  year?: string
+  year?: string,
 ) => {
   try {
     await dbConnect();
@@ -149,7 +150,7 @@ export const createFolder = async (data: FormData) => {
     if (formData.isPrivate === "true") {
       const parsedArr = JSON.parse(formData.grades as string);
       const parsedGrades = parsedArr.map(
-        (grade: { _id: string }) => new Types.ObjectId(grade._id)
+        (grade: { _id: string }) => new Types.ObjectId(grade._id),
       );
       formData.grades = parsedGrades;
     }
@@ -194,7 +195,7 @@ export const updateFolder = async (id: string, data: FormData) => {
     if (formData.isPrivate === "true") {
       const parsedArr = JSON.parse(formData.grades as string);
       const parsedGrades = parsedArr.map(
-        (grade: { _id: string }) => new Types.ObjectId(grade._id)
+        (grade: { _id: string }) => new Types.ObjectId(grade._id),
       );
       formData.grades = parsedGrades;
     }
@@ -272,6 +273,24 @@ export const getFoldersAndFiles = async (id: string) => {
       success: false,
       message: "Error al buscar carpetas y archivos, intente nuevamente",
       data: { folders: [], files: [] },
+    };
+  }
+};
+
+export const getAllFoldersMigration = async () => {
+  try {
+    await dbConnect();
+    const folders = await models.Folder.find().lean();
+    return {
+      success: true,
+      message: "Carpetas encontradas",
+      folders: JSON.parse(JSON.stringify(folders)),
+    };
+  } catch (error) {
+    console.error("Error buscando las carpetas:", error);
+    return {
+      success: false,
+      message: "Error al buscar las carpetas, intente nuevamente",
     };
   }
 };

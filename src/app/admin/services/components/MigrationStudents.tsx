@@ -5,7 +5,7 @@ import { useUser } from "@/context/UserContext";
 import { supabase } from "@/supabase/supabase";
 import React, { useEffect, useState } from "react";
 import { IStudent } from "@/models/Student";
-import { getAllStudents } from "@/server/studentAction";
+import { getAllStudentsMigration } from "@/server/studentAction";
 
 interface SupabaseStudent {
   id: string;
@@ -30,7 +30,7 @@ function MigrationStudents() {
   useEffect(() => {
     if (user) {
       const fetchStudents = async () => {
-        const res = await getAllStudents();
+        const res = await getAllStudentsMigration();
         if (res.success) {
           setMongoStudents(res.students);
         }
@@ -56,10 +56,14 @@ function MigrationStudents() {
 
     for (const student of mongoStudents) {
       try {
-        const response = await fetch("/api/migrate/student", {
+        const response = await fetch("/api/migrate/student/edit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ student }),
+          body: JSON.stringify({
+            studentId: student._id,
+            gradeId: student.gradeId,
+            schoolId: student.schoolId,
+          }),
         });
 
         const result = await response.json();

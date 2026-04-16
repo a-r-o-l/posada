@@ -5,7 +5,7 @@ import { useUser } from "@/context/UserContext";
 import { supabase } from "@/supabase/supabase";
 import React, { useEffect, useState } from "react";
 import { IFolder } from "@/models/Folder";
-import { getAllFolders } from "@/server/folderAction";
+import { getAllFoldersMigration } from "@/server/folderAction";
 
 interface SupabaseFolder {
   id: string;
@@ -36,7 +36,7 @@ function MigrationFolders() {
   useEffect(() => {
     if (user) {
       const fetchFolders = async () => {
-        const res = await getAllFolders();
+        const res = await getAllFoldersMigration();
         if (res.success) {
           setMongoFolders(res.folders);
         }

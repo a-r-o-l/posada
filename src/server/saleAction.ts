@@ -342,3 +342,22 @@ export const updateTransferProof = async (saleId: string, data: FormData) => {
     };
   }
 };
+
+export const getAllSalesMigration = async () => {
+  try {
+    await dbConnect();
+    const sales = await models.Sale.find().lean();
+    return {
+      success: true,
+      message: "Ventas encontradas",
+      sales: JSON.parse(JSON.stringify(sales)),
+    };
+  } catch (error) {
+    console.error("Error getting sales for migration:", error);
+    return {
+      success: false,
+      message: "Error al obtener las ventas para migración, intente nuevamente",
+      sales: null,
+    };
+  }
+};
