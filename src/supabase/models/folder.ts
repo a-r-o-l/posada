@@ -3,14 +3,14 @@ export interface Folder {
   type: string | null;
   title: string;
   description: string | null;
-  school_id: string;
+  schoolId: string;
   password: string | null;
-  is_private: boolean | null;
-  image_url: string | null;
+  isPrivate: boolean | null;
+  imageUrl: string | null;
   grades: string[] | null; // JSONB array de ObjectIds
-  parent_folder: string | null;
+  parentFolder: string | null;
   year: string | null;
   level: string | null;
-  created_at: string | null;
-  updated_at: string | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }

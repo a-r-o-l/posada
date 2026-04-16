@@ -14,7 +14,7 @@ import WhatsAppLogo from "@/icons/whatsappsvg";
 import Section6 from "@/components/rootsComponents/section6/Section6";
 import Section6Mini from "@/components/rootsComponents/section6/Section6Mini";
 
-const ready = true;
+const ready = false;
 
 function page() {
   if (ready) {
@@ -32,8 +32,6 @@ function page() {
           <Section4 />
           <Section6 />
           <Section6Mini />
-          {/* <Section5 />
-          <Section5Mini /> */}
         </div>
         <div className="w-full bg-black p-5 flex flex-col mt-auto">
           <div className="w-full flex items-center justify-start">
@@ -46,10 +44,6 @@ function page() {
             <p className="text-xs text-gray-400 underline whitespace-nowrap font-bold">
               Contacto:
             </p>
-            {/* <div className="flex items-center gap-2">
-              <Mail className="w-5 h-5 text-white" />
-              <p className="text-white text-xs">contacto@fotosposada.com.ar</p>
-            </div> */}
             <div className="flex items-center gap-2">
               <WhatsAppLogo className="w-5 h-5" />
               <p className="text-white text-xs">+54 9 11 5403-2747</p>
@@ -61,7 +55,6 @@ function page() {
             </p>
           </div>
         </div>
-        {/* Botón flotante de WhatsApp */}
         <a
           href="https://wa.me/5491154032747?text=Hola!%20Quiero%20hacer%20una%20consulta"
           target="_blank"
@@ -75,17 +68,22 @@ function page() {
     );
   }
   return (
-    <div className="flex flex-col items-center justify-center h-screen w-screen">
+    <div className="flex flex-col items-center justify-center h-screen w-screen text-center px-4">
       <div
         style={{ backgroundImage: "url(/logoposada.png)" }}
         className="w-60 h-60 bg-contain bg-center bg-no-repeat"
       ></div>
-      <h1 className="font-black text-5xl text-center">
-        Pagina en construccion
-      </h1>
+      <h1 className="font-black text-5xl mt-4">🚧 Página en construcción</h1>
+      <p className="text-lg text-gray-700 mt-4 max-w-md">
+        Estamos trabajando para ofrecerte una mejor experiencia.
+      </p>
+      <p className="text-md text-gray-600 mt-2">
+        📅 Vuelve pronto —{" "}
+        <span className="font-semibold">Estimado: 20 de abril de 2026</span>
+      </p>
       <div
         style={{ backgroundImage: "url(/underConstruction.png)" }}
-        className="w-96 h-60 bg-contain bg-center bg-no-repeat"
+        className="w-96 h-60 bg-contain bg-center bg-no-repeat mt-2"
       ></div>
     </div>
   );

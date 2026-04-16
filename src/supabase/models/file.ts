@@ -1,13 +1,13 @@
 export interface File {
   id: string;
-  file_name: string;
+  fileName: string;
   title: string;
   description: string | null;
-  folder_id: string | null;
-  image_url: string | null;
-  original_image_url: string | null;
+  folderId: string | null;
+  imageUrl: string | null;
+  originalImageUrl: string | null;
   price: number | null;
-  is_new: boolean | null;
-  created_at: string | null;
-  updated_at: string | null;
+  isNew: boolean | null;
+  createdAt: string | null;
+  updatedAt: string | null;
 }

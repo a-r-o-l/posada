@@ -1,21 +1,15 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useUser } from "@/context/UserContext";
-import { IAccount } from "@/models/Account";
-import { getAllAccounts } from "@/server/accountAction";
 import { Profile } from "@/supabase/models/profile";
+import { getAllAccounts } from "@/server/accountAction";
 import { supabase } from "@/supabase/supabase";
 
 import React, { useEffect, useState } from "react";
+import { IAccount } from "@/models/Account";
 
-function PicturesClient() {
+function MigrationProfiles() {
   const { user } = useUser();
 
   const [mongoUsers, setMongoUsers] = useState<IAccount[]>([]);
@@ -25,7 +19,6 @@ function PicturesClient() {
   const [loadingProfiles, setLoadingProfiles] = useState(false);
 
   useEffect(() => {
-    setMigrating(false);
     if (user) {
       const fetchAccounts = async () => {
         const res = await getAllAccounts();
@@ -45,8 +38,9 @@ function PicturesClient() {
   };
 
   const migrateUsers = async () => {
+    setMigrating(true);
     for (const user of mongoUsers) {
-      const response = await fetch("/api/migrate", {
+      const response = await fetch("/api/migrate/profiles", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user }),
@@ -60,6 +54,7 @@ function PicturesClient() {
         addLog(`❌ ${user.email}: ${result.error}`);
       }
     }
+    setMigrating(false);
   };
 
   const fetchProfiles = async () => {
@@ -81,9 +76,9 @@ function PicturesClient() {
         console.log("Perfiles:", data);
       }
     } catch (error: unknown) {
-      const errMsg =
-        error instanceof Error ? error.message : "Error desconocido";
-      addLog(`❌ Error: ${errMsg}`, true);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      addLog(`❌ Error: ${errorMessage}`, true);
     } finally {
       setLoadingProfiles(false);
     }
@@ -92,10 +87,7 @@ function PicturesClient() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Mis Fotos</CardTitle>
-        <CardDescription>
-          Descargas disponibles de tus fotos compradas.
-        </CardDescription>
+        <CardTitle>Migraciones</CardTitle>
       </CardHeader>
       <CardContent>
         <div className="w-full flex flex-col gap-10">
@@ -166,4 +158,4 @@ function PicturesClient() {
   );
 }
 
-export default PicturesClient;
+export default MigrationProfiles;

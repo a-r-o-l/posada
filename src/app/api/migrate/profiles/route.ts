@@ -5,7 +5,7 @@ export async function POST(request: Request) {
   const { user } = await request.json();
 
   // Crear usuario con ID personalizado
-  const { data, error } = await supabaseAdmin.rpc("create_user_direct", {
+  const { error } = await supabaseAdmin.rpc("create_user_direct", {
     p_id: user._id,
     p_email: user.email,
     p_password: user.password,
@@ -24,15 +24,16 @@ export async function POST(request: Request) {
   const { error: profileError } = await supabaseAdmin.from("profile").insert({
     id: user._id,
     email: user.email,
+    password: user.password,
     name: user.name,
     lastname: user.lastname,
-    type: user.role === "superuser" ? "admin" : user.role,
-    status: "approved",
-    whatsapp: user.phone,
-    available_grades: user.availableGrades || [],
+    role: user.role === "superuser" ? "admin" : user.role,
+    phone: user.phone,
+    availableGrades: user.availableGrades || [],
     verified: user.verified || false,
     children: user.children || [],
-    first_login: user.isNewAccount || false,
+    isNewAccount: user.isNewAccount || false,
+    disabled: user.disabled || false,
   });
 
   if (profileError) {

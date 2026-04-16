@@ -3,7 +3,8 @@ export interface Product {
   name: string;
   description: string | null;
   price: number;
-  school_id: string;
-  created_at: string | null;
-  updated_at: string | null;
+  schoolId: string;
+  isDownloadable: boolean;
+  createdAt: string | null;
+  updatedAt: string | null;
 }

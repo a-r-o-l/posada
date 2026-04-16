@@ -7,6 +7,7 @@ import Product from "./Product";
 import Student from "./Student";
 import Grade from "./Grade";
 import Sale from "./Sale";
+import DownloabledPicture from "./DownloabledPicture";
 
 const models = {
   Grade,
@@ -18,6 +19,7 @@ const models = {
   File,
   Message,
   Sale,
+  DownloabledPicture,
 };
 
 export default models;

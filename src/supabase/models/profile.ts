@@ -3,21 +3,21 @@ export interface ProfileChild {
   lastname: string;
   schoolId: string | null;
   gradeId: string | null;
+  studentId: string | null;
 }
 
 export interface Profile {
   id: string;
+  name: string;
+  lastname: string;
+  phone: string;
   email: string;
-  name: string | null;
-  lastname: string | null;
-  type: string | null;
-  status: string | null;
-  profile_image: string | null;
-  whatsapp: string | null;
-  available_grades: string[] | null; // array de ObjectIds
-  verified: boolean | null;
-  children: ProfileChild[] | null;
-  first_login: boolean | null;
-  created_at: string | null;
-  updated_at: string | null;
+  password: string;
+  role: string;
+  imageUrl: string;
+  children: ProfileChild[];
+  isNewAccount: boolean;
+  availableGrades: string[];
+  verified: boolean;
+  disabled: boolean;
 }

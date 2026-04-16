@@ -23,7 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -59,6 +59,7 @@ const formSchema = z.object({
 
 function SignUpForm() {
   const router = useRouter();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -70,6 +71,10 @@ function SignUpForm() {
     },
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    router.push("/");
+  }, [router]);
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     try {

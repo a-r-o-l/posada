@@ -19,6 +19,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  redirect("/");
+
   const session: ExtendedSession | null = await auth();
 
   const user = session?.token?.token?.user;
@@ -30,7 +32,7 @@ export default async function RootLayout({
   if (user?.role === "admin") {
     redirect("/admin");
   }
-  if (!user?.verified && user.role === "user") {
+  if (!user?.verified && user?.role === "user") {
     redirect(`/signup/extradata?account=${user?.id}`);
   }
 
