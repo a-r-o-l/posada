@@ -79,7 +79,7 @@ function page() {
       </p>
       <p className="text-md text-gray-600 mt-2">
         📅 Vuelve pronto —{" "}
-        <span className="font-semibold">Estimado: 20 de abril de 2026</span>
+        <span className="font-semibold">Estimado: 30 de abril de 2026</span>
       </p>
       <div
         style={{ backgroundImage: "url(/underConstruction.png)" }}
