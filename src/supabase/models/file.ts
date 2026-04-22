@@ -1,13 +1,14 @@
 export interface File {
   id: string;
-  fileName: string;
+  mongo_id: string;
+  file_name: string;
   title: string;
   description: string | null;
-  folderId: string | null;
-  imageUrl: string | null;
-  originalImageUrl: string | null;
+  folder_id: string | null;
+  image_url: string | null;
+  original_image_url: string | null;
   price: number | null;
-  isNew: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
+  is_new: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
 }

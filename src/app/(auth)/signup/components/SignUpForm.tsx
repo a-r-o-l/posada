@@ -18,16 +18,25 @@ import {
   Form,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createAccount } from "@/server/accountAction";
+import { useUser } from "@/hooks/use-user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { FcGoogle } from "react-icons/fc";
 
+interface SignupData {
+  email: string;
+  password: string;
+  name: string;
+  lastname: string;
+  phone?: string;
+  role?: "admin" | "user";
+}
 const formSchema = z.object({
   email: z
     .string()
@@ -59,7 +68,7 @@ const formSchema = z.object({
 
 function SignUpForm() {
   const router = useRouter();
-
+  const { signup, loginWithGoogle, isLoading } = useUser();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -72,29 +81,23 @@ function SignUpForm() {
   });
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    router.push("/");
-  }, [router]);
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    try {
-      setLoading(true);
-      const formData = new FormData();
-      formData.append("name", values.name);
-      formData.append("lastname", values.lastname);
-      formData.append("email", values.email);
-      formData.append("phone", values.phone);
-      formData.append("password", values.password);
-      const response = await createAccount(formData);
-      if (response.success) {
-        toast.success(response.message);
-        router.push(`/signup/extradata?account=${response.account._id}`);
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      console.error("Error: ", error);
-      toast.error("Error en el servidor, intente nuevamente");
+    setLoading(true);
+    const formData: SignupData = {
+      name: values.name,
+      lastname: values.lastname,
+      email: values.email,
+      phone: values.phone,
+      password: values.password,
+    };
+    const { success } = await signup(formData);
+    if (success) {
+      toast.success(
+        "Cuenta creada exitosamente. Por favor, completa tus datos adicionales.",
+      );
+      router.push(`/onboarding`);
+    } else {
+      toast.error("Error al crear la cuenta. Inténtalo de nuevo.");
     }
   }
 
@@ -208,23 +211,46 @@ function SignUpForm() {
               />
             </CardContent>
             <CardFooter className="flex flex-col space-y-5 mt-10">
-              <LoadingButton
-                loading={loading}
-                title="Crear Cuenta"
-                type="submit"
-                classname="w-full"
-              >
-                <UserPlus className="mr-2 h-4 w-4" />
-              </LoadingButton>
-              <Button
-                className="w-full"
-                type="button"
-                variant="outline"
-                onClick={() => router.push("/")}
-              >
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Volver
-              </Button>
+              <div className="space-y-4">
+                <LoadingButton
+                  loading={loading}
+                  title="Crear Cuenta"
+                  type="submit"
+                  classname="w-full rounded-full"
+                  disabled={loading}
+                >
+                  <UserPlus className="mr-2 h-4 w-4" />
+                </LoadingButton>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-gray-400"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="bg-white px-4 text-gray-400">o</span>
+                  </div>
+                </div>
+                <Button
+                  className="w-full cursor-pointer rounded-full"
+                  type="button"
+                  onClick={() => loginWithGoogle()}
+                  size="lg"
+                >
+                  <FcGoogle size={30} className="mr-2" />
+                  Continuar con Google
+                </Button>
+                <Button
+                  className="w-full rounded-full"
+                  type="button"
+                  variant="outline"
+                  disabled={loading}
+                  onClick={() => router.push("/")}
+                  size="lg"
+                >
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Volver
+                </Button>
+              </div>
             </CardFooter>
           </form>
         </Form>

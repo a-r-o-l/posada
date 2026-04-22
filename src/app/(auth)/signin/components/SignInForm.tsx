@@ -23,7 +23,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -39,10 +39,6 @@ const formSchema = z.object({
 
 function SignInForm() {
   const router = useRouter();
-
-  useEffect(() => {
-    router.push("/");
-  }, [router]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

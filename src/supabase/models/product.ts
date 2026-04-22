@@ -1,10 +1,11 @@
 export interface Product {
   id: string;
+  mongo_id: string;
   name: string;
   description: string | null;
   price: number;
-  schoolId: string;
-  isDownloadable: boolean;
-  createdAt: string | null;
-  updatedAt: string | null;
+  school_id: string;
+  is_downloadable: boolean;
+  created_at: string | null;
+  updated_at: string | null;
 }

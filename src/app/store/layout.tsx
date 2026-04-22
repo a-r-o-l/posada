@@ -1,43 +1,14 @@
-import { IUser, UserProvider } from "@/context/UserContext";
-import { auth } from "@/auth";
-import { Session } from "next-auth";
-import { redirect } from "next/navigation";
 import Link from "next/link";
-import UserAvatar from "./components/UserAvatar";
+// import UserAvatar from "./components/UserAvatar";
 import HeaderShoppingCart from "./components/HeaderShoppingCart";
-
-interface ExtendedSession extends Session {
-  token?: {
-    token: {
-      user?: IUser;
-    };
-  };
-}
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  redirect("/");
-
-  const session: ExtendedSession | null = await auth();
-
-  const user = session?.token?.token?.user;
-
-  if (!session || !user) {
-    redirect("/signin");
-  }
-
-  if (user?.role === "admin") {
-    redirect("/admin");
-  }
-  if (!user?.verified && user?.role === "user") {
-    redirect(`/signup/extradata?account=${user?.id}`);
-  }
-
   return (
-    <UserProvider user={user}>
+    <>
       <header className="shadow-md top-0 sticky z-50 bg-[#F0F1FF]">
         <nav className="flex flex-row items-center overflow-hidden px-5 h-[10vh]">
           <Link href="/" className="">
@@ -87,6 +58,6 @@ export default async function RootLayout({
         </nav>
       </header>
       <main className="flex flex-col w-full">{children}</main>
-    </UserProvider>
+    </>
   );
 }

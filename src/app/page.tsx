@@ -17,7 +17,7 @@ import Section6Mini from "@/components/rootsComponents/section6/Section6Mini";
 const ready = false;
 
 function page() {
-  if (ready) {
+  if (!ready) {
     return (
       <main className="flex flex-col flex-1 bg-[#F0F1FF]">
         <RootHeader />

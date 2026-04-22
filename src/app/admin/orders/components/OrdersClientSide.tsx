@@ -288,8 +288,8 @@ function OrdersClientSide({
                     {sale.paymentTypeId === "account_money"
                       ? "Efectivo"
                       : sale.paymentTypeId === "transfer"
-                      ? "Transferencia"
-                      : "Tarjeta"}
+                        ? "Transferencia"
+                        : "Tarjeta"}
                   </TableCell>
                   <TableCell>
                     {format(sale.createdAt!, "dd / MM / yyyy", {
@@ -409,7 +409,7 @@ function OrdersClientSide({
           const res = await updateSaleStatus(
             selectedSale._id,
             "delivered",
-            !currentState
+            !currentState,
           );
           if (res.success) {
             toast.success(res.message);
@@ -455,7 +455,7 @@ function OrdersClientSide({
           const res = await updateSaleStatus(
             selectedSale._id,
             "status",
-            "approved"
+            "approved",
           );
           if (res.success) {
             toast.success(res.message);

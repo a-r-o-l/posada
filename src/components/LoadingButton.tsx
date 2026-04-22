@@ -34,6 +34,7 @@ function LoadingButton({
       disabled={loading || disabled}
       variant={variant}
       onClick={onClick}
+      size="lg"
     >
       {loading && <Loader className="mr-2 h-4 w-4 animate-spin" />}
       {children}
