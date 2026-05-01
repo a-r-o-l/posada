@@ -1,23 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Frown, Smile } from "lucide-react";
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { useRouter } from "next/navigation";
-import { useAuthStore } from "@/zustand/auth-store";
 
 function PaymentStatusComponent({ status }: { status: boolean }) {
   const router = useRouter();
-  const { initializeAuth } = useAuthStore();
-
-  useEffect(() => {
-    const restoreSession = async () => {
-      // Pequeño delay para asegurar que la página cargó
-      setTimeout(() => {
-        initializeAuth();
-      }, 100);
-    };
-    restoreSession();
-  }, [initializeAuth]);
 
   const isSuccessful = useMemo(() => {
     return status;

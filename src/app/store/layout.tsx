@@ -1,20 +1,19 @@
-import { createClient } from "@/supabase/server";
 // import { redirect } from "next/navigation";
+
+import { AuthInitializer } from "@/components/auth-initializer";
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  console.log("session(store) -> ", user);
   return (
     <>
       <header className="shadow-md top-0 sticky z-50 bg-[#F0F1FF]"></header>
-      <main className="flex flex-col w-full">{children}</main>
+      <main className="flex flex-col w-full">
+        <AuthInitializer />
+        {children}
+      </main>
     </>
   );
 }

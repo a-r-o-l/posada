@@ -1,19 +1,13 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
+import { AuthInitializer } from "@/components/auth-initializer";
 // import { redirect } from "next/navigation";
-import { createClient } from "@/supabase/server";
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  console.log("session(admin) -> ", user);
   return (
     <div>
       <SidebarProvider>
@@ -23,6 +17,7 @@ export default async function RootLayout({
             <SidebarTrigger variant="outline" />
             <div className="flex items-center gap-5"></div>
           </div>
+          <AuthInitializer />
           {children}
         </main>
       </SidebarProvider>
