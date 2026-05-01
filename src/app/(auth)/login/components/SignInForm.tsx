@@ -18,13 +18,14 @@ import {
   Form,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { login } from "@/server/loginAction";
+import { useAuthStore } from "@/zustand/auth-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState } from "react";
 import { useForm } from "react-hook-form";
+import { FcGoogle } from "react-icons/fc";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -39,7 +40,8 @@ const formSchema = z.object({
 
 function SignInForm() {
   const router = useRouter();
-
+  const { login, isLoading, loginWithGoogle } = useAuthStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,16 +50,33 @@ function SignInForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
+  // const onSubmit = async (values: z.infer<typeof formSchema>) => {
+  //   setIsSubmitting(true);
+  //   const email = values.email.toLowerCase();
+  //   const response = await login(email, values.password);
+  //   if (response) {
+  //     toast.success(`Bienvenido ${values.email.toLowerCase()}`);
+  //     setIsSubmitting(false);
+  //     router.push("/admin");
+  //   } else {
+  //     toast.error("Credenciales incorrectas. Inténtalo de nuevo.");
+  //     setIsSubmitting(false);
+  //   }
+  // };
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setIsSubmitting(true);
     const email = values.email.toLowerCase();
-    const response = await login(email, values.password);
-    if (response.success) {
-      toast.success(`Bienvenido ${values.email.toLowerCase()}`);
-      router.push("/admin");
+    const success = await login(email.toLowerCase(), values.password);
+
+    if (success) {
+      toast.success("Bienvenido");
+      // El middleware se encargará de redirigir según el rol
     } else {
-      toast.error(response.message);
+      toast.error("Credenciales incorrectas");
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <div>
@@ -127,19 +146,42 @@ function SignInForm() {
             </CardContent>
 
             <CardFooter className="flex flex-col space-y-5 mt-10">
-              <LoadingButton
-                title="Iniciar sesión"
-                type="submit"
-                classname="w-full"
-              >
-                <LogIn className="mr-2 h-4 w-4" />
-              </LoadingButton>
+              <div className="space-y-4 w-full">
+                <LoadingButton
+                  title="Iniciar sesión"
+                  type="submit"
+                  classname="w-full rounded-full"
+                  loading={isSubmitting}
+                  disabled={isSubmitting || isLoading}
+                >
+                  <LogIn className="mr-2 h-4 w-4" />
+                </LoadingButton>
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-neutral-700"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="bg-white px-4 text-gray-400">o</span>
+                  </div>
+                </div>
+                <Button
+                  className="w-full cursor-pointer rounded-full"
+                  type="button"
+                  onClick={() => loginWithGoogle()}
+                  size="lg"
+                >
+                  <FcGoogle size={30} className="mr-2" />
+                  Iniciar sesión con Google
+                </Button>
+              </div>
 
               <Button
-                className="w-full"
+                className="w-full rounded-full"
                 type="button"
                 variant="outline"
                 onClick={() => router.push("/")}
+                disabled={isSubmitting || isLoading}
+                size="lg"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Volver

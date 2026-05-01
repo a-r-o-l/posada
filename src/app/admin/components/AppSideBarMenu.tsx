@@ -10,10 +10,7 @@ import {
   User,
 } from "lucide-react";
 import AppSideBarMenuItem from "./AppSideBarMenuItem";
-import { useUser } from "@/context/UserContext";
-import { useEffect, useState } from "react";
-import { getNewMessagesCount } from "@/server/messageAction";
-import { getNewSalesCount } from "@/server/saleAction";
+import { useAuthStore } from "@/zustand/auth-store";
 
 const items = [
   {
@@ -68,22 +65,20 @@ const items = [
 ];
 
 function AppSideBarMenu() {
-  const { user } = useUser();
-  const [newMessagesCount, setNewMessagesCount] = useState(0);
-  const [newSalesCount, setNewSalesCount] = useState(0);
+  const { currentUser: user } = useAuthStore();
 
-  useEffect(() => {
-    const getNewMessagesCountRuner = async () => {
-      const res = await getNewMessagesCount();
-      setNewMessagesCount(res);
-    };
-    const getNewSalesCountRuner = async () => {
-      const res = await getNewSalesCount();
-      setNewSalesCount(res);
-    };
-    getNewSalesCountRuner();
-    getNewMessagesCountRuner();
-  }, []);
+  // useEffect(() => {
+  //   const getNewMessagesCountRuner = async () => {
+  //     const res = await getNewMessagesCount();
+  //     setNewMessagesCount(res);
+  //   };
+  //   const getNewSalesCountRuner = async () => {
+  //     const res = await getNewSalesCount();
+  //     setNewSalesCount(res);
+  //   };
+  //   getNewSalesCountRuner();
+  //   getNewMessagesCountRuner();
+  // }, []);
 
   return (
     <>
@@ -93,13 +88,6 @@ function AppSideBarMenu() {
             key={item.title}
             item={item}
             role={user?.role || "user"}
-            notification={
-              item.title === "Mensajes"
-                ? newMessagesCount
-                : item.title === "Pedidos"
-                ? newSalesCount
-                : undefined
-            }
           />
         );
       })}

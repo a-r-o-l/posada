@@ -7,12 +7,10 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React, { useState } from "react";
-import { ISchool, PartialSchool } from "@/models/School";
+import React, { useMemo, useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { IProduct } from "@/models/Product";
 import { Separator } from "@/components/ui/separator";
 import ProductModal from "./ProductModal";
 import { priceParserToString } from "@/lib/utilsFunctions";
@@ -25,23 +23,32 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
-import { deleteProduct } from "@/server/productAction";
 import { toast } from "sonner";
 import ProductDropDownMenu from "./ProductDropDownMenu";
+import { Product } from "@/supabase/models/product";
+import { School } from "@/supabase/models/school";
+import { useProducts } from "@/supabase/hooks/client/useProducts";
+import { Check, X } from "lucide-react";
 
 function ProductsClientSide({
   schools,
-  selectedSchool,
+  selectedSchoolId,
   products,
 }: {
-  schools: PartialSchool[];
-  selectedSchool?: ISchool;
-  products: IProduct[];
+  schools: School[];
+  selectedSchoolId?: string;
+  products: Product[];
 }) {
+  const { deleteProduct } = useProducts();
   const router = useRouter();
   const [productModal, setProductModal] = useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<IProduct | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const selectedSchool = useMemo(() => {
+    return schools.find((school) => school.id === selectedSchoolId);
+  }, [selectedSchoolId, schools]);
+
   return (
     <Card className="w-full">
       <CardHeader>
@@ -63,24 +70,22 @@ function ProductsClientSide({
               <ScrollArea className="h-[500px] py-10">
                 {schools?.map((school) => (
                   <Button
-                    key={school._id}
+                    key={school.id}
                     variant={
-                      selectedSchool?._id === school._id
-                        ? "secondary"
-                        : "outline"
+                      selectedSchool?.id === school.id ? "secondary" : "outline"
                     }
                     className="w-full justify-start text-left mb-2 py-10"
                     onClick={() => {
                       const currentUrl = new URL(window.location.href);
                       const params = new URLSearchParams(currentUrl.search);
-                      params.set("school", school?._id || "");
+                      params.set("school", school?.id || "");
                       router.push(
-                        `${currentUrl.pathname}?${params.toString()}`
+                        `${currentUrl.pathname}?${params.toString()}`,
                       );
                     }}
                   >
                     <Avatar>
-                      <AvatarImage src={school.imageUrl} alt={school.name} />
+                      <AvatarImage src={school.image_url} alt={school.name} />
                       <AvatarFallback></AvatarFallback>
                     </Avatar>
 
@@ -113,6 +118,7 @@ function ProductsClientSide({
                     <TableHead>Nombre</TableHead>
                     <TableHead>Descripcion</TableHead>
                     <TableHead>Precio</TableHead>
+                    <TableHead>Descargable</TableHead>
                     <TableHead></TableHead>
                   </TableRow>
                 </TableHeader>
@@ -120,20 +126,27 @@ function ProductsClientSide({
                   {!!products?.length ? (
                     products.map((product) => (
                       <TableRow
-                        key={product._id}
+                        key={product.id}
                         onClick={() => setSelectedProduct(product)}
                         className={`${
-                          selectedProduct?._id === product._id ? "bg-muted" : ""
+                          selectedProduct?.id === product.id ? "bg-muted" : ""
                         } hover:cursor-pointer`}
                       >
-                        <TableCell className="w-96 truncate max-w-96">
+                        <TableCell className="max-w-60 truncate">
                           {product.name}
                         </TableCell>
-                        <TableCell className="w-72 truncate max-w-72">
+                        <TableCell className="max-w-60 truncate">
                           <p className="truncate">{product.description}</p>
                         </TableCell>
                         <TableCell>
                           $ {priceParserToString(product.price)}
+                        </TableCell>
+                        <TableCell>
+                          {product.is_downloadable ? (
+                            <Check className="text-green-500" />
+                          ) : (
+                            <X className="text-red-500" />
+                          )}
                         </TableCell>
                         <TableCell className="text-end">
                           <ProductDropDownMenu
@@ -154,7 +167,7 @@ function ProductsClientSide({
                   ) : (
                     <TableRow>
                       <TableCell
-                        colSpan={3}
+                        colSpan={5}
                         className="text-sm font-medium text-muted-foreground text-center h-60"
                       >
                         No hay productos
@@ -183,7 +196,7 @@ function ProductsClientSide({
         onClose={() => setOpenDeleteAlert(false)}
         onAccept={async () => {
           if (!selectedProduct) return;
-          const res = await deleteProduct(selectedProduct._id);
+          const res = await deleteProduct(selectedProduct.id);
           if (res.success) {
             toast.success(res.message);
             setOpenDeleteAlert(false);

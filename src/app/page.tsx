@@ -1,7 +1,7 @@
 import React from "react";
 import Section2 from "../components/rootsComponents/section2/Section2";
 import Section3 from "../components/rootsComponents/section3/Section3";
-import RootHeader from "../components/rootsComponents/RootHeader";
+// import RootHeader from "../components/rootsComponents/RootHeader";
 import Section1 from "../components/rootsComponents/section1/Section1";
 import Section4 from "../components/rootsComponents/section4/Section4";
 // import Section5 from "../components/rootsComponents/section5/Section5";
@@ -17,10 +17,10 @@ import Section6Mini from "@/components/rootsComponents/section6/Section6Mini";
 const ready = false;
 
 function page() {
-  if (ready) {
+  if (!ready) {
     return (
       <main className="flex flex-col flex-1 bg-[#F0F1FF]">
-        <RootHeader />
+        {/* <RootHeader /> */}
         <MiniRootHeader />
         <div className="py-20" id="quienes-somos">
           <Section1 />
@@ -46,7 +46,7 @@ function page() {
             </p>
             <div className="flex items-center gap-2">
               <WhatsAppLogo className="w-5 h-5" />
-              <p className="text-white text-xs">+54 9 11 5403-2747</p>
+              <p className="text-white text-xs">+54 9 11 4143-4032</p>
             </div>
           </div>
           <div className="flex flex-col mt-4 gap-1 text-end">
@@ -56,7 +56,7 @@ function page() {
           </div>
         </div>
         <a
-          href="https://wa.me/5491154032747?text=Hola!%20Quiero%20hacer%20una%20consulta"
+          href="https://wa.me/5491141434032?text=Hola!%20Quiero%20hacer%20una%20consulta"
           target="_blank"
           rel="noopener noreferrer"
           className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full shadow-lg flex items-center justify-center p-4 transition-all"

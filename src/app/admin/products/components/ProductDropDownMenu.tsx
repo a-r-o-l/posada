@@ -18,6 +18,21 @@ function ProductDropDownMenu({
   onEditClick: (e: React.MouseEvent) => void;
   onDeleteClick: (e: React.MouseEvent) => void;
 }) {
+  // Función para limpiar el foco antes de ejecutar acciones
+  const handleAction = (callback: (e: React.MouseEvent) => void) => {
+    return (e: React.MouseEvent) => {
+      e.stopPropagation();
+      // Forzar blur del elemento actualmente enfocado
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      // Pequeño delay para asegurar que el blur se complete antes de abrir el modal
+      setTimeout(() => {
+        callback(e);
+      }, 10);
+    };
+  };
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -30,7 +45,7 @@ function ProductDropDownMenu({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
-            onClick={onEditClick}
+            onClick={handleAction(onEditClick)}
             className="flex items-center justify-between"
           >
             Editar
@@ -38,7 +53,7 @@ function ProductDropDownMenu({
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={onDeleteClick}
+            onClick={handleAction(onDeleteClick)}
             className="flex items-center justify-between text-red-500"
           >
             Eliminar

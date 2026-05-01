@@ -7,60 +7,91 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { IStudentPopulated } from "@/models/Student";
 import { addChildToAccount } from "@/server/accountAction";
-import { Loader2 } from "lucide-react";
+import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { getAllStudentsBySchool } from "@/server/studentAction";
+import { useSchools } from "@/supabase/hooks/client/useSchools";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useStudents } from "@/supabase/hooks/client/useStudents";
+import { Student, StudentFullDetails } from "@/supabase/models/student";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 function CreateChildren({
   open,
   onClose,
   accountId,
   onChildAdded,
-  schoolId,
 }: {
   open: boolean;
   onClose: () => void;
   accountId: string;
-  onChildAdded?: (child: IStudentPopulated) => void;
-  schoolId: string;
+  onChildAdded?: (child: StudentFullDetails) => void;
 }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [searchParam, setSearchParam] = useState("");
-  const [students, setStudents] = useState<IStudentPopulated[] | []>();
+  const { fetchSchools, schools } = useSchools();
+  const [selectedSchool, setSelectedSchool] = useState<string>("");
+  const [selectedGrade, setSelectedGrade] = useState<string>("");
+  const { fetchStudentsByGradeId, students } = useStudents();
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [openPop, setOpenPop] = useState(false);
+  const [coin, setCoin] = useState("ARS");
 
-  const filteredChildren = useMemo(() => {
-    if (!students || !students.length) return [];
-    if (!searchParam) return students;
-    return students.filter((child: IStudentPopulated) => {
-      const fullName = `${child.name} ${child.lastname}`.toLowerCase();
-      return fullName.includes(searchParam.toLowerCase());
-    });
-  }, [students, searchParam]);
+  const filteredStudents = useMemo(() => {
+    if (!searchParam) {
+      return students;
+    }
+    return students
+      .filter((student) => {
+        const fullName = `${student.name} ${student.lastname}`.toLowerCase();
+        return fullName.includes(searchParam.toLowerCase());
+      })
+      .sort((a, b) => {
+        const nameA = `${a.name} ${a.lastname}`.toLowerCase();
+        const nameB = `${b.name} ${b.lastname}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+  }, [searchParam, students]);
 
-  const handleAddChild = async (child: IStudentPopulated) => {
+  const availableGrades = useMemo(() => {
+    if (!selectedSchool) return [];
+    const school = schools.find((s) => s.id === selectedSchool);
+    return (
+      school?.grades?.sort((a, b) => Number(a.year) - Number(b.year)) || []
+    );
+  }, [selectedSchool, schools]);
+
+  const handleAddChild = async (child: Student) => {
     try {
       setLoading(true);
-      const res = await addChildToAccount(accountId, child._id);
+      const res = await addChildToAccount(accountId, child.id);
 
       if (res.success) {
         toast.success(res.message);
-        // Llamar al callback para actualizar el estado del componente padre
         onChildAdded?.(child);
         setLoading(false);
         onClose();
@@ -77,85 +108,172 @@ function CreateChildren({
   };
 
   useEffect(() => {
-    if (schoolId) {
-      const fetchStudents = async () => {
-        setLoading(true);
-        const { students: fetchedStudents } = await getAllStudentsBySchool(
-          schoolId
-        );
-        setStudents(fetchedStudents);
-        setLoading(false);
-      };
-      fetchStudents();
+    if (selectedGrade) {
+      fetchStudentsByGradeId(selectedGrade);
     }
-  }, [schoolId]);
+  }, [selectedGrade]);
 
-  if (!schoolId) {
-    return null;
-  }
+  useEffect(() => {
+    fetchSchools();
+  }, []);
+
+  // Reset states when dialog closes
+  useEffect(() => {
+    if (!open) {
+      setSelectedSchool("");
+      setSelectedGrade("");
+      setSelectedStudent(null);
+      setSearchParam("");
+      setOpenPop(false);
+    }
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent>
+      <DialogContent className="sm:max-w-[425px]" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Menores</DialogTitle>
-          <DialogDescription></DialogDescription>
+          <DialogTitle>Agregar Menor</DialogTitle>
+          <DialogDescription>
+            Selecciona la escuela, curso y busca al estudiante que deseas
+            agregar.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-5">
-          <div>
-            <Label>Buscar alumno</Label>
-            <Input
-              autoComplete="off"
-              type="text"
-              placeholder="Buscar por nombre o apellido"
-              value={searchParam}
-              onChange={(e) => setSearchParam(e.target.value)}
-            />
+          <div className="space-y-2">
+            <Label>Escuela</Label>
+            <Select value={selectedSchool} onValueChange={setSelectedSchool}>
+              <SelectTrigger className="capitalize w-full">
+                <SelectValue placeholder="Seleccionar escuela" />
+              </SelectTrigger>
+              <SelectContent>
+                {schools.map((school) => (
+                  <SelectItem
+                    key={school.id}
+                    value={school.id}
+                    className="capitalize"
+                  >
+                    {school.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          {loading ? (
-            <div className="flex items-center justify-center h-40">
-              <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
+          <div className="space-y-2">
+            <Label>Curso</Label>
+            <Select
+              value={selectedGrade}
+              onValueChange={setSelectedGrade}
+              disabled={!selectedSchool}
+            >
+              <SelectTrigger className="capitalize w-full">
+                <SelectValue placeholder="Seleccionar curso" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableGrades.map((grade) => (
+                  <SelectItem
+                    key={grade.id}
+                    value={grade.id}
+                    className="uppercase"
+                  >
+                    {grade.display_name} ({grade.year})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2 md:col-span-2 w-full">
+            <Label>Buscar Estudiante</Label>
+            <Popover
+              open={openPop}
+              onOpenChange={setOpenPop}
+              modal={true} // Add this prop
+            >
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={openPop}
+                  className="w-full justify-between capitalize"
+                  disabled={!selectedGrade}
+                  type="button"
+                >
+                  {selectedStudent
+                    ? `${selectedStudent.name} ${selectedStudent.lastname}`
+                    : "Buscar estudiante..."}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent
+                className="p-0"
+                align="start"
+                sideOffset={5}
+                style={{ width: "var(--radix-popover-trigger-width)" }}
+                onOpenAutoFocus={(e) => {
+                  // Prevent auto-focus when popover opens
+                  e.preventDefault();
+                }}
+              >
+                <Command>
+                  <CommandInput
+                    placeholder="Buscar por nombre o apellido..."
+                    value={searchParam}
+                    onValueChange={setSearchParam}
+                    autoFocus={false}
+                  />
+                  <CommandList>
+                    {searchParam.trim().length > 0 ? (
+                      <>
+                        <CommandEmpty>
+                          No se encontraron estudiantes.
+                        </CommandEmpty>
+                        <CommandGroup>
+                          {filteredStudents.map((student) => (
+                            <CommandItem
+                              key={student.id}
+                              value={`${student.name} ${student.lastname}`}
+                              className="capitalize"
+                              onSelect={() => {
+                                setSelectedStudent(student);
+                                setOpenPop(false);
+                              }}
+                            >
+                              <Check
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  selectedStudent?.id === student.id
+                                    ? "opacity-100"
+                                    : "opacity-0",
+                                )}
+                              />
+                              {student.name} {student.lastname}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </>
+                    ) : (
+                      <div className="py-6 text-center text-sm text-muted-foreground">
+                        Escribe para buscar estudiantes...
+                      </div>
+                    )}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
+          </div>
+          {selectedStudent && !loading && (
+            <div className="flex justify-center">
+              <Button
+                type="button"
+                onClick={() => handleAddChild(selectedStudent)}
+                className="w-full"
+              >
+                Agregar Estudiante
+              </Button>
             </div>
-          ) : (
-            <div className="max-h-[400px] overflow-y-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Nombre</TableHead>
-                    <TableHead>Apellido</TableHead>
-                    <TableHead>Colegio</TableHead>
-                    <TableHead>Curso</TableHead>
-                    <TableHead></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {searchParam ? (
-                    filteredChildren.map((child: IStudentPopulated) => (
-                      <TableRow key={child._id}>
-                        <TableCell>{child.name}</TableCell>
-                        <TableCell>{child.lastname}</TableCell>
-                        <TableCell>{child?.schoolId?.name || ""}</TableCell>
-                        <TableCell>{child?.gradeId?.grade || ""}</TableCell>
-                        <TableCell>
-                          <Button
-                            variant="link"
-                            disabled={loading}
-                            onClick={() => handleAddChild(child)}
-                          >
-                            agregar
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={4} className="text-center h-40">
-                        Escribe un nombre o apellido para buscar
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
+          )}
+          {loading && (
+            <div className="flex items-center justify-center py-4">
+              <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
             </div>
           )}
         </div>

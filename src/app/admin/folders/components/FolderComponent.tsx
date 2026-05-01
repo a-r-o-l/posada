@@ -1,26 +1,26 @@
-import { IFolder } from "@/models/Folder";
 import { Calendar, Lock, Unlock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
 import FolderDropDownMenu from "./FolderDropDownMenu";
+import { FolderFullDetails } from "@/supabase/models/folder";
 
 function FolderComponent({
   folder,
   onDeleteFolder,
   onEditFolder,
 }: {
-  folder: IFolder;
-  onDeleteFolder: (folder: IFolder) => void;
-  onEditFolder: (folder: IFolder) => void;
+  folder: FolderFullDetails;
+  onDeleteFolder: (folder: FolderFullDetails) => void;
+  onEditFolder: (folder: FolderFullDetails) => void;
 }) {
   const router = useRouter();
   return (
     <div
-      key={folder._id}
+      key={folder.id}
       className="w-48 h-32 rounded-xl flex flex-col gap-5 border"
     >
       <div className="p-1 relative h-full">
-        {folder.isPrivate ? (
+        {folder.is_private ? (
           <div className="absolute bottom-0 right-0 p-3">
             <Lock size={14} className="text-red-500" />
           </div>
@@ -35,7 +35,7 @@ function FolderComponent({
             title={folder.title}
             onEditClick={() => onEditFolder(folder)}
             onDeleteClick={() => onDeleteFolder(folder)}
-            onViewClick={() => router.push(`/admin/folders/${folder._id}`)}
+            onViewClick={() => router.push(`/admin/folders/${folder.id}`)}
           />
         </div>
         <div className="h-full flex flex-col">

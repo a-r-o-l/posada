@@ -1,6 +1,6 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import React, { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation"; // 👈 Importamos useSearchParams
 import {
   Select,
   SelectContent,
@@ -12,35 +12,28 @@ import {
 
 function YearSelect({ url }: { url: string }) {
   const router = useRouter();
+  const searchParams = useSearchParams(); // 👈 Leemos los parámetros actuales
 
-  const [state, setState] = useState("");
+  // 👇 Inicializamos el estado con el valor actual de "year" en la URL
+  const [state, setState] = useState(searchParams.get("year") || "");
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      const params = new URLSearchParams(window.location.search);
-      if (state === "") {
-        if (params.has("year")) {
-          const levelValue = params.get("year");
-          setState(levelValue || "");
-        } else {
-          params.delete("year");
-        }
-      } else if (state) {
-        if (state === "all") {
-          params.delete("year");
-        } else {
-          params.set("year", state);
-        }
-      } else {
-        params.delete("year");
-      }
-      router.push(`${url}?${params.toString()}`);
-    }, 100);
-    return () => clearTimeout(timeoutId);
-  }, [state, router, url]);
+  const handleValueChange = (newValue: string) => {
+    setState(newValue);
+
+    // Construimos los nuevos parámetros
+    const params = new URLSearchParams(searchParams.toString());
+    if (newValue === "" || newValue === "all") {
+      params.delete("year");
+    } else {
+      params.set("year", newValue);
+    }
+
+    // Navegamos a la nueva URL
+    router.push(`${url}?${params.toString()}`);
+  };
 
   return (
-    <Select value={state} onValueChange={setState}>
+    <Select value={state} onValueChange={handleValueChange}>
       <SelectTrigger className="w-full">
         <SelectValue placeholder="Seleccionar año" />
       </SelectTrigger>

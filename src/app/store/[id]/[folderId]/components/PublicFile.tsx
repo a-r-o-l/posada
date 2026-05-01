@@ -1,5 +1,5 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { IFile } from "@/models/File";
+import { File } from "@/supabase/models/file";
 import Image from "next/image";
 import React from "react";
 
@@ -7,12 +7,12 @@ function PublicFile({
   file,
   onClick,
 }: {
-  file: IFile;
-  onClick: (file: IFile) => void;
+  file: File;
+  onClick: (file: File) => void;
 }) {
   return (
     <div
-      key={file._id}
+      key={file.id}
       className="w-20 lg:w-40 flex justify-center items-center rounded-md opacity-100 hover:opacity-80 cursor-pointer"
       onClick={() => {
         onClick(file);
@@ -20,7 +20,7 @@ function PublicFile({
     >
       <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
         <Image
-          src={file?.imageUrl || "/placeholderimg.jpg"}
+          src={file?.image_url || "/placeholderimg.jpg"}
           alt={file?.title}
           layout="fill"
           objectFit="contain"

@@ -40,8 +40,8 @@ function BigCartItemsTable({ total }: { total: number }) {
                   <div className="w-32 h-32 rounded-xl border-4 flex justify-start my-2">
                     <AspectRatio ratio={21 / 9}>
                       <Image
-                        src={item?.fileImageUrl || "/placeholderimg.jpg"}
-                        alt={item?.fileTitle}
+                        src={item?.file_image_url || "/placeholderimg.jpg"}
+                        alt={item?.file_title}
                         layout="fill"
                         objectFit="contain"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -53,7 +53,7 @@ function BigCartItemsTable({ total }: { total: number }) {
                   {item.name}
                 </TableCell>
                 <TableCell className="min-w-14 whitespace-nowrap overflow-ellipsis">
-                  $ {item.price}
+                  $ {item.price.toLocaleString("es-AR")}
                 </TableCell>
                 <TableCell className="min-w-14 whitespace-nowrap overflow-ellipsis">
                   <div className="flex justify-center items-center gap-10">
@@ -80,7 +80,7 @@ function BigCartItemsTable({ total }: { total: number }) {
                   className="min-w-14 whitespace-nowrap overflow-ellipsis pr-6"
                   align="right"
                 >
-                  $ {item.total}
+                  $ {item.total.toLocaleString("es-AR")}
                 </TableCell>
               </TableRow>
             ))

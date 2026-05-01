@@ -11,11 +11,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { nameParser } from "@/lib/utilsFunctions";
-import { ISchool } from "@/models/School";
 import { ArrowLeft } from "lucide-react";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { School } from "@/supabase/models/school";
 
 function SchoolPasswordModal({
   school,
@@ -23,7 +23,7 @@ function SchoolPasswordModal({
   onClose,
   onAccess,
 }: {
-  school: ISchool;
+  school: School;
   open: boolean;
   onClose: () => void;
   onAccess: () => void;

@@ -14,10 +14,11 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { PartialSchool } from "@/models/School";
-import { createSchool, updateSchool } from "@/server/schoolAction";
+import { School } from "@/supabase/models/school";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
+import { useSchools } from "@/supabase/hooks/client/useSchools";
+import { uploadFile } from "@/supabase/storage";
 
 type FormValues = {
   name: string;
@@ -38,8 +39,9 @@ function CreateSchoolModal({
 }: {
   open: boolean;
   onClose: () => void;
-  editSchool: PartialSchool | null;
+  editSchool: School | null;
 }) {
+  const { createSchool, updateSchool } = useSchools();
   const [loading, setLoading] = useState(false);
   const [withPassword, setWithPassword] = useState(false);
   const [file, setFile] = useState<File | null>(null);
@@ -53,20 +55,17 @@ function CreateSchoolModal({
     try {
       if (!!editSchool) {
         if (file) {
+          const fileName = `${file.name}`;
+          const filePath = `schools/logos/${fileName}`;
           const formDataImage = new FormData();
           formDataImage.append("file", file);
-          formDataImage.append("folder", "school");
-          const response = await fetch("/api/upload/folderImage", {
-            method: "POST",
-            body: formDataImage,
-          });
-          if (response.ok) {
-            const result = await response.json();
-            imageUrl = result.imageUrl;
-            console.log("File uploaded successfully", result);
-          } else {
-            console.error("File upload failed", await response.text());
+          formDataImage.append("folder", filePath);
+          const uploadResult = await uploadFile(file, filePath);
+          if (!uploadResult.success) {
+            toast.error(`Error al subir la imagen: ${uploadResult.error}`);
+            return;
           }
+          imageUrl = uploadResult.url || "";
         } else {
           imageUrl = existingImage || "";
         }
@@ -76,7 +75,7 @@ function CreateSchoolModal({
         formData.append("password", withPassword ? values.password : "");
         formData.append("imageUrl", imageUrl);
         formData.append("isPrivate", withPassword ? "true" : "false");
-        const response = await updateSchool(editSchool._id || "", formData);
+        const response = await updateSchool(editSchool.id || "", formData);
         if (response.success) {
           toast.success("Colegio editado correctamente");
           onClose();
@@ -89,20 +88,20 @@ function CreateSchoolModal({
         return;
       }
       if (file) {
+        const fileName = `${file.name}`;
+        const filePath = `schools/logos/${fileName}`;
         const formDataImage = new FormData();
         formDataImage.append("file", file);
-        formDataImage.append("folder", "school");
-        const response = await fetch("/api/upload/folderImage", {
-          method: "POST",
-          body: formDataImage,
-        });
-        if (response.ok) {
-          const result = await response.json();
-          imageUrl = result.imageUrl;
-          console.log("File uploaded successfully", result);
-        } else {
-          console.error("File upload failed", await response.text());
+        formDataImage.append("folder", filePath);
+
+        const uploadResult = await uploadFile(file, filePath);
+
+        if (!uploadResult.success) {
+          toast.error(`Error al subir la imagen: ${uploadResult.error}`);
+          return;
         }
+
+        imageUrl = uploadResult.url || "";
       }
       const formData = new FormData();
       Object.entries(values).forEach(([key, value]) => {
@@ -140,8 +139,8 @@ function CreateSchoolModal({
           password: editSchool?.password || "",
         });
         setWithPassword(!!editSchool?.password);
-        setExistingImage(editSchool?.imageUrl || null);
-        if (editSchool.isPrivate) {
+        setExistingImage(editSchool?.image_url || null);
+        if (editSchool.is_private) {
           setWithPassword(true);
         }
       }
@@ -155,8 +154,8 @@ function CreateSchoolModal({
         values.name === editSchool?.name &&
         values.description === editSchool?.description &&
         values.password === editSchool?.password &&
-        existingImage === editSchool?.imageUrl &&
-        editSchool?.isPrivate === withPassword
+        existingImage === editSchool?.image_url &&
+        editSchool?.is_private === withPassword
       ) {
         return true;
       }

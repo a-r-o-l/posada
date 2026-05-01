@@ -22,70 +22,78 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { paymentStateParser, priceParserToString } from "@/lib/utilsFunctions";
-import { ISalePopulated } from "@/models/Sale";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
 import { ArrowLeft, Download } from "lucide-react";
 import NextImage from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-
 import TransferProofModal from "./TransferProofModal";
-import { updateSale } from "@/server/saleAction";
 import { toast } from "sonner";
-import PaymentBadge from "@/app/store/purchases/components/PaymentBadge";
-import { sendEmailToUserAfterApproveTransfer } from "@/server/emailsAction";
+import { newSendEmailToUserAfterApproveTransfer } from "@/server/emailsAction";
+import { SaleFullDetails } from "@/supabase/models/sale";
+import { useProfileStudents } from "@/supabase/hooks/client/useProfileStudents";
+import { useSaleItems } from "@/supabase/hooks/client/useSaleItems";
+import { useSales } from "@/supabase/hooks/client/useSales";
+import { useDigitalDownloads } from "@/supabase/hooks/client/useDigitalDownloads";
+import LoadingTable from "@/components/LoadingTable";
+import PaymentBadge from "@/app/store/account/purchases/components/PaymentBadge";
 
-function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
+function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
+  const { updateSale } = useSales();
+  const router = useRouter();
+  const { fetchSaleItemsBySaleId, saleItems } = useSaleItems();
+  const { fetchDigitaldownloadsBySaleId, digitaldownloads, loading } =
+    useDigitalDownloads();
+  const { fetchProfileStudentsByAccountId, profileStudents } =
+    useProfileStudents();
   const [proofModalOpen, setProofModalOpen] = React.useState(false);
   const [approving, setApproving] = React.useState(false);
   const [proofUrl, setProofUrl] = React.useState<string>("");
 
-  console.log(sale);
+  useEffect(() => {
+    if (sale) {
+      fetchProfileStudentsByAccountId(sale.account_id);
+      fetchSaleItemsBySaleId(sale.id);
+      fetchDigitaldownloadsBySaleId(sale.id);
+    }
+  }, [sale]);
   // Función para aprobar la orden
   const approveOrder = async () => {
     setApproving(true);
     try {
-      const formData = new FormData();
-      formData.append("status", "approved");
-      const res = await updateSale(sale._id, formData);
+      const res = await updateSale(sale.id, { status: "approved" });
       if (!res.success) {
-        throw new Error(res.message);
+        console.log(res.error);
+        toast.error("Error al aprobar la orden");
+        return;
       }
-      await sendEmailToUserAfterApproveTransfer(sale);
+      await newSendEmailToUserAfterApproveTransfer(sale, saleItems);
       await new Promise((r) => setTimeout(r, 1000));
       toast.success("Orden aprobada correctamente");
       setProofModalOpen(false);
+      router.refresh();
     } catch (err) {
       console.log(err);
-      alert("Error al aprobar la orden");
+      toast.error("Error al intentar aprobar la orden");
     } finally {
       setApproving(false);
     }
   };
-  const router = useRouter();
-  const products = useMemo(() => {
-    if (!sale) {
-      return [];
-    }
-    return sale.products;
-  }, [sale]);
 
   const uniqueSchools = useMemo(() => {
-    if (!sale?.accountId?.children?.length) {
+    if (!profileStudents.length) {
       return [];
     }
 
     // Extraer todos los nombres de colegios
-    const schoolNames = sale.accountId.children.map(
-      (child) => child.schoolId.name,
-    );
+    const schoolNames = profileStudents.map((child) => child?.school?.name);
 
     // Eliminar duplicados usando Set
     return [...new Set(schoolNames)];
-  }, [sale]);
+  }, [profileStudents]);
 
   if (!sale) {
     return <></>;
@@ -136,22 +144,24 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       doc.setFontSize(12);
       doc.text(`Orden: ${sale.order}`, 10, startY + 10);
       doc.text(
-        `Fecha: ${format(new Date(sale.createdAt ?? ""), "dd / MM / yyyy", {
+        `Fecha: ${format(new Date(sale.created_at ?? ""), "dd / MM / yyyy", {
           locale: es,
         })}`,
         10,
         startY + 20,
       );
       doc.text(
-        `Cliente: ${sale.accountId.lastname} ${sale.accountId.name}`,
+        `Cliente: ${sale?.profile?.lastname} ${sale?.profile?.name}`,
         10,
         startY + 30,
       );
-      doc.text(`Email: ${sale.accountId.email}`, 10, startY + 40);
-      doc.text(`Telefono: ${sale.accountId.phone}`, 10, startY + 50);
-      doc.text(`Total: $${sale.total.toFixed(2)}`, 10, startY + 60);
+      doc.text(`Email: ${sale.profile?.email}`, 10, startY + 40);
+      doc.text(`Telefono: ${sale.profile?.phone}`, 10, startY + 50);
+      if (sale.total) {
+        doc.text(`Total: $${sale.total.toFixed(2)}`, 10, startY + 60);
+      }
       doc.text(
-        `Estado: ${paymentStateParser(sale.status).text}`,
+        `Estado: ${paymentStateParser(sale?.status || "").text}`,
         10,
         startY + 70,
       );
@@ -162,7 +172,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       // Mostrar colegios en la parte superior
       uniqueSchools.forEach((schoolName) => {
         schoolStartY += 5;
-        doc.text(schoolName, 110, schoolStartY);
+        doc.text(schoolName!, 110, schoolStartY);
       });
 
       // Agregar menores en la parte superior (después de los colegios)
@@ -172,10 +182,10 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       schoolStartY += 5;
 
       // Mostrar cada niño en la parte superior
-      sale.accountId.children.forEach((child) => {
+      profileStudents.forEach((child) => {
         // Divide el texto en dos partes
-        const nombreApellido = `${child.name} ${child.lastname} - `;
-        const gradoDivision = `${child.gradeId.grade} ${child.gradeId.division}`;
+        const nombreApellido = `${child?.student?.name} ${child?.student?.lastname} - `;
+        const gradoDivision = `${child.student?.grade?.grade} ${child?.student?.grade?.division}`;
 
         // Calcula el ancho del nombre y apellido
         const nombreApellidoWidth = doc.getTextWidth(nombreApellido);
@@ -219,12 +229,12 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       ];
       const tableRows: string[][] = [];
 
-      products.forEach((product) => {
+      saleItems.forEach((product) => {
         const productData: string[] = [
-          product?.fileTitle,
-          product?.productId?.name,
-          product?.fileId?.folderId?.schoolId?.name,
-          product?.fileId?.folderId?.title,
+          product?.file?.title || "",
+          product?.product?.name || "",
+          product?.product?.school?.name || "",
+          product?.file?.folder?.title || "",
           priceParserToString(product?.price),
           (product?.quantity).toString(),
           priceParserToString(product?.total),
@@ -267,7 +277,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       // Listar colegios
       let leftYPos = textY + 5;
       uniqueSchools.forEach((schoolName) => {
-        doc.text(schoolName, leftX, leftYPos);
+        doc.text(schoolName!, leftX, leftYPos);
         leftYPos += 5;
       });
 
@@ -278,10 +288,10 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
 
       // Listar alumnos
       let rightYPos = textY + 5;
-      sale.accountId.children.forEach((child) => {
+      profileStudents.forEach((child) => {
         // Divide el texto en dos partes
-        const nombreApellido = `${child.name} ${child.lastname} - `;
-        const gradoDivision = `${child.gradeId.grade} ${child.gradeId.division}`;
+        const nombreApellido = `${child?.student?.name} ${child?.student?.lastname} - `;
+        const gradoDivision = `${child?.grade?.grade} ${child?.grade?.division}`;
 
         // Calcula el ancho del nombre y apellido
         const nombreApellidoWidth = doc.getTextWidth(nombreApellido);
@@ -317,7 +327,6 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
       console.error("Error al generar el PDF:", error);
     }
   };
-
   return (
     <Card>
       <CardHeader>
@@ -357,10 +366,10 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                 </TableHeader>
                 <TableBody>
                   <TableRow>
-                    <TableCell>{sale?.accountId?.name}</TableCell>
-                    <TableCell>{sale?.accountId?.lastname}</TableCell>
-                    <TableCell>{sale?.accountId?.email}</TableCell>
-                    <TableCell>{sale?.accountId?.phone}</TableCell>
+                    <TableCell>{sale?.profile?.name}</TableCell>
+                    <TableCell>{sale?.profile?.lastname}</TableCell>
+                    <TableCell>{sale?.profile?.email}</TableCell>
+                    <TableCell>{sale?.profile?.phone}</TableCell>
                     <TableCell align="right">
                       <Popover>
                         <PopoverTrigger asChild>
@@ -383,19 +392,20 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                                   </TableRow>
                                 </TableHeader>
                                 <TableBody>
-                                  {sale?.accountId?.children?.map((child) => (
+                                  {profileStudents?.map((child) => (
                                     <TableRow
-                                      key={`${child.name}-${child.lastname}`}
+                                      key={`${child?.student?.name}-${child?.student?.lastname}`}
                                     >
                                       <TableCell>
-                                        {child.name} {child.lastname}
+                                        {child?.student?.name}{" "}
+                                        {child?.student?.lastname}
                                       </TableCell>
                                       <TableCell>
-                                        {child.gradeId.grade}{" "}
-                                        {child.gradeId.division}
+                                        {child?.student?.grade?.grade}{" "}
+                                        {child?.student?.grade?.division}
                                       </TableCell>
                                       <TableCell>
-                                        {child.schoolId.name}
+                                        {child?.student?.school?.name}
                                       </TableCell>
                                     </TableRow>
                                   ))}
@@ -427,7 +437,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                     <TableHead>Total</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead className="text-center">Entrega</TableHead>
-                    {sale.paymentTypeId === "transfer" && (
+                    {sale.payment_type_id === "transfer" && (
                       <TableHead>Comprobante</TableHead>
                     )}
                   </TableRow>
@@ -436,34 +446,36 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                   <TableRow>
                     <TableCell>{sale.order}</TableCell>
                     <TableCell>
-                      {sale.paymentTypeId === "account_money"
+                      {sale.payment_type_id === "account_money"
                         ? "Efectivo"
-                        : sale.paymentTypeId === "transfer"
+                        : sale.payment_type_id === "transfer"
                           ? "Transferencia"
                           : "Tarjeta"}
                     </TableCell>
                     <TableCell>
-                      {format(sale.createdAt!, "dd / MM / yyyy", {
+                      {format(sale.created_at!, "dd / MM / yyyy", {
                         locale: es,
                       })}
                     </TableCell>
-                    <TableCell>{sale?.accountId?.email}</TableCell>
+                    <TableCell>{sale?.profile?.email}</TableCell>
                     <TableCell>${sale?.total?.toFixed(2)}</TableCell>
                     <TableCell>
                       <PaymentBadge
                         state={sale?.status || ""}
-                        paymentTypeId={sale?.paymentTypeId || ""}
-                        transferProofUrl={sale?.transferProofUrl || ""}
+                        paymentTypeId={sale?.payment_type_id || ""}
+                        transferProofUrl={sale?.transfer_proof_url || ""}
                       />
                     </TableCell>
                     <TableCell align="center">
-                      <Checkbox checked={sale?.delivered} />
+                      <Checkbox checked={sale?.delivered || false} />
                     </TableCell>
-                    {sale.paymentTypeId === "transfer" && (
+                    {sale.payment_type_id === "transfer" && (
                       <TableCell>
-                        {sale.transferProofUrl ? (
+                        {sale.transfer_proof_url ? (
                           <NextImage
-                            src={sale.transferProofUrl || "/placeholderimg.jpg"}
+                            src={
+                              sale.transfer_proof_url || "/placeholderimg.jpg"
+                            }
                             alt="Comprobante de transferencia"
                             width={48}
                             height={48}
@@ -474,7 +486,7 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                               border: "1px solid #eee",
                             }}
                             onClick={() => {
-                              setProofUrl(sale.transferProofUrl || "");
+                              setProofUrl(sale.transfer_proof_url || "");
                               setProofModalOpen(true);
                             }}
                           />
@@ -508,19 +520,19 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {products.map((product) => (
+                  {saleItems.map((product) => (
                     <TableRow key={product.id}>
                       <TableCell>
                         <NextImage
-                          src={product.fileImageUrl || "/placeholder.svg"}
-                          alt={product.fileTitle}
+                          src={product.file?.image_url || "/placeholder.svg"}
+                          alt={product.file?.title || "Archivo"}
                           width={50}
                           height={50}
                           className="rounded-md"
                         />
                       </TableCell>
-                      <TableCell>{product?.fileTitle}</TableCell>
-                      <TableCell>{product?.productId?.name}</TableCell>
+                      <TableCell>{product.file?.title}</TableCell>
+                      <TableCell>{product?.product?.name}</TableCell>
                       <TableCell>$ {product?.price?.toFixed(2)}</TableCell>
                       <TableCell>{product?.quantity}</TableCell>
                       <TableCell align="right">
@@ -528,6 +540,49 @@ function OrderDetailClient({ sale }: { sale: ISalePopulated }) {
                       </TableCell>
                     </TableRow>
                   ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Descargables</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Imagen</TableHead>
+                    <TableHead>Archivo</TableHead>
+                    <TableHead className="text-right">Estado</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    <LoadingTable span={3} />
+                  ) : (
+                    digitaldownloads.map((dd) => (
+                      <TableRow key={dd.id}>
+                        <TableCell>
+                          <NextImage
+                            src={dd.url || "/placeholder.svg"}
+                            alt={dd.file_name || "Archivo"}
+                            width={50}
+                            height={50}
+                            className="rounded-md"
+                          />
+                        </TableCell>
+                        <TableCell>{dd.file_name}</TableCell>
+                        <TableCell align="right">
+                          {dd.status === "approved" ? (
+                            <span className="text-green-600">Aprobado</span>
+                          ) : (
+                            <span className="text-yellow-600">Pendiente</span>
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
                 </TableBody>
               </Table>
             </CardContent>

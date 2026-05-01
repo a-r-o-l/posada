@@ -10,10 +10,11 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { IProduct } from "@/models/Product";
-import { ISchool } from "@/models/School";
-import { createProduct, updateProduct } from "@/server/productAction";
+import { useProducts } from "@/supabase/hooks/client/useProducts";
+import { Product } from "@/supabase/models/product";
+import { School } from "@/supabase/models/school";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -21,6 +22,7 @@ const initialValues = {
   name: "",
   description: "",
   price: "",
+  isDownloadable: false,
 };
 
 function ProductModal({
@@ -31,9 +33,10 @@ function ProductModal({
 }: {
   open: boolean;
   onClose: () => void;
-  school?: ISchool;
-  product: IProduct | null;
+  school?: School;
+  product: Product | null;
 }) {
+  const { createProduct, updateProduct } = useProducts();
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
 
@@ -47,9 +50,10 @@ function ProductModal({
       formData.append("name", values.name);
       formData.append("description", values.description);
       formData.append("price", values.price);
-      formData.append("schoolId", school._id);
+      formData.append("school_id", school.id);
+      formData.append("is_downloadable", values.isDownloadable.toString());
       const res = product
-        ? await updateProduct(product._id, formData)
+        ? await updateProduct(product.id, formData)
         : await createProduct(formData);
       if (res.success) {
         toast.success(res.message);
@@ -69,8 +73,9 @@ function ProductModal({
     if (product && open) {
       setValues({
         name: product.name,
-        description: product.description,
+        description: product?.description || "",
         price: product.price.toString(),
+        isDownloadable: product.is_downloadable,
       });
     } else {
       setValues(initialValues);
@@ -110,6 +115,21 @@ function ProductModal({
                 setValues({ ...values, description: e.target.value })
               }
             />
+          </div>
+          <div className="flex items-center gap-3">
+            <Label>Es Descargable?</Label>
+            <Switch
+              checked={values.isDownloadable}
+              onCheckedChange={(e) =>
+                setValues({ ...values, isDownloadable: e })
+              }
+            />
+            {/* <Checkbox
+              checked={values.isDownloadable}
+              onCheckedChange={(e) =>
+                setValues({ ...values, isDownloadable: !!e })
+              }
+            /> */}
           </div>
         </div>
 

@@ -10,17 +10,18 @@ import { useCartStore } from "@/zustand/useCartStore";
 import { redirect } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { createPayment } from "@/server/mpAction";
-import { useUser } from "@/context/UserContext";
 import { toast } from "sonner";
 import MercadoPago from "@/icons/mpsvg";
 import { Banknote } from "lucide-react";
 import TransferModal from "./TransferModal";
 import BigCartItemsTable from "./BigCartItemsTable";
 import SmallCartItemsTable from "./SmallCartItemsTable";
-import { createTransferSale } from "@/server/saleAction";
+// import { createTransferSale } from "@/server/saleAction";
+import { createTransferSale } from "@/supabase/hooks/server/transferSale";
+import { useAuthStore } from "@/zustand/auth-store";
 
 function CartItemsList() {
-  const account = useUser();
+  const { currentUser: account } = useAuthStore();
   const cartItems = useCartStore((state) => state.products);
   const cleanCart = useCartStore((state) => state.clearCart);
   const [loading, setLoading] = useState(false);
@@ -31,8 +32,6 @@ function CartItemsList() {
       .map((item) => item.price * item.quantity)
       .reduce((acc, curr) => acc + curr, 0);
   }, [cartItems]);
-
-  console.log(cartItems);
 
   if (loading) {
     return (
@@ -58,7 +57,7 @@ function CartItemsList() {
                 setLoading(true);
                 const formData = new FormData();
                 formData.append("products", JSON.stringify(cartItems));
-                formData.append("accountId", account?.user?.id || "");
+                formData.append("accountId", account?.id || "");
                 formData.append("total", total.toString());
                 const res = await createPayment(formData);
                 if (res.success && res.url) {
@@ -108,7 +107,7 @@ function CartItemsList() {
           try {
             const formData = new FormData();
             formData.append("products", JSON.stringify(cartItems));
-            formData.append("accountId", account?.user?.id || "");
+            formData.append("accountId", account?.id || "");
             formData.append("total", total.toString());
             formData.append("paymentTypeId", "transfer");
             if (proofFile) {

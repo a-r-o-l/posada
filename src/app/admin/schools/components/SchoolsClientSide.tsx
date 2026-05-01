@@ -2,13 +2,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import React, { useState } from "react";
-import { PartialSchool } from "@/models/School";
 import CreateSchoolModal from "./CreateSchoolModal";
 import SchoolButton from "./SchoolButton";
+import { School } from "@/supabase/models/school";
 
-function SchoolsClientSide({ schools }: { schools: PartialSchool[] }) {
+function SchoolsClientSide({ schools }: { schools: School[] }) {
   const [openSchoolModal, setOpenSchoolModal] = useState(false);
-  const [editSchool, setEditSchool] = useState<PartialSchool | null>(null);
+  const [editSchool, setEditSchool] = useState<School | null>(null);
 
   return (
     <Card className="w-full">
@@ -24,7 +24,7 @@ function SchoolsClientSide({ schools }: { schools: PartialSchool[] }) {
         {schools?.length ? (
           schools?.map((school) => (
             <SchoolButton
-              key={school._id}
+              key={school.id}
               school={school}
               onEdit={() => {
                 setEditSchool(school);

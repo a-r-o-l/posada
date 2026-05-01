@@ -1,3 +1,5 @@
+import { Profile } from "./profile";
+
 export interface SaleProduct {
   id: string;
   fileId: string;
@@ -30,25 +32,30 @@ export interface SalePayer {
 
 export interface Sale {
   id: string;
+  mongo_id: string;
   order: string;
-  preferenceId: string | null;
-  accountId: string;
+  preference_id: string | null;
+  account_id: string;
   total: number | null;
   status: string | null;
-  statusDetail: string | null;
+  status_detail: string | null;
   delivered: boolean | null;
   products: SaleProduct[] | null;
-  transactionId: string | null;
-  transferProofUrl: string | null;
-  transferStatus: string | null;
-  transferNote: string | null;
-  dateCreated: string | null;
-  dateApproved: string | null;
-  paymentMethodId: string | null;
-  paymentTypeId: string | null;
+  transaction_id: string | null;
+  transfer_proof_url: string | null;
+  transfer_status: string | null;
+  transfer_note: string | null;
+  date_created: string | null;
+  date_approved: string | null;
+  payment_method_id: string | null;
+  payment_type_id: string | null;
   collector_id: string | null;
   payer: SalePayer | null;
-  isNewSale: boolean | null;
-  createdAt: string | null;
-  updatedAt: string | null;
+  is_new_sale: boolean | null;
+  created_at: string | null;
+  updated_at: string | null;
+}
+
+export interface SaleFullDetails extends Sale {
+  profile?: Profile;
 }

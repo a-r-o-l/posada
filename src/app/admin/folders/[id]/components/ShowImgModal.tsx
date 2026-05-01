@@ -9,19 +9,19 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { IFile } from "@/models/File";
 import { Link, Trash2 } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { deleteFileInParentFolder } from "@/server/fileAction";
 import { toast } from "sonner";
+import { FileFullDetails } from "@/supabase/models/file";
 
 function ShowImgModal({
   img,
   open,
   onClose,
 }: {
-  img: IFile | null;
+  img: FileFullDetails | null;
   open: boolean;
   onClose: () => void;
 }) {
@@ -41,11 +41,11 @@ function ShowImgModal({
             <DialogDescription></DialogDescription>
           </DialogHeader>
 
-          {!!img?.imageUrl && (
+          {!!img?.image_url && (
             <div className="flex justify-center">
               <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
                 <Image
-                  src={img?.imageUrl || "/placeholderimg.jpg"}
+                  src={img?.image_url || "/placeholderimg.jpg"}
                   alt={img?.title}
                   layout="fill"
                   objectFit="contain"
@@ -61,7 +61,7 @@ function ShowImgModal({
               variant="outline"
               size="icon"
               onClick={() => {
-                window.open(img?.imageUrl || "", "_blank");
+                window.open(img?.image_url || "", "_blank");
               }}
             >
               <Link />
@@ -85,7 +85,7 @@ function ShowImgModal({
         onAccept={async () => {
           try {
             setDeleting(true);
-            const response = await deleteFileInParentFolder(img._id);
+            const response = await deleteFileInParentFolder(img.id);
             if (response.success) {
               toast.success(response.message);
               setOpenAlert(false);

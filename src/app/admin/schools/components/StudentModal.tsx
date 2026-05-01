@@ -10,9 +10,9 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { PartialSchool } from "@/models/School";
-import { IStudentWP } from "@/models/Student";
-import { createStudent, updateStudent } from "@/server/studentAction";
+import { useStudents } from "@/supabase/hooks/client/useStudents";
+import { School } from "@/supabase/models/school";
+import { StudentFullDetails } from "@/supabase/models/student";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -30,16 +30,17 @@ function StudentModal({
 }: {
   open: boolean;
   onClose: () => void;
-  school?: PartialSchool | null;
+  school?: School | null;
   grade?: string;
-  editStudent?: IStudentWP | null;
+  editStudent?: StudentFullDetails | null;
 }) {
+  const { createStudent, updateStudent } = useStudents();
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
 
   const handleSubmit = async () => {
     setLoading(true);
-    if (!school?._id || !grade) {
+    if (!school?.id || !grade) {
       return;
     }
     try {
@@ -47,8 +48,8 @@ function StudentModal({
         const formData = new FormData();
         formData.append("name", values.name);
         formData.append("lastname", values.lastname);
-        formData.append("displayName", `${values.lastname} ${values.name}`);
-        const res = await updateStudent(editStudent._id, formData);
+        formData.append("display_name", `${values.lastname} ${values.name}`);
+        const res = await updateStudent(editStudent.id, formData);
         if (res.success) {
           toast.success(res.message);
           setLoading(false);
@@ -61,9 +62,9 @@ function StudentModal({
         const formData = new FormData();
         formData.append("name", values.name);
         formData.append("lastname", values.lastname);
-        formData.append("displayName", `${values.lastname} ${values.name}`);
-        formData.append("schoolId", school._id);
-        formData.append("gradeId", grade);
+        formData.append("display_name", `${values.lastname} ${values.name}`);
+        formData.append("school_id", school.id);
+        formData.append("grade_id", grade);
         const res = await createStudent(formData);
         if (res.success) {
           toast.success(res.message);

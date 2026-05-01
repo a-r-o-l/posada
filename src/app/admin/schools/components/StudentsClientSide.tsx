@@ -8,7 +8,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import React, { useMemo, useState } from "react";
-import { PartialSchool } from "@/models/School";
 import { useRouter } from "next/navigation";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
@@ -24,8 +23,6 @@ import { ArrowLeft, FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import StudentModal from "./StudentModal";
 import GradeModal from "./GradeModal";
-import { IGrade } from "@/models/Grade";
-import { IStudentWP } from "@/models/Student";
 import { deleteStudent } from "@/server/studentAction";
 import { toast } from "sonner";
 import { initialsParser, nameParser } from "@/lib/utilsFunctions";
@@ -34,6 +31,9 @@ import SeveralStudentsModal from "./SeveralStudentsModal";
 import DateSelectAdminSchools from "./DateSelectAdminSchools";
 import { deleteGrade } from "@/server/gradeAction";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { School } from "@/supabase/models/school";
+import { Grade } from "@/supabase/models/grade";
+import { StudentFullDetails } from "@/supabase/models/student";
 
 function StudentsClientSide({
   schools,
@@ -42,11 +42,11 @@ function StudentsClientSide({
   selectedGrade,
   students,
 }: {
-  schools: PartialSchool[];
+  schools: School[];
   selectedSchool?: string;
-  grades: IGrade[];
+  grades: Grade[];
   selectedGrade: string;
-  students: IStudentWP[];
+  students: StudentFullDetails[];
 }) {
   const router = useRouter();
   const [studentModal, setStudentModal] = useState(false);
@@ -55,15 +55,16 @@ function StudentsClientSide({
     useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
   const [openDeleteGradeAlert, setOpenDeleteGradeAlert] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<IStudentWP | null>(
-    null
+  const [selectedStudent, setSelectedStudent] =
+    useState<StudentFullDetails | null>(null);
+  const [editGrade, setEditGrade] = useState<Grade | null>(null);
+  const [editStudent, setEditStudent] = useState<StudentFullDetails | null>(
+    null,
   );
-  const [editGrade, setEditGrade] = useState<IGrade | null>(null);
-  const [editStudent, setEditStudent] = useState<IStudentWP | null>(null);
 
   const school = useMemo(() => {
     const foundSchool = schools.find(
-      (eachSchool) => eachSchool._id === selectedSchool
+      (eachSchool) => eachSchool.id === selectedSchool,
     );
     if (!foundSchool) {
       return null;
@@ -89,7 +90,7 @@ function StudentsClientSide({
             <div className="flex items-center">
               <Avatar className="h-20 w-20">
                 <AvatarImage
-                  src={school?.imageUrl}
+                  src={school?.image_url}
                   alt={school?.name}
                   className="object-contain !aspect-square p-1"
                 />
@@ -127,17 +128,17 @@ function StudentsClientSide({
                 {grades.length ? (
                   grades?.map((grade) => (
                     <Button
-                      key={grade._id}
+                      key={grade.id}
                       variant={
-                        selectedGrade === grade._id ? "secondary" : "outline"
+                        selectedGrade === grade.id ? "secondary" : "outline"
                       }
                       className="w-full justify-start text-left mb-2 p-10 relative"
                       onClick={() => {
                         const currentUrl = new URL(window.location.href);
                         const params = new URLSearchParams(currentUrl.search);
-                        params.set("grade", grade?._id || "");
+                        params.set("grade", grade?.id || "");
                         router.push(
-                          `${currentUrl.pathname}?${params.toString()}`
+                          `${currentUrl.pathname}?${params.toString()}`,
                         );
                       }}
                     >
@@ -157,7 +158,7 @@ function StudentsClientSide({
                             setOpenDeleteGradeAlert(true);
                           }}
                           title={`${grade.grade} - ${nameParser(
-                            grade.division
+                            grade.division,
                           )}`}
                         />
                       </div>
@@ -214,19 +215,19 @@ function StudentsClientSide({
                     {!!students?.length ? (
                       students.map((student) => (
                         <TableRow
-                          key={student._id}
+                          key={student.id}
                           onClick={() => setSelectedStudent(student)}
                           className={`hover:cursor-pointer ${
-                            selectedStudent?._id === student._id
+                            selectedStudent?.id === student.id
                               ? "bg-slate-100 text-black"
                               : ""
                           }`}
                         >
                           <TableCell>{student.name}</TableCell>
                           <TableCell>{student.lastname}</TableCell>
-                          <TableCell>{student.gradeId?.grade}</TableCell>
+                          <TableCell>{student.grade?.grade}</TableCell>
                           <TableCell>
-                            {nameParser(student.gradeId?.division)}
+                            {nameParser(student?.grade?.division || "")}
                           </TableCell>
                           <TableCell className="text-end gap-2 flex justify-end">
                             <Button
@@ -280,7 +281,7 @@ function StudentsClientSide({
         onClose={() => setOpenDeleteAlert(false)}
         onAccept={async () => {
           if (!selectedStudent) return;
-          const res = await deleteStudent(selectedStudent?._id || "");
+          const res = await deleteStudent(selectedStudent?.id || "");
           if (res.success) {
             toast.success(res.message);
             setOpenDeleteAlert(false);

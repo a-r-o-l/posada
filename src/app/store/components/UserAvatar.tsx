@@ -1,4 +1,5 @@
 "use client";
+
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import {
   DropdownMenu,
@@ -9,15 +10,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { IUser } from "@/context/UserContext";
+import { useUser } from "@/hooks/use-user";
 import { LogOutIcon, Package2, User } from "lucide-react";
-import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import { useState } from "react";
 
-function UserAvatar({ user }: { user?: IUser }) {
+function UserAvatar() {
   const router = useRouter();
+  const { user, logout } = useUser();
   const [openAlert, setOpenAlert] = useState(false);
+
+  if (!user) return null;
+
+  const handleLogout = async () => {
+    await logout();
+    setOpenAlert(false);
+  };
+
   return (
     <div className="flex items-center gap-1">
       <DropdownMenu>
@@ -29,12 +38,11 @@ function UserAvatar({ user }: { user?: IUser }) {
         <DropdownMenuContent className="w-56">
           <div className="flex justify-between items-center">
             <DropdownMenuLabel>
-              {user?.name} {user?.lastname}
+              {user.name} {user.lastname}
             </DropdownMenuLabel>
-            {/* <ThemeButton /> */}
           </div>
           <div className="px-2">
-            <p className="text-xs text-gray-400">{user?.email}</p>
+            <p className="text-xs text-gray-400">{user.email}</p>
           </div>
           <DropdownMenuSeparator />
           <DropdownMenuGroup>
@@ -69,11 +77,7 @@ function UserAvatar({ user }: { user?: IUser }) {
         onClose={() => setOpenAlert(false)}
         title="Cerrar sesión"
         description="¿Estás seguro de cerrar sesión?"
-        onAccept={() => {
-          signOut({
-            callbackUrl: "/signin",
-          });
-        }}
+        onAccept={handleLogout}
       />
     </div>
   );

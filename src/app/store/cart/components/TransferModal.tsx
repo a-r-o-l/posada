@@ -5,6 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
+  DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Banknote, UploadCloud } from "lucide-react";
@@ -52,6 +53,7 @@ export default function TransferModal({
             <Banknote className="w-6 h-6 text-green-500" />
             Pago por transferencia
           </DialogTitle>
+          <DialogDescription></DialogDescription>
         </DialogHeader>
         <div className="space-y-2 mt-2">
           <div>

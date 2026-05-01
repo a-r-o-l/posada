@@ -1,8 +1,8 @@
 import React from "react";
 import StudentsClientSide from "../components/StudentsClientSide";
-import { getAllSchools } from "@/server/schoolAction";
-import { getAllGradesBySchoolAndYear } from "@/server/gradeAction";
-import { getAllStudentByGrade } from "@/server/studentAction";
+import { getSchools } from "@/supabase/hooks/server/schools";
+import { getStudentsByGrade } from "@/supabase/hooks/server/students";
+import { getGradesBySchoolIdYear } from "@/supabase/hooks/server/grades";
 
 export default async function page({
   searchParams,
@@ -14,9 +14,9 @@ export default async function page({
   const search = await searchParams;
   const param = await params;
 
-  const { schools } = await getAllSchools();
-  const { grades } = await getAllGradesBySchoolAndYear(param.id, search.year);
-  const { students } = await getAllStudentByGrade(search.grade);
+  const schools = await getSchools();
+  const { data: grades } = await getGradesBySchoolIdYear(param.id, search.year);
+  const { data: students } = await getStudentsByGrade(search.grade);
 
   return (
     <div className="p-4 w-full">

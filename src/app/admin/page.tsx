@@ -1,10 +1,7 @@
-import React from "react";
-import AdminDashboard from "./components/AdminDashboardClient";
-
-export default function page() {
+export default function AdminPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center p-4">
-      <AdminDashboard />
+    <div>
+      <h1>Panel de Admin</h1>
     </div>
   );
 }

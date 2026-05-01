@@ -40,8 +40,8 @@ function SmallCartItemsTable({ total }: { total: number }) {
                   <div className="w-20 h-20 rounded-xl border-4 flex justify-start my-2">
                     <AspectRatio ratio={21 / 9}>
                       <Image
-                        src={item?.fileImageUrl || "/placeholderimg.jpg"}
-                        alt={item?.fileTitle}
+                        src={item?.file_image_url || "/placeholderimg.jpg"}
+                        alt={item?.file_title}
                         layout="fill"
                         objectFit="contain"
                         sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -51,7 +51,7 @@ function SmallCartItemsTable({ total }: { total: number }) {
                 </TableCell>
                 <TableCell className="text-xs">{item.name}</TableCell>
                 <TableCell className="text-xs whitespace-nowrap">
-                  $ {item.price}
+                  {item.price.toLocaleString("es-AR")}
                 </TableCell>
                 <TableCell className="text-xs">
                   <div className="flex justify-start items-center gap-3">
@@ -74,7 +74,9 @@ function SmallCartItemsTable({ total }: { total: number }) {
                     </Button>
                   </div>
                 </TableCell>
-                <TableCell className="text-xs pr-2">$ {item.total}</TableCell>
+                <TableCell className="text-xs pr-2">
+                  {item.total.toLocaleString("es-AR")}
+                </TableCell>
               </TableRow>
             ))
           ) : (

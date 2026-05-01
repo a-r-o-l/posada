@@ -25,9 +25,9 @@ export function AppSidebar() {
   return (
     <Sidebar>
       <SidebarContent>
-        <SidebarGroup>
-          <SidebarGroupLabel className="my-5">
-            <div className="w-60 overflow-hidden">
+        <SidebarGroup className="bg-white">
+          <SidebarGroupLabel className="my-5 bg-white">
+            <div className="w-60 overflow-hidden bg-white">
               <AspectRatio ratio={21 / 9}>
                 <Image
                   src={imageUrl}

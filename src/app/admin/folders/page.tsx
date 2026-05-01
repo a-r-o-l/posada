@@ -1,8 +1,8 @@
 import React from "react";
 import FoldersClientSide from "./components/FoldersClientSide";
-import { getAllSchools } from "@/server/schoolAction";
-import { getFoldersByLvlAndYear } from "@/server/folderAction";
-import { getAllGradesBySchool } from "@/server/gradeAction";
+import { getSchools } from "@/supabase/hooks/server/schools";
+import { getGradesBySchoolId } from "@/supabase/hooks/server/grades";
+import { getFoldersBySchoolId } from "@/supabase/hooks/server/folders";
 
 export default async function page({
   searchParams,
@@ -10,13 +10,13 @@ export default async function page({
   searchParams: Promise<{ school?: string; level?: string; year?: string }>;
 }) {
   const search = await searchParams;
-  const { schools } = await getAllSchools();
-  const { folders } = await getFoldersByLvlAndYear(
-    search.school,
+  const schools = await getSchools();
+  const folders = await getFoldersBySchoolId(
+    search?.school || "",
     search.level,
-    search.year
+    search.year,
   );
-  const { grades } = await getAllGradesBySchool(search.school);
+  const grades = await getGradesBySchoolId(search?.school || "");
 
   return (
     <div className="p-4 w-full">

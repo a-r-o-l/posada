@@ -6,11 +6,11 @@ import {
 } from "@/components/ui/popover";
 import { Separator } from "@/components/ui/separator";
 import { TableCell, TableRow } from "@/components/ui/table";
-import { IProduct } from "@/models/Product";
+import { Product } from "@/supabase/models/product";
 import { Info, Minus, Plus } from "lucide-react";
 import React from "react";
 
-interface IProductWithQuantity extends IProduct {
+interface IProductWithQuantity extends Product {
   quantity: number;
 }
 

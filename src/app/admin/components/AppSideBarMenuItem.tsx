@@ -22,6 +22,7 @@ function AppSideBarMenuItem({
     item.url === "/admin"
       ? pathname === item.url
       : pathname.startsWith(item.url);
+
   return (
     <SidebarMenuItem key={item.title}>
       <SidebarMenuButton asChild className="h-12 my-2">
