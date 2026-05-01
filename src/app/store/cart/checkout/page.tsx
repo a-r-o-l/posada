@@ -7,10 +7,9 @@ async function page({
   searchParams: Promise<{ status: string[] }>;
 }) {
   const param = await searchParams;
-
   const isSuccessful =
-    param.status.includes("success") ||
-    (param.status.includes("approved") as boolean);
+    param?.status?.includes("success") ||
+    (param?.status?.includes("approved") as boolean);
 
   return (
     <div className="flex items-center justify-center p-4">

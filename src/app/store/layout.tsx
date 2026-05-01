@@ -1,5 +1,5 @@
 import { createClient } from "@/supabase/server";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 
 export default async function RootLayout({
   children,
@@ -10,10 +10,7 @@ export default async function RootLayout({
   const {
     data: { session },
   } = await supabase.auth.getSession();
-
-  if (!session) {
-    redirect("/");
-  }
+  console.log("session(store) -> ", session);
   return (
     <>
       <header className="shadow-md top-0 sticky z-50 bg-[#F0F1FF]"></header>

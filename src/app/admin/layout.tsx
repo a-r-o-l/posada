@@ -1,6 +1,6 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
-import { redirect } from "next/navigation";
+// import { redirect } from "next/navigation";
 import { createClient } from "@/supabase/server";
 
 export default async function RootLayout({
@@ -13,9 +13,7 @@ export default async function RootLayout({
     data: { session },
   } = await supabase.auth.getSession();
 
-  if (!session) {
-    redirect("/");
-  }
+  console.log("session(admin) -> ", session);
   return (
     <div>
       <SidebarProvider>
