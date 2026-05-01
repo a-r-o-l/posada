@@ -10,10 +10,10 @@ export default async function RootLayout({
 }>) {
   const supabase = await createClient();
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  console.log("session(admin) -> ", session);
+  console.log("session(admin) -> ", user);
   return (
     <div>
       <SidebarProvider>

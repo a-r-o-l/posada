@@ -35,10 +35,10 @@ export function useUser() {
     setIsLoading(true);
 
     const {
-      data: { session },
-    } = await supabase.auth.getSession();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-    if (!session) {
+    if (!user) {
       setUser(null);
       setIsLoading(false);
       return;
@@ -47,7 +47,7 @@ export function useUser() {
     const { data: profile } = await supabase
       .from("profile")
       .select("id, email, name, lastname, role, phone, image_url")
-      .eq("id", session.user.id)
+      .eq("id", user.id)
       .single();
 
     if (profile) {

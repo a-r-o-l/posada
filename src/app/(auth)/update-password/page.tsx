@@ -27,12 +27,12 @@ export default function UpdatePasswordPage() {
     // Verificar si el usuario está autenticado (viene del enlace del correo)
     const checkSession = async () => {
       const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session) {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) {
         // Si no hay sesión, redirigir al login
         toast.error("Enlace inválido o expirado");
-        router.push("/auth/login");
+        router.push("/?login=true");
       } else {
         setIsValidSession(true);
         setInitialLoading(false);

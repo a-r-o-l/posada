@@ -42,9 +42,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       // Obtener sesión actual
       const {
-        data: { session },
+        data: { user: us },
         error,
-      } = await supabase.auth.getSession();
+      } = await supabase.auth.getUser();
 
       if (error) {
         console.error("Error obteniendo sesión:", error);
@@ -52,7 +52,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         return;
       }
 
-      if (!session?.user) {
+      if (!us) {
         set({
           currentUser: null,
           isAuthenticated: false,
@@ -65,7 +65,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const { data: userData, error: userError } = await supabase
         .from("profile")
         .select("*")
-        .eq("id", session.user.id)
+        .eq("id", us.id)
         .single();
 
       if (userError) {
@@ -105,11 +105,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       // Obtener sesión actual
       const {
-        data: { session },
+        data: { user: us },
         error,
-      } = await supabase.auth.getSession();
+      } = await supabase.auth.getUser();
 
-      if (error || !session?.user) {
+      if (error || !us) {
         console.error("Error obteniendo sesión:", error);
         return;
       }
@@ -118,7 +118,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const { data: userData, error: userError } = await supabase
         .from("profile")
         .select("*")
-        .eq("id", session.user.id)
+        .eq("id", us.id)
         .single();
 
       if (userError) {

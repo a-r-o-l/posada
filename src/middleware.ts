@@ -29,7 +29,7 @@ export async function middleware(request: NextRequest) {
   );
 
   // Esto refresca la sesión en cada request
-  await supabase.auth.getSession();
+  await supabase.auth.getUser();
 
   return response;
 }

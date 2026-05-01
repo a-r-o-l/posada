@@ -8,9 +8,9 @@ export default async function RootLayout({
 }>) {
   const supabase = await createClient();
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
-  console.log("session(store) -> ", session);
+    data: { user },
+  } = await supabase.auth.getUser();
+  console.log("session(store) -> ", user);
   return (
     <>
       <header className="shadow-md top-0 sticky z-50 bg-[#F0F1FF]"></header>
