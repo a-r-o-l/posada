@@ -1,8 +1,10 @@
 import { Payment } from "mercadopago";
 import { mercadopago } from "@/app/api";
-import { getSale, updateSale } from "@/server/saleAction";
+// import { getSale, updateSale } from "@/server/saleAction";
+import { getSale, updateSale } from "@/supabase/hooks/server/sales";
 import { sendEmail } from "@/lib/brevo";
-import { tahnksEmailTemplate } from "@/templates/thanksEmail";
+import { newTahnksEmailTemplate } from "@/templates/thanksEmail";
+import { getSaleItemsBySaleId } from "@/supabase/hooks/server/sale_items";
 
 export async function POST(request: Request) {
   try {
@@ -15,19 +17,25 @@ export async function POST(request: Request) {
 
     // Obtener la venta completa de la base de datos
     const { sale: foundSale } = await getSale(saleId);
+    const { data } = await getSaleItemsBySaleId(saleId);
 
     if (!foundSale) {
       console.error("Venta no encontrada:", saleId);
       return new Response(null, { status: 404 });
     }
 
+    if (!data) {
+      console.error("Items de venta no encontrados para la venta:", saleId);
+      return new Response(null, { status: 404 });
+    }
+
     const formData = new FormData();
-    formData.append("statusDetail", payment.status_detail || "");
-    formData.append("transactionId", payment.id?.toString() || "");
-    formData.append("dateApproved", payment?.date_approved || "");
-    formData.append("dateCreated", payment?.date_created || "");
-    formData.append("paymentMethodId", payment.payment_method_id || "");
-    formData.append("paymentTypeId", payment.payment_type_id || "");
+    formData.append("status_detail", payment.status_detail || "");
+    formData.append("transaction_id", payment.id?.toString() || "");
+    formData.append("date_approved", payment?.date_approved || "");
+    formData.append("date_created", payment?.date_created || "");
+    formData.append("payment_method_id", payment.payment_method_id || "");
+    formData.append("payment_type_id", payment.payment_type_id || "");
     formData.append("collector_id", payment.collector_id?.toString() || "");
 
     if (payment.payer) {
@@ -48,7 +56,7 @@ export async function POST(request: Request) {
               email: foundSale.accountId.email,
             },
           ],
-          htmlContent: tahnksEmailTemplate(foundSale),
+          htmlContent: newTahnksEmailTemplate(foundSale, data),
         });
 
         return new Response(null, { status: 200 });

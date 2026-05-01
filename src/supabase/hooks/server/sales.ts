@@ -1,6 +1,6 @@
 import { generateRandomNumber } from "@/lib/utilsFunctions";
 import { createClient } from "@/supabase/server";
-import { serverUploadFile } from "@/supabase/serverStorage";
+// import { serverUploadFile } from "@/supabase/serverStorage";
 
 interface GetAllSalesByDateParams {
   start?: string;

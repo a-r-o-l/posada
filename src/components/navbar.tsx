@@ -5,7 +5,8 @@ import { usePathname } from "next/navigation";
 import HeaderShoppingCart from "@/app/store/components/HeaderShoppingCart";
 import { useAuthStore } from "@/zustand/auth-store";
 import { cn } from "@/lib/utils";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
+import { Button } from "./ui/button";
 
 const hideNavbarRoutes = ["login", "/update-password", "/admin"];
 
@@ -15,9 +16,21 @@ export default function Navbar() {
   const shouldHideNavbar = hideNavbarRoutes.some((route) =>
     pathname.startsWith(route),
   );
+  const [enabled, setEnabled] = useState(false);
 
   if (shouldHideNavbar) {
     return null;
+  }
+
+  if (!enabled) {
+    return (
+      <div className="flex justify-end items-end">
+        <Button
+          className="bg-white hover:bg-white shadow-none cursor-default"
+          onClick={() => setEnabled(!enabled)}
+        ></Button>
+      </div>
+    );
   }
 
   return (
@@ -54,7 +67,7 @@ export default function Navbar() {
             className={cn(
               "transition-colors duration-300 font-medium",
               pathname === "/"
-                ? "text-[#139FDC]"
+                ? "text-white"
                 : "text-neutral-400 hover:text-white",
             )}
           >
@@ -82,7 +95,7 @@ export default function Navbar() {
               className={cn(
                 "transition-colors duration-300 font-medium",
                 pathname === "/store/pictures"
-                  ? "text-[#139FDC]"
+                  ? "text-white"
                   : "text-neutral-400 hover:text-white",
               )}
             >
@@ -95,7 +108,7 @@ export default function Navbar() {
               className={cn(
                 "transition-colors duration-300 font-medium",
                 pathname === "/store/account"
-                  ? "text-[#139FDC]"
+                  ? "text-white"
                   : "text-neutral-400 hover:text-white",
               )}
             >
@@ -125,7 +138,7 @@ export default function Navbar() {
               className={cn(
                 "transition-colors duration-300 font-medium text-sm",
                 pathname === "/"
-                  ? "text-[#139FDC]"
+                  ? "text-white"
                   : "text-neutral-400 hover:text-white",
               )}
             >
@@ -153,7 +166,7 @@ export default function Navbar() {
                 className={cn(
                   "transition-colors duration-300 font-medium text-sm",
                   pathname === "/store/pictures"
-                    ? "text-[#139FDC]"
+                    ? "text-white"
                     : "text-neutral-400 hover:text-white",
                 )}
               >
@@ -166,7 +179,7 @@ export default function Navbar() {
                 className={cn(
                   "transition-colors duration-300 font-medium text-sm",
                   pathname === "/store/account"
-                    ? "text-[#139FDC]"
+                    ? "text-white"
                     : "text-neutral-400 hover:text-white",
                 )}
               >
@@ -179,7 +192,7 @@ export default function Navbar() {
                 className={cn(
                   "transition-colors duration-300 font-medium text-sm",
                   pathname === "/store"
-                    ? "text-[#139FDC] font-semibold"
+                    ? "text-white font-semibold"
                     : "text-neutral-400 hover:text-white",
                 )}
               >
