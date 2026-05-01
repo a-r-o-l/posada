@@ -34,7 +34,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen flex flex-col`}
       >
         <AuthInitializer />
-        <Navbar />
+        {/* <Navbar /> */}
 
         <main className="flex-1">{children}</main>
         <Toaster richColors />

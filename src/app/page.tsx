@@ -6,7 +6,7 @@ import Section1 from "../components/rootsComponents/section1/Section1";
 import Section4 from "../components/rootsComponents/section4/Section4";
 // import Section5 from "../components/rootsComponents/section5/Section5";
 import Section3Mini from "@/components/rootsComponents/section3/Section3Mini";
-import MiniRootHeader from "@/components/rootsComponents/MiniRootHeader";
+// import MiniRootHeader from "@/components/rootsComponents/MiniRootHeader";
 import Section1Mini from "@/components/rootsComponents/section1/Section1Mini";
 import Section2Mini from "@/components/rootsComponents/section2/Section2Mini";
 // import Section5Mini from "@/components/rootsComponents/section5/Section5Mini";
@@ -17,11 +17,11 @@ import Section6Mini from "@/components/rootsComponents/section6/Section6Mini";
 const ready = false;
 
 function page() {
-  if (!ready) {
+  if (ready) {
     return (
       <main className="flex flex-col flex-1 bg-[#F0F1FF]">
         {/* <RootHeader /> */}
-        <MiniRootHeader />
+        {/* <MiniRootHeader /> */}
         <div className="py-20" id="quienes-somos">
           <Section1 />
           <Section1Mini />
@@ -79,7 +79,7 @@ function page() {
       </p>
       <p className="text-md text-gray-600 mt-2">
         📅 Vuelve pronto —{" "}
-        <span className="font-semibold">Estimado: 30 de abril de 2026</span>
+        <span className="font-semibold">Estimado: 05 de mayo de 2026</span>
       </p>
       <div
         style={{ backgroundImage: "url(/underConstruction.png)" }}
