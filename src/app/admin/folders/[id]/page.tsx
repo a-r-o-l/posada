@@ -1,7 +1,8 @@
 import React from "react";
 import FolderDetailClientSide from "./components/FolderDetailClientSide";
-import { getFoldersAndFiles, getOneFolder } from "@/server/folderAction";
-import { getAllGradesBySchool } from "@/server/gradeAction";
+import { getFolder } from "@/supabase/hooks/server/folders";
+import { getGradesBySchoolId } from "@/supabase/hooks/server/grades";
+import { getFilesAndFoldersByFolderId } from "@/supabase/hooks/server/files";
 
 export default async function page({
   params,
@@ -9,16 +10,16 @@ export default async function page({
   params: Promise<{ id: string }>;
 }) {
   const param = await params;
-  const { data } = await getFoldersAndFiles(param.id);
-  const { folder } = await getOneFolder(param.id);
-  const { grades } = await getAllGradesBySchool(folder.schoolId);
+  const { files, folders } = await getFilesAndFoldersByFolderId(param.id);
+  const folder = await getFolder(param.id);
+  const grades = await getGradesBySchoolId(folder.school_id);
 
   return (
     <div className="p-4 w-full">
       <FolderDetailClientSide
         selectedFolder={folder}
-        folders={data.folders}
-        files={data.files}
+        folders={folders}
+        files={files}
         grades={grades}
       />
     </div>

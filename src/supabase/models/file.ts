@@ -1,3 +1,5 @@
+import { FolderFullDetails } from "./folder";
+
 export interface File {
   id: string;
   mongo_id: string;
@@ -11,4 +13,8 @@ export interface File {
   is_new: boolean | null;
   created_at: string | null;
   updated_at: string | null;
+}
+
+export interface FileFullDetails extends File {
+  folder?: FolderFullDetails;
 }

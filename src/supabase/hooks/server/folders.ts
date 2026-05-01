@@ -1,3 +1,4 @@
+import { Folder } from "@/supabase/models/folder";
 import { createClient } from "@/supabase/server";
 
 export async function getFolders() {
@@ -14,7 +15,11 @@ export async function getFoldersBySchoolId(
   id: string,
   level?: string,
   year?: string,
-) {
+): Promise<Folder[]> {
+  if (!id) {
+    return [];
+  }
+
   const supabase = await createClient();
 
   let query = supabase.from("folders").select("*").eq("school_id", id);
@@ -29,9 +34,12 @@ export async function getFoldersBySchoolId(
 
   const { data: folders, error } = await query;
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.error("Error fetching folders:", error);
+    return [];
+  }
 
-  return folders;
+  return folders || [];
 }
 
 export async function getFolder(id: string) {

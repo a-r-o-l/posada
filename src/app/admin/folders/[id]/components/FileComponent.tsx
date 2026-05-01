@@ -1,6 +1,6 @@
 "use client";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import { IFile } from "@/models/File";
+import { FileFullDetails } from "@/supabase/models/file";
 import Image from "next/image";
 import React from "react";
 
@@ -8,8 +8,8 @@ function FileComponent({
   file,
   onShowImage,
 }: {
-  file: IFile;
-  onShowImage: (file: IFile) => void;
+  file: FileFullDetails;
+  onShowImage: (file: FileFullDetails) => void;
 }) {
   return (
     <div
@@ -20,7 +20,7 @@ function FileComponent({
     >
       <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
         <Image
-          src={file?.imageUrl || "/placeholderimg.jpg"}
+          src={file?.image_url || "/placeholderimg.jpg"}
           alt={file?.title}
           layout="fill"
           objectFit="contain"

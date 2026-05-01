@@ -12,10 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
-import { IFolder } from "@/models/Folder";
-import { ISchool } from "@/models/School";
-import { createManyFiles } from "@/server/fileAction";
-import { getSchool } from "@/server/schoolAction";
+import { FolderFullDetails } from "@/supabase/models/folder";
+import { createManyFilesSpb, delay } from "@/supabase/storage";
 import { Upload, X } from "lucide-react";
 import Image from "next/image";
 import React, { ChangeEvent, useEffect, useRef, useState } from "react";
@@ -28,6 +26,7 @@ interface ImageInfo {
   title: string;
   description: string;
   price: string;
+  watermarkedFile?: File;
 }
 
 function FileCreateModal({
@@ -37,40 +36,51 @@ function FileCreateModal({
 }: {
   open: boolean;
   onClose: () => void;
-  folder?: IFolder;
+  folder?: FolderFullDetails;
 }) {
+  // const { fetchSchool, school } = useSchools();
   const [images, setImages] = useState<ImageInfo[]>([]);
   const [loading, setLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [processing, setProcessing] = useState(false);
-  const [school, setSchool] = useState<null | ISchool>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    simulateProgress();
     const files = Array.from(e.target.files || []);
-    const newImages = await Promise.all(
-      files.map(async (file) => {
-        const image = await processFile(file);
-        return image;
-      })
-    );
+    setProcessing(true);
+    setProgress(0);
+
+    const newImages: ImageInfo[] = [];
+
+    // Procesar secuencialmente para no saturar cliente
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const image = await processFile(file);
+      newImages.push(image);
+      setProgress(((i + 1) / files.length) * 100);
+
+      // Pequeño delay entre procesamientos
+      if (i % 5 === 0) await delay(100);
+    }
+
     setImages((prev) => [...prev, ...newImages]);
+    setProcessing(false);
+    setProgress(0);
   };
 
-  const simulateProgress = () => {
-    setProcessing(true);
-    let progressValue = 0;
-    const interval = setInterval(() => {
-      progressValue += 10;
-      setProgress(progressValue);
-      if (progressValue >= 100) {
-        clearInterval(interval);
-        setProcessing(false);
-        setProgress(0);
-      }
-    }, 100);
-  };
+  // const simulateProgress = () => {
+  //   setProcessing(true);
+  //   let progressValue = 0;
+  //   const interval = setInterval(() => {
+  //     progressValue += 10;
+  //     setProgress(progressValue);
+  //     if (progressValue >= 100) {
+  //       clearInterval(interval);
+  //       setProcessing(false);
+  //       setProgress(0);
+  //     }
+  //   }, 100);
+  // };
 
   const processFile = async (file: File): Promise<ImageInfo> => {
     const watermarkedFile = await applyWatermark(file);
@@ -80,7 +90,8 @@ function FileCreateModal({
       title: file.name,
       description: "",
       price: "100",
-      file: watermarkedFile,
+      file: file,
+      watermarkedFile,
     };
   };
 
@@ -96,26 +107,34 @@ function FileCreateModal({
     await new Promise((resolve) => {
       img.onload = resolve;
     });
-    const scaleFactor = 3;
+
+    // ✅ REDUCIR TAMAÑO aún más
+    const scaleFactor = 4; // Más pequeño = más rápido
     const width = img.width / scaleFactor;
     const height = img.height / scaleFactor;
     canvas.width = width;
     canvas.height = height;
     ctx.drawImage(img, 0, 0, width, height);
 
-    const fontSize = 100;
+    // Texto más pequeño
+    const fontSize = Math.max(20, Math.min(width / 4, 50));
     ctx.font = `${fontSize}px Arial`;
-    ctx.fillStyle = `rgba(255, 255, 255, 0.8)`;
+    ctx.fillStyle = `rgba(255, 255, 255, 0.6)`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
     ctx.save();
     ctx.translate(canvas.width / 2, canvas.height / 2);
     ctx.rotate((-30 * Math.PI) / 180);
-    ctx.fillText(file.name, 0, 0);
+
+    // Texto limitado y con ajuste de línea
+    let text = file.name;
+    if (text.length > 30) text = text.slice(0, 27) + "...";
+    ctx.fillText(text, 0, 0);
     ctx.restore();
 
-    const watermarkedPreview = canvas.toDataURL("image/jpeg");
+    // ✅ COMPRESIÓN MÁS AGRESIVA
+    const watermarkedPreview = canvas.toDataURL("image/jpeg", 0.5); // calidad 50%
     const response = await fetch(watermarkedPreview);
     const blob = await response.blob();
     return new File([blob], file.name, { type: "image/jpeg" });
@@ -129,76 +148,66 @@ function FileCreateModal({
     });
   };
 
-  const handleSubmit = async () => {
+  const submit = async () => {
+    if (!images.length) return;
+
     setLoading(true);
-    if (!!images?.length) {
-      const formData = new FormData();
 
-      images.forEach((file, index) => {
-        formData.append(`file${index}`, file.file);
-      });
-      formData.append(
-        "folder",
-        `files/${school?.name}/${folder?.title}(${folder?.year})`
-      );
-      try {
-        const response = await fetch("/api/upload", {
-          method: "POST",
-          body: formData,
-        });
+    try {
+      // Mostrar progreso en tiempo real
+      toast.info(`Subiendo ${images.length} imágenes...`, { duration: 3000 });
 
-        if (response.ok) {
-          const result = await response.json();
-          const updatedImages = images.map((image, index) => ({
-            ...image,
-            imageUrl: result.imageUrls[index],
-          }));
-
-          const filesData = updatedImages.map((image) => ({
-            fileName: image.name,
-            title: image.title,
-            description: image.description,
-            price: image.price,
-            folderId: folder?._id || "",
-            imageUrl: image.imageUrl!,
-          }));
-
-          const createFilesResponse = await createManyFiles(
-            filesData,
-            folder?._id || ""
-          );
-
-          if (createFilesResponse.success) {
-            toast.success(createFilesResponse.message);
-            onClose();
-          } else {
-            console.error("File creation failed");
-            toast.error(createFilesResponse.message);
+      const result = await createManyFilesSpb(
+        images.map((img) => ({
+          fileName: img.name,
+          title: img.title,
+          description: img.description,
+          price: img.price,
+          folderId: folder?.id || "",
+          imageFile: img.file,
+          watermarkedFile: img.watermarkedFile,
+        })),
+        folder?.id || "",
+        (current, total) => {
+          // Actualizar progreso
+          setProgress((current / total) * 100);
+          if (current % 5 === 0) {
+            toast.info(`Subiendo imágenes: ${current}/${total}`, {
+              duration: 1000,
+            });
           }
-        } else {
-          console.error("File upload failed", await response.text());
-          toast.error("Error al subir los archivos");
+        },
+      );
+
+      if (result.success) {
+        toast.success(
+          `✅ ${result.files?.length || 0} archivos subidos correctamente`,
+        );
+        if (result.errors?.length) {
+          toast.warning(`⚠️ ${result.errors.length} archivos fallaron`);
+          console.error("Errores:", result.errors);
         }
-      } catch (error) {
-        console.error("Error uploading files", error);
-        toast.error("Error al subir los archivos");
-      } finally {
-        setLoading(false);
+        onClose();
+      } else {
+        toast.error(result.message || "Error al subir los archivos");
+        if (result.errors) {
+          console.error("Detalles de errores:", result.errors);
+        }
       }
+    } catch (error) {
+      console.error("Error en submit:", error);
+      toast.error("Error inesperado al subir archivos");
+    } finally {
+      setLoading(false);
+      setProgress(0);
     }
   };
 
-  useEffect(() => {
-    if (folder) {
-      const fetchSchool = async () => {
-        const { school: fetchedSchool } = await getSchool(
-          folder?.schoolId || ""
-        );
-        setSchool(fetchedSchool);
-      };
-      fetchSchool();
-    }
-  }, [folder]);
+  // useEffect(() => {
+  //   if (folder) {
+  //     fetchSchool(folder.school_id);
+  //   }
+  // }, [folder]);
 
   useEffect(() => {
     if (!open) {
@@ -218,8 +227,11 @@ function FileCreateModal({
     >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Subir archivos</DialogTitle>
-          <DialogDescription>carpeta: {folder?.title}</DialogDescription>
+          <DialogTitle>Subir archivos awsd</DialogTitle>
+          <DialogDescription className="flex flex-col">
+            <span>carpeta: {folder?.title}</span>
+            <span>cantidad: {images.length}</span>
+          </DialogDescription>
         </DialogHeader>
         <div className="w-full flex items-center justify-center flex-wrap gap-5 max-h-96 overflow-y-auto mt-10">
           {processing ? (
@@ -261,7 +273,7 @@ function FileCreateModal({
                     size="icon"
                     onClick={() =>
                       setImages((prev) =>
-                        prev.filter((image) => image.id !== img.id)
+                        prev.filter((image) => image.id !== img.id),
                       )
                     }
                   >
@@ -269,9 +281,15 @@ function FileCreateModal({
                   </Button>
                 </div>
                 <CardContent className="flex justify-center items-center">
-                  <div>
+                  <div
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      console.log(img);
+                    }}
+                  >
                     <Image
-                      src={URL.createObjectURL(img.file)}
+                      src={URL.createObjectURL(img.watermarkedFile || img.file)}
                       alt={img.name}
                       className="object-center rounded"
                       width={100}
@@ -283,13 +301,33 @@ function FileCreateModal({
             ))
           )}
           <canvas ref={canvasRef} style={{ display: "none" }} />
+          {processing && (
+            <div className="w-full flex flex-col items-center justify-center p-4">
+              <span className="text-gray-600 mb-2">
+                Procesando imágenes... {Math.round(progress)}%
+              </span>
+              <Progress value={progress} className="w-full" />
+              <span className="text-xs text-gray-400 mt-2">
+                Esto puede tomar unos minutos para muchas imágenes
+              </span>
+            </div>
+          )}
+
+          {loading && !processing && (
+            <div className="w-full flex flex-col items-center justify-center p-4">
+              <span className="text-gray-600 mb-2">
+                Subiendo a servidor... {Math.round(progress)}%
+              </span>
+              <Progress value={progress} className="w-full" />
+            </div>
+          )}
         </div>
         <div className="flex w-full justify-evenly mt-10 gap-5">
           <LoadingButton
             title="Guardar"
             loading={loading}
             disabled={!images.length || processing}
-            onClick={handleSubmit}
+            onClick={submit}
             classname="w-40"
           />
           <Button

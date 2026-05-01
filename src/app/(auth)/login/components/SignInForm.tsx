@@ -57,7 +57,7 @@ function SignInForm() {
   //   if (response) {
   //     toast.success(`Bienvenido ${values.email.toLowerCase()}`);
   //     setIsSubmitting(false);
-  //     router.push("/sadmin");
+  //     router.push("/admin");
   //   } else {
   //     toast.error("Credenciales incorrectas. Inténtalo de nuevo.");
   //     setIsSubmitting(false);

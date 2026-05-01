@@ -12,12 +12,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { IGrade } from "@/models/Grade";
-import { createFolder, updateFolder } from "@/server/folderAction";
 import React, { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import GradeSelect from "./GradeSelect";
-import { IFolder } from "@/models/Folder";
 import {
   Select,
   SelectContent,
@@ -26,6 +23,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Grade } from "@/supabase/models/grade";
+import { Folder } from "@/supabase/models/folder";
+import { useFolders } from "@/supabase/hooks/client/useFolders";
 
 type FormValues = {
   title: string;
@@ -38,7 +38,6 @@ type FormValues = {
 const initialValues = {
   title: "",
   description: "",
-  costPrice: "",
   password: "",
   year: new Date().getFullYear().toString(),
   level: "jardin",
@@ -71,9 +70,10 @@ function CreateFolderModal({
   open: boolean;
   parentFolder?: string;
   onClose: () => void;
-  grades: IGrade[];
-  folder?: IFolder | null;
+  grades: Grade[];
+  folder?: Folder | null;
 }) {
+  const { createFolder, updateFolder } = useFolders();
   const [loading, setLoading] = useState(false);
   const [withPassword, setWithPassword] = useState(false);
   const [isPrivate, setIsPrivate] = useState(false);
@@ -89,54 +89,52 @@ function CreateFolderModal({
         year: folder.year || new Date().getFullYear().toString(),
         level: folder.level || "jardin",
       });
-      setIsPrivate(folder.isPrivate!);
+      setIsPrivate(folder.is_private!);
       setGradeState(folder?.grades?.map((grade) => grade as string) || []);
     }
   }, [open, folder]);
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     if (isPrivate && !gradeState.length) {
       toast.error("Seleccione al menos un grado");
       return;
     }
-
     setLoading(true);
     try {
-      const formData = new FormData();
-      Object.entries(values).forEach(([key, value]) => {
-        formData.append(key, value.toString());
-      });
-      formData.append("type", type);
+      let payload = {};
+      payload = { ...payload, type: type };
+
       if (parentFolder) {
-        formData.append("parentFolder", parentFolder);
+        payload = { ...payload, parent_folder: parentFolder };
       }
       if (schoolId) {
-        formData.append("schoolId", schoolId);
+        payload = { ...payload, school_id: schoolId };
       }
       if (isPrivate) {
         const arrGrades = grades.filter((grade) =>
-          gradeState.includes(grade._id)
+          gradeState.includes(grade.id),
         );
-        formData.append("grades", JSON.stringify(arrGrades));
+        payload = { ...payload, grades: arrGrades };
       }
-      formData.append("isPrivate", isPrivate.toString());
+      payload = { ...payload, is_private: isPrivate };
+      payload = { ...payload, ...values };
+      // IMPORTANTE: Usar await correctamente
       const response = folder
-        ? await updateFolder(folder._id, formData)
-        : await createFolder(formData);
+        ? await updateFolder(folder.id, payload)
+        : await createFolder(payload);
+
       if (response.success) {
         toast.success(response.message);
         onClose();
-        setLoading(false);
       } else {
         toast.error(response.message);
-        console.error("Error al crear la carpeta:", response.message);
-        setLoading(false);
+        console.error("Error:", response.message);
       }
     } catch (error) {
       toast.error("Error del servidor, intente nuevamente");
-      console.log(error);
+      console.error(error);
+    } finally {
       setLoading(false);
     }
   };

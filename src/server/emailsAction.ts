@@ -3,7 +3,12 @@
 import { sendEmail, sendEmailFromUser } from "@/lib/brevo";
 import { ISalePopulated } from "@/models/Sale";
 import { sendEmail as sendEmailFromServer } from "@/lib/brevo";
-import { tahnksEmailTemplate } from "@/templates/thanksEmail";
+import {
+  newTahnksEmailTemplate,
+  tahnksEmailTemplate,
+} from "@/templates/thanksEmail";
+import { SaleFullDetails } from "@/supabase/models/sale";
+import { SaleItemsFullDetails } from "@/supabase/models/sale_items";
 
 export const handleSendEmail = async (formdata: FormData, template: string) => {
   const subject = formdata.get("subject") as string;
@@ -34,7 +39,7 @@ export const handleSendEmailFromUser = async (formdata: FormData) => {
 };
 
 export const sendEmailToUserAfterApproveTransfer = async (
-  sale: ISalePopulated
+  sale: ISalePopulated,
 ) => {
   await sendEmailFromServer({
     subject: "Compra Exitosa",
@@ -45,6 +50,23 @@ export const sendEmailToUserAfterApproveTransfer = async (
       },
     ],
     htmlContent: tahnksEmailTemplate(sale),
+  });
+  return { success: true, message: "Email enviado" };
+};
+
+export const newSendEmailToUserAfterApproveTransfer = async (
+  sale: SaleFullDetails,
+  products: SaleItemsFullDetails[],
+) => {
+  await sendEmailFromServer({
+    subject: "Compra Exitosa",
+    to: [
+      {
+        name: sale?.profile?.name || "",
+        email: sale?.profile?.email || "",
+      },
+    ],
+    htmlContent: newTahnksEmailTemplate(sale, products),
   });
   return { success: true, message: "Email enviado" };
 };

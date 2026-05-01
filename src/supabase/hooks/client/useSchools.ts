@@ -60,6 +60,85 @@ export const useSchools = () => {
     }
   };
 
+  const createSchool = async (formData: FormData) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data, error } = await supabase
+        .from("schools")
+        .insert({
+          name: formData.get("name") as string,
+          description: formData.get("description") as string,
+          password: formData.get("password") as string,
+          is_private: formData.get("isPrivate") === "true",
+          image_url: formData.get("imageUrl") as string,
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return { success: true, data };
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error al crear el colegio",
+      );
+      return { success: false, message: error || "Error desconocido" };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateSchool = async (id: string, formData: FormData) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data, error } = await supabase
+        .from("schools")
+        .update({
+          name: formData.get("name") as string,
+          description: formData.get("description") as string,
+          password: formData.get("password") as string,
+          is_private: formData.get("isPrivate") === "true",
+          image_url: formData.get("imageUrl") as string,
+        })
+        .eq("id", id)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return { success: true, data };
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error al actualizar el colegio",
+      );
+      return { success: false, message: error || "Error desconocido" };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSchool = async (id: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error } = await supabase
+        .from("schools")
+        .select("*")
+        .eq("id", id)
+        .single();
+      if (error) throw error;
+      setSchool(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al obtener colegio");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     schools,
     school,
@@ -67,5 +146,8 @@ export const useSchools = () => {
     error,
     fetchSchools,
     fetchSchoolById,
+    fetchSchool,
+    createSchool,
+    updateSchool,
   };
 };

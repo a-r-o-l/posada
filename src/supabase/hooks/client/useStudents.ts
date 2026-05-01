@@ -161,6 +161,83 @@ export const useStudents = () => {
     }
   };
 
+  const createStudent = async (formData: FormData) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data, error } = await supabase
+        .from("students")
+        .insert({
+          name: formData.get("name") as string,
+          lastname: formData.get("lastname") as string,
+          display_name: formData.get("display_name") as string,
+          school_id: formData.get("school_id") as string,
+          grade_id: formData.get("grade_id") as string,
+        })
+        .select("*")
+        .single();
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        message: "Estudiante creado exitosamente",
+        data,
+      };
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error al crear estudiante",
+      );
+      return {
+        success: false,
+        message:
+          err instanceof Error ? err.message : "Error al crear estudiante",
+        data: null,
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateStudent = async (id: string, formData: FormData) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const { data, error } = await supabase
+        .from("students")
+        .update({
+          name: formData.get("name") as string,
+          lastname: formData.get("lastname") as string,
+          display_name: formData.get("display_name") as string,
+        })
+        .eq("id", id)
+        .select("*")
+        .single();
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        message: "Estudiante actualizado exitosamente",
+        data,
+      };
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error al actualizar estudiante",
+      );
+      return {
+        success: false,
+        message:
+          err instanceof Error ? err.message : "Error al actualizar estudiante",
+        data: null,
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     students,
     student,
@@ -171,5 +248,7 @@ export const useStudents = () => {
     fetchStudentsByGradeId,
     fetchStudentsBySchoolId,
     fetchStudentsByGradeIdAndFullName,
+    createStudent,
+    updateStudent,
   };
 };

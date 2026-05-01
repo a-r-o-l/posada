@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { format } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
-import { ISalePopulated } from "@/models/Sale";
 import {
   Table,
   TableBody,
@@ -25,11 +24,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import DatePicker from "./DatePicker";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
-import { deleteSale, updateSaleStatus } from "@/server/saleAction";
+import { useSales } from "@/supabase/hooks/client/useSales";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import StateSelect from "./StateSelect";
-import PaymentBadge from "@/app/store/purchases/components/PaymentBadge";
 import DeliveredSelect from "./DeliveredSelect";
 import { priceParserToString } from "@/lib/utilsFunctions";
 import { Input } from "@/components/ui/input";
@@ -51,17 +49,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ISchool } from "@/models/School";
+import { SaleFullDetails } from "@/supabase/models/sale";
+import { School } from "@/supabase/models/school";
+import PaymentBadge from "@/app/store/account/purchases/components/PaymentBadge";
+// import { updateSale } from "@/supabase/hooks/server/sales";
 
 function OrdersClientSide({
   sales = [],
   schools = [],
 }: {
-  sales?: ISalePopulated[] | [];
-  schools?: ISchool[] | [];
+  sales?: SaleFullDetails[] | [];
+  schools?: School[] | [];
 }) {
+  const { updateSale, deleteSale } = useSales();
   const router = useRouter();
-  const [selectedSale, setSelectedSale] = useState<ISalePopulated | null>(null);
+  const [selectedSale, setSelectedSale] = useState<SaleFullDetails | null>(
+    null,
+  );
   const [openAlert, setOpenAlert] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -78,17 +82,17 @@ function OrdersClientSide({
   // Inicializar con todos los colegios seleccionados
   useEffect(() => {
     if (allSchools.length > 0 && selectedSchools.length === 0) {
-      setSelectedSchools(allSchools.map((school) => school._id));
+      setSelectedSchools(allSchools.map((school) => school.id));
     }
   }, [allSchools, selectedSchools.length]);
 
-  useEffect(() => {
-    if (selectedSale && selectedSale.isNewSale) {
-      const runReadSale = async () =>
-        await updateSaleStatus(selectedSale._id, "isNewSale", false);
-      runReadSale();
-    }
-  }, [selectedSale]);
+  // useEffect(() => {
+  //   if (selectedSale && selectedSale.is_new_sale) {
+  //     const runReadSale = async () =>
+  //       await updateSale(selectedSale.id, { is_new_sale: false });
+  //     runReadSale();
+  //   }
+  // }, [selectedSale]);
 
   const filteredSales = useMemo(() => {
     if (!sales || !sales.length) return [];
@@ -101,19 +105,20 @@ function OrdersClientSide({
     // Filtro por email
     if (searchParams) {
       filtered = filtered.filter((sale) => {
-        const email = sale?.accountId?.email?.toLowerCase();
+        const email = sale?.profile?.email?.toLowerCase();
         return email && email.includes(searchParams.toLowerCase());
       });
     }
     // Filtro por colegios seleccionados
-    if (selectedSchools.length > 0) {
-      filtered = filtered.filter((sale) => {
-        const schoolId = sale.products?.[0]?.productId?.schoolId;
-        return (
-          typeof schoolId === "string" && selectedSchools.includes(schoolId)
-        );
-      });
-    }
+    // if (selectedSchools.length > 0) {
+    //   console.log("selectedSchools.length > 0");
+    //   filtered = filtered.filter((sale) => {
+    //     const schoolId = sale.products?.[0]?.productId?.schoolId;
+    //     return (
+    //       typeof schoolId === "string" && selectedSchools.includes(schoolId)
+    //     );
+    //   });
+    // }
     return filtered;
   }, [searchParams, sales, selectedSchools, order]);
 
@@ -121,7 +126,7 @@ function OrdersClientSide({
     if (!filteredSales || !filteredSales.length)
       return { totalSales: 0, newSales: 0 };
     const totalSales = filteredSales?.length;
-    const newSales = filteredSales?.filter((sale) => !sale.isNewSale).length;
+    const newSales = filteredSales?.filter((sale) => !sale.is_new_sale).length;
     return { totalSales, newSales };
   }, [filteredSales]);
 
@@ -148,7 +153,7 @@ function OrdersClientSide({
   };
 
   const selectAllSchools = () => {
-    setSelectedSchools(allSchools.map((school) => school._id));
+    setSelectedSchools(allSchools.map((school) => school.id));
   };
 
   // Eliminar la función de deseleccionar todos
@@ -238,17 +243,17 @@ function OrdersClientSide({
                 <DropdownMenuSeparator />
                 {allSchools.map((school) => (
                   <div
-                    key={school._id}
+                    key={school.id}
                     className="flex items-center gap-2 px-2 py-1"
                   >
                     <Checkbox
-                      checked={selectedSchools.includes(school._id)}
-                      onCheckedChange={() => toggleSchoolSelection(school._id)}
+                      checked={selectedSchools.includes(school.id)}
+                      onCheckedChange={() => toggleSchoolSelection(school.id)}
                       className="cursor-pointer"
                     />
                     <span
                       className="flex-1 cursor-pointer"
-                      onClick={() => toggleSchoolSelection(school._id)}
+                      onClick={() => toggleSchoolSelection(school.id)}
                     >
                       {school.name}
                     </span>
@@ -275,39 +280,39 @@ function OrdersClientSide({
             {!!filteredSales.length ? (
               filteredSales.map((sale) => (
                 <TableRow
-                  key={sale._id}
+                  key={sale.id}
                   className={`${
-                    sale.isNewSale ? "opacity-30" : ""
+                    sale.is_new_sale ? "opacity-30" : ""
                   } cursor-pointer ${
-                    selectedSale?._id === sale._id ? "bg-gray-200" : ""
+                    selectedSale?.id === sale.id ? "bg-gray-200" : ""
                   }`}
                   onClick={() => setSelectedSale(sale)}
                 >
                   <TableCell>{sale.order}</TableCell>
                   <TableCell>
-                    {sale.paymentTypeId === "account_money"
+                    {sale.payment_type_id === "account_money"
                       ? "Efectivo"
-                      : sale.paymentTypeId === "transfer"
+                      : sale.payment_type_id === "transfer"
                         ? "Transferencia"
                         : "Tarjeta"}
                   </TableCell>
                   <TableCell>
-                    {format(sale.createdAt!, "dd / MM / yyyy", {
+                    {format(sale.created_at!, "dd / MM / yyyy", {
                       locale: es,
                     })}
                   </TableCell>
-                  <TableCell>{sale?.accountId?.email}</TableCell>
+                  <TableCell>{sale?.profile?.email}</TableCell>
                   <TableCell>${sale?.total?.toFixed(2)}</TableCell>
                   <TableCell>
                     <PaymentBadge
                       state={sale?.status || ""}
-                      paymentTypeId={sale?.paymentTypeId || ""}
-                      transferProofUrl={sale?.transferProofUrl || ""}
+                      paymentTypeId={sale?.payment_type_id || ""}
+                      transferProofUrl={sale?.transfer_proof_url || ""}
                     />
                   </TableCell>
                   <TableCell>
                     <Checkbox
-                      checked={sale.delivered}
+                      checked={sale.delivered ? true : false}
                       onClick={() => {
                         setSelectedSale(sale);
                         setOpenAlert(true);
@@ -335,7 +340,7 @@ function OrdersClientSide({
                             className="flex items-center gap-2"
                             onClick={() => {
                               setSelectedSale(sale);
-                              router.push(`/admin/orders/${sale._id}`);
+                              router.push(`/admin/orders/${sale.id}`);
                             }}
                           >
                             <ExternalLink />
@@ -406,18 +411,16 @@ function OrdersClientSide({
           if (!selectedSale) return;
           setUpdateLoading(true);
           const currentState = selectedSale?.delivered;
-          const res = await updateSaleStatus(
-            selectedSale._id,
-            "delivered",
-            !currentState,
-          );
+          const res = await updateSale(selectedSale.id, {
+            delivered: !currentState,
+          });
           if (res.success) {
-            toast.success(res.message);
+            toast.success("Venta actualizada");
             setOpenAlert(false);
             setSelectedSale(null);
             setUpdateLoading(false);
           } else {
-            toast.error(res.message);
+            toast.error("Error al actualizar la venta");
             setUpdateLoading(false);
           }
         }}
@@ -430,14 +433,14 @@ function OrdersClientSide({
         description="Estas seguro de eliminar esta orden? Esta accion no se puede deshacer."
         onAccept={async () => {
           if (!selectedSale) return;
-          const res = await deleteSale(selectedSale._id);
+          const res = await deleteSale(selectedSale.id);
           if (res.success) {
-            toast.success(res.message);
+            toast.success("Venta eliminada");
             setOpenDeleteDialog(false);
             setSelectedSale(null);
             router.refresh();
           } else {
-            toast.error(res.message);
+            toast.error("Error al eliminar la venta");
           }
         }}
       />
@@ -452,18 +455,14 @@ function OrdersClientSide({
         onAccept={async () => {
           if (!selectedSale) return;
           setUpdateLoading(true);
-          const res = await updateSaleStatus(
-            selectedSale._id,
-            "status",
-            "approved",
-          );
+          const res = await updateSale(selectedSale.id, { status: "approved" });
           if (res.success) {
-            toast.success(res.message);
+            toast.success("Venta actualizada");
             setOpenEditOrderModal(false);
             setSelectedSale(null);
             setUpdateLoading(false);
           } else {
-            toast.error(res.message);
+            toast.error("Error al actualizar la venta");
             setUpdateLoading(false);
           }
         }}

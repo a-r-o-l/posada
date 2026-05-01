@@ -33,7 +33,7 @@ export default function OnboardingPage() {
   const { user, logout } = useUser();
 
   console.log("user ", user);
-  const { createProfileStudent } = useProfileStudents();
+  const { createProfileStudents } = useProfileStudents();
   const [students, setStudents] = useState<Partial<Student>[]>([]);
   const [saving, setSaving] = useState(false);
 
@@ -71,13 +71,13 @@ export default function OnboardingPage() {
         profile_id: user?.id,
         student_id: student.id!,
       }));
-      const { error } = await createProfileStudent(studentsToInsert);
+      const { error } = await createProfileStudents(studentsToInsert);
       if (error) {
         toast.error(error || "Error al guardar los estudiantes");
         return;
       }
       toast.success("Menores registrados correctamente en la cuenta");
-      router.push("/sstore");
+      router.push("/store");
     } catch (error) {
       console.error("Error:", error);
       toast.error("Error al guardar los estudiantes");

@@ -47,6 +47,64 @@ export const useGrades = () => {
     }
   };
 
+  const createGrade = async (formData: FormData) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error } = await supabase
+        .from("grades")
+        .insert({
+          grade: formData.get("grade") as string,
+          division: formData.get("division") as string,
+          year: formData.get("year") as string,
+          display_name: formData.get("displayName") as string,
+          school_id: formData.get("schoolId") as string,
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      return { success: true, message: "Curso creado correctamente", data };
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al crear el curso";
+      setError(message);
+      return { success: false, message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateGrade = async (formData: FormData, id: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error } = await supabase
+        .from("grades")
+        .update({
+          grade: formData.get("grade") as string,
+          division: formData.get("division") as string,
+          year: formData.get("year") as string,
+          display_name: formData.get("displayName") as string,
+        })
+        .eq("id", id)
+        .select()
+        .single();
+      if (error) throw error;
+      return {
+        success: true,
+        message: "Curso actualizado correctamente",
+        data,
+      };
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al actualizar el curso";
+      setError(message);
+      return { success: false, message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     grades,
     grade,
@@ -54,5 +112,7 @@ export const useGrades = () => {
     error,
     fetchGrades,
     fetchGradesBySchoolId,
+    createGrade,
+    updateGrade,
   };
 };

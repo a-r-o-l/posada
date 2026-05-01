@@ -1,7 +1,7 @@
 import React from "react";
-import { getAllSchools, getSchool } from "@/server/schoolAction";
 import ProductsClientSide from "./components/ProductsClientSide";
-import { getAllProductsById } from "@/server/productAction";
+import { getSchools } from "@/supabase/hooks/server/schools";
+import { getProductsBySchoolId } from "@/supabase/hooks/server/products";
 
 export default async function page({
   searchParams,
@@ -9,15 +9,14 @@ export default async function page({
   searchParams: Promise<{ school: string }>;
 }) {
   const search = await searchParams;
-  const { schools } = await getAllSchools();
-  const { school } = await getSchool(search.school);
-  const { products } = await getAllProductsById(search.school);
+  const schools = await getSchools();
+  const { data: products } = await getProductsBySchoolId(search.school);
 
   return (
     <div className="p-4 w-full">
       <ProductsClientSide
         schools={schools}
-        selectedSchool={school}
+        selectedSchoolId={search.school}
         products={products}
       />
     </div>

@@ -1,43 +1,42 @@
 "use client";
-import { useCacheSchools } from "@/zustand/useCacheSchools";
-import React, { useEffect, useState } from "react";
-import { IFolder } from "@/models/Folder";
+import React, { useEffect, useMemo, useState } from "react";
 import { nameParser } from "@/lib/utilsFunctions";
-import PublicFile from "./PublicFile";
-import SelectFileModal from "./SelectFileModal";
-import { IFile } from "@/models/File";
-import { IProduct } from "@/models/Product";
-import { ISchool } from "@/models/School";
 import Image from "next/image";
 import DynamicFolder from "../../components/DynamicFolder";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { useFolders } from "@/supabase/hooks/client/useFolders";
+import PublicFile from "./PublicFile";
+import SelectFileModal from "./SelectFileModal";
+import { useProducts } from "@/supabase/hooks/client/useProducts";
+import { File } from "@/supabase/models/file";
 
-type folderWithFiles = IFolder & { files: IFile[] };
-
-function FolderStoreDetailClient({
-  folder,
-  products,
-  school,
-}: {
-  folder: folderWithFiles;
-  products: IProduct[];
-  school: ISchool;
-}) {
+function FolderStoreDetailClient({ folderId }: { folderId: string }) {
   const router = useRouter();
-  const accesses = useCacheSchools((state) => state.accesses);
-  // const addAccess = useCacheSchools((state) => state.addAccess);
-
+  const { fetchFolderById, folder } = useFolders();
+  const { fetchProductsBySchoolId, products } = useProducts();
   // const [needAccess, setNeedAccess] = useState(false);
-  const [fileModal, setFileModal] = useState<IFile | null>(null);
+  const [fileModal, setFileModal] = useState<File | null>(null);
+
+  const school = useMemo(() => {
+    if (!folder) return null;
+    return folder.school;
+  }, [folder]);
+
+  const files = useMemo(() => {
+    if (!folder) return [];
+    return folder.files || [];
+  }, [folder]);
 
   useEffect(() => {
-    if (!accesses.includes(folder._id) && folder.isPrivate) {
-      // setNeedAccess(true);
-    }
-  }, [accesses, folder]);
+    if (folderId) fetchFolderById(folderId);
+  }, [folderId]);
 
-  const onClickFile = (file: IFile) => {
+  useEffect(() => {
+    if (school) fetchProductsBySchoolId(school.id);
+  }, [school]);
+
+  const onClickFile = (file: File) => {
     setFileModal(file);
   };
 
@@ -57,55 +56,58 @@ function FolderStoreDetailClient({
   return (
     <div className="flex flex-col lg:flex-row h-full">
       <div className="flex flex-row items-center justify-evenly rounded-t-3xl bg-[#F0F1FF] lg:hidden">
-        <Link href={`/store/${school._id}`}>
+        <Link href={`/store/${school?.id}`}>
           <Image
-            src={school.imageUrl || "/placeholderimg.jpg"}
-            alt={school.name}
+            src={school?.image_url || "/placeholderimg.jpg"}
+            alt={school?.name || "Escuela"}
             width={100}
             height={100}
           />
         </Link>
         <DynamicFolder
-          color={getFolderColor(folder.level)}
-          title={nameParser(folder.level)}
+          color={getFolderColor(folder?.level || "")}
+          title={nameParser(folder?.level || "")}
           isOpened={true}
           height={80}
           width={80}
           onClick={() =>
-            router.push(`/store/${school._id}?level=${folder.level}`)
+            router.push(
+              `/store/${school?.id}?level=${folder?.level}&year=${folder?.year}`,
+            )
           }
         />
         <DynamicFolder
           color="blue"
-          title={nameParser(folder.title)}
+          title={nameParser(folder?.title || "")}
           isOpened={true}
           height={80}
           width={80}
-          onClick={() => {}}
         />
       </div>
       <div className="hidden bg-[#F0F1FF] items-center lg:flex lg:min-w-40 lg:h-full lg:flex-col lg:justify-start lg:rounded-l-3xl lg:rounded-r-none lg:gap-5 lg:w-40">
-        <Link href={`/store/${school._id}`}>
+        <Link href={`/store/${school?.id}`}>
           <Image
-            src={school.imageUrl || "/placeholderimg.jpg"}
-            alt={school.name}
+            src={school?.image_url || "/placeholderimg.jpg"}
+            alt={school?.name || "Escuela"}
             width={150}
             height={150}
           />
         </Link>
         <DynamicFolder
-          color={getFolderColor(folder.level)}
-          title={nameParser(folder.level)}
+          color={getFolderColor(folder?.level || "")}
+          title={nameParser(folder?.level || "")}
           isOpened={true}
           height={130}
           width={130}
           onClick={() =>
-            router.push(`/store/${school._id}?level=${folder.level}`)
+            router.push(
+              `/store/${school?.id}?level=${folder?.level}&year=${folder?.year}`,
+            )
           }
         />
         <DynamicFolder
           color="blue"
-          title={nameParser(folder.title)}
+          title={nameParser(folder?.title || "")}
           isOpened={true}
           height={130}
           width={130}
@@ -119,9 +121,9 @@ function FolderStoreDetailClient({
       lg:border-t-0
       lg:rounded-r-3xl items-start lg:border-l-8 border-[#139FDC] h-full overflow-y-auto justify-center lg:justify-normal"
       >
-        {!!folder.files.length ? (
-          folder?.files?.map((file) => (
-            <PublicFile file={file} key={file._id} onClick={onClickFile} />
+        {!!files.length ? (
+          files?.map((file) => (
+            <PublicFile file={file} key={file.id} onClick={onClickFile} />
           ))
         ) : (
           <div className="flex flex-1 justify-center items-center h-full">

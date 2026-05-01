@@ -98,6 +98,45 @@ export const useProfileStudents = () => {
     }
   };
 
+  const createProfileStudents = async (
+    profileStudents: Partial<ProfileStudent>[],
+  ) => {
+    try {
+      setMutationLoading(true);
+      setError(null);
+      const { data, error } = await supabase
+        .from("profile_students")
+        .insert(profileStudents);
+
+      if (error) {
+        return {
+          success: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : "Error al crear profile students",
+          data: null,
+        };
+      }
+      return {
+        data,
+        success: true,
+        error: null,
+      };
+    } catch (err) {
+      return {
+        success: false,
+        error:
+          err instanceof Error
+            ? err.message
+            : "Error al crear profile students",
+        data: null,
+      };
+    } finally {
+      setMutationLoading(false);
+    }
+  };
+
   const deleteProfileStudent = async (accountId: string, studentId: string) => {
     try {
       setMutationLoading(true);
@@ -144,5 +183,6 @@ export const useProfileStudents = () => {
     fetchProfileStudentById,
     createProfileStudent,
     deleteProfileStudent,
+    createProfileStudents,
   };
 };

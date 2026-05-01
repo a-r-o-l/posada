@@ -1,7 +1,8 @@
 "use server";
 
 import fetch from "node-fetch";
-import { createSale, getSale, updateSale } from "./saleAction";
+// import { createSale, getSale, updateSale } from "./saleAction";
+import { updateSale, createSale, getSale } from "@/supabase/hooks/server/sales";
 import { IMPPreference } from "@/types/mercadopago";
 import { ISaleProduct } from "@/models/Sale";
 
@@ -28,7 +29,7 @@ export const createPayment = async (data: FormData) => {
         items: parsedProds,
         external_reference: res.sale.order,
         metadata: {
-          sale: res.sale._id.toString(),
+          sale: res.sale.id.toString(),
         },
         back_urls: {
           success: MERCADOPAGO_SUCCESS,
@@ -47,7 +48,7 @@ export const createPayment = async (data: FormData) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(preference),
-        }
+        },
       );
 
       console.log("Response:", response);
@@ -57,7 +58,7 @@ export const createPayment = async (data: FormData) => {
       if (!response.ok) {
         const errorText = await response.text();
         console.error(
-          `Error al obtener la preferencia de Mercado Pago: ${response.status} - ${response.statusText}`
+          `Error al obtener la preferencia de Mercado Pago: ${response.status} - ${response.statusText}`,
         );
         console.error(`Respuesta de la API: ${errorText}`);
         throw new Error("Error al obtener la preferencia de Mercado Pago.");
@@ -65,7 +66,7 @@ export const createPayment = async (data: FormData) => {
         const preferenceResponse = (await response.json()) as IMPPreference;
         const updateFormData = new FormData();
         updateFormData.append("preferenceId", preferenceResponse?.id);
-        await updateSale(res.sale._id, updateFormData);
+        await updateSale(res.sale.id, updateFormData);
         return {
           success: true,
           message: res.message,
@@ -110,13 +111,13 @@ export const getPaymentLink = async (saleId: string) => {
         headers: {
           Authorization: `Bearer ${MERCADOPAGO_ACCESS_TOKEN}`,
         },
-      }
+      },
     );
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error(
-        `Error al obtener la preferencia de Mercado Pago: ${response.status} - ${response.statusText}`
+        `Error al obtener la preferencia de Mercado Pago: ${response.status} - ${response.statusText}`,
       );
       console.error(`Respuesta de la API: ${errorText}`);
       throw new Error("Error al obtener la preferencia de Mercado Pago.");

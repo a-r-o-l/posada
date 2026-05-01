@@ -1,3 +1,5 @@
+import { Profile } from "./profile";
+
 export interface SaleProduct {
   id: string;
   fileId: string;
@@ -52,4 +54,8 @@ export interface Sale {
   is_new_sale: boolean | null;
   created_at: string | null;
   updated_at: string | null;
+}
+
+export interface SaleFullDetails extends Sale {
+  profile?: Profile;
 }

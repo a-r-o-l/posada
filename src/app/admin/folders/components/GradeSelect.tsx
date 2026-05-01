@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { nameParser } from "@/lib/utilsFunctions";
-import { IGrade } from "@/models/Grade";
+import { Grade } from "@/supabase/models/grade";
 import { Check, ChevronDown } from "lucide-react";
 import React from "react";
 
@@ -24,13 +24,13 @@ function GradeSelect({
   setState,
   disabled,
 }: {
-  grades: IGrade[];
+  grades: Grade[];
   state: string[];
   setState: React.Dispatch<React.SetStateAction<string[]>>;
   disabled: boolean;
 }) {
   const getGradeName = (gradeId: string) => {
-    const grade = grades.find((grade) => grade._id === gradeId);
+    const grade = grades.find((grade) => grade.id === gradeId);
     return grade ? nameParser(`${grade.grade} ${grade?.division}`) : "";
   };
 
@@ -70,7 +70,7 @@ function GradeSelect({
                       setState([]);
                       return;
                     }
-                    setState(grades.map((grade) => grade._id));
+                    setState(grades.map((grade) => grade.id));
                   }}
                   className="hover:cursor-pointer"
                 >
@@ -78,14 +78,14 @@ function GradeSelect({
                 </CommandItem>
                 {grades.map((grade) => (
                   <CommandItem
-                    value={grade._id}
-                    key={grade._id}
+                    value={grade.id}
+                    key={grade.id}
                     onSelect={() => {
-                      if (state.includes(grade._id)) {
-                        setState(state.filter((v) => v !== grade._id));
+                      if (state.includes(grade.id)) {
+                        setState(state.filter((v) => v !== grade.id));
                         return;
                       }
-                      setState([...state, grade._id]);
+                      setState([...state, grade.id]);
                     }}
                     className="hover:cursor-pointer"
                   >
@@ -97,7 +97,7 @@ function GradeSelect({
                     <Check
                       className={cn(
                         "ml-auto",
-                        state.includes(grade._id) ? "opacity-100" : "opacity-0"
+                        state.includes(grade.id) ? "opacity-100" : "opacity-0",
                       )}
                     />
                   </CommandItem>

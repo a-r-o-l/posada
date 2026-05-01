@@ -3,10 +3,10 @@ import { persist, createJSONStorage } from "zustand/middleware";
 
 interface IProd {
   id: string;
-  fileId: string;
-  productId: string;
-  fileTitle: string;
-  fileImageUrl: string;
+  file_id: string;
+  product_id: string;
+  file_title: string;
+  file_image_url: string;
   quantity: number;
   name: string;
   price: number;
@@ -29,7 +29,7 @@ export const useCartStore = create<CartState>()(
       addProduct: (product: IProd) =>
         set((state) => {
           const existingProduct = state.products.find(
-            (p) => p.id === product.id
+            (p) => p.id === product.id,
           );
 
           if (existingProduct) {
@@ -41,7 +41,7 @@ export const useCartStore = create<CartState>()(
                       quantity: p.quantity + product.quantity,
                       total: (p.quantity + product.quantity) * p.price,
                     }
-                  : p
+                  : p,
               ),
             };
           }
@@ -53,7 +53,7 @@ export const useCartStore = create<CartState>()(
       removeProduct: (productId) =>
         set((state) => ({
           products: state.products.filter(
-            (product) => product.id !== productId
+            (product) => product.id !== productId,
           ),
         })),
       clearCart: () => set({ products: [] }),
@@ -66,7 +66,7 @@ export const useCartStore = create<CartState>()(
                   quantity: product.quantity + 1,
                   total: (product.quantity + 1) * product.price,
                 }
-              : product
+              : product,
           ),
         })),
       removeOne: (productId: string) =>
@@ -89,7 +89,7 @@ export const useCartStore = create<CartState>()(
                     quantity: product.quantity - 1,
                     total: (product.quantity - 1) * product.price,
                   }
-                : product
+                : product,
             ),
           };
         }),
@@ -97,6 +97,6 @@ export const useCartStore = create<CartState>()(
     {
       name: "cart-storage",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

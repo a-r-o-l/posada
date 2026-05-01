@@ -17,11 +17,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { IGrade } from "@/models/Grade";
-import { PartialSchool } from "@/models/School";
-import { createGrade, updateGrade } from "@/server/gradeAction";
+import { Grade } from "@/supabase/models/grade";
+import { School } from "@/supabase/models/school";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { useGrades } from "@/supabase/hooks/client/useGrades";
 
 const initialValues = {
   grade: "",
@@ -37,15 +37,16 @@ function GradeModal({
 }: {
   open: boolean;
   onClose: () => void;
-  school?: PartialSchool | null;
-  editGrade: IGrade | null;
+  school?: School | null;
+  editGrade: Grade | null;
 }) {
+  const { createGrade, updateGrade } = useGrades();
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
 
   const handleSubmit = async () => {
     setLoading(true);
-    if (!school?._id) {
+    if (!school?.id) {
       return;
     }
     try {
@@ -53,9 +54,9 @@ function GradeModal({
         const formData = new FormData();
         formData.append("grade", values.grade);
         formData.append("division", values.division);
-        formData.append("displayName", `${values.grade} ${values.division}`);
+        formData.append("display_name", `${values.grade} ${values.division}`);
         formData.append("year", values.year);
-        const res = await updateGrade(formData, editGrade._id);
+        const res = await updateGrade(formData, editGrade.id);
         if (res.success) {
           toast.success(res.message);
           setLoading(false);
@@ -69,8 +70,8 @@ function GradeModal({
         formData.append("grade", values.grade);
         formData.append("division", values.division);
         formData.append("year", values.year);
-        formData.append("displayName", `${values.grade} ${values.division}`);
-        formData.append("schoolId", school._id);
+        formData.append("display_name", `${values.grade} ${values.division}`);
+        formData.append("school_id", school.id);
         const res = await createGrade(formData);
         if (res.success) {
           toast.success(res.message);
@@ -95,7 +96,8 @@ function GradeModal({
       setValues({
         grade: editGrade.grade,
         division: editGrade.division,
-        year: editGrade.year.toString(),
+        year:
+          editGrade?.year?.toString() || new Date().getFullYear().toString(),
       });
     }
   }, [open, editGrade]);

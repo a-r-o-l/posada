@@ -1,3 +1,7 @@
+import { File } from "./file";
+import { Product } from "./product";
+import { School } from "./school";
+
 export interface Folder {
   id: string;
   mongo_id: string;
@@ -14,4 +18,10 @@ export interface Folder {
   level: string | null;
   created_at: string | null;
   updated_at: string | null;
+}
+
+export interface FolderFullDetails extends Folder {
+  school?: School;
+  files?: File[];
+  products?: Product[];
 }

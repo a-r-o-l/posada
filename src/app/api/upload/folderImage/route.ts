@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
     if (!file) {
       return NextResponse.json(
         { message: "La imagen es requerida" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     const buffer = Buffer.from(await file.arrayBuffer());

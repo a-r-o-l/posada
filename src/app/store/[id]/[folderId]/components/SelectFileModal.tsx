@@ -15,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IFile } from "@/models/File";
 import Image from "next/image";
 import React, { useEffect, useState } from "react";
 import SelectFileTableRow from "./SelectFileTableRow";
@@ -23,10 +22,12 @@ import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/zustand/useCartStore";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
-import { IProduct } from "@/models/Product";
+import { Product } from "@/supabase/models/product";
+import { File } from "@/supabase/models/file";
 
-interface IProductWithQuantity extends IProduct {
+interface IProductWithQuantity extends Product {
   quantity: number;
+  isDownloadable?: boolean;
 }
 
 function SelectFileModal({
@@ -35,18 +36,18 @@ function SelectFileModal({
   onClose,
   products,
 }: {
-  file: IFile | null;
+  file: File | null;
   open: boolean;
   onClose: () => void;
-  products: IProduct[];
+  products: Product[];
 }) {
   const addProduct = useCartStore((state) => state.addProduct);
   const [data, setData] = useState([] as IProductWithQuantity[]);
 
   useEffect(() => {
     if (!!products.length) {
-      const prodsWithQuantity = products.map((prod) => {
-        return { ...prod, quantity: 0 };
+      const prodsWithQuantity: IProductWithQuantity[] = products.map((prod) => {
+        return { ...prod, quantity: 0, isDownloadable: prod.is_downloadable };
       });
       setData(prodsWithQuantity);
     }
@@ -55,7 +56,7 @@ function SelectFileModal({
   const handlePlus = (id: string) => {
     setData((prev) =>
       prev.map((item) =>
-        item._id === id ? { ...item, quantity: item.quantity + 1 } : item,
+        item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
       ),
     );
   };
@@ -63,7 +64,7 @@ function SelectFileModal({
   const handleMinus = (id: string) => {
     setData((prev) =>
       prev.map((item) =>
-        item._id === id && item.quantity > 0
+        item.id === id && item.quantity > 0
           ? { ...item, quantity: item.quantity - 1 }
           : item,
       ),
@@ -78,16 +79,17 @@ function SelectFileModal({
       .filter((i) => i.quantity > 0)
       .map((it) => {
         return {
-          id: `${it._id}${file._id}`,
-          fileId: file?._id,
-          productId: it._id,
-          fileTitle: file?.title,
-          fileImageUrl: file.imageUrl || "",
-          fileOriginalImageUrl: file.originalImageUrl || "",
+          id: `${it.id}${file.id}`,
+          file_id: file?.id,
+          product_id: it.id,
+          file_title: file?.title,
+          file_image_url: file.image_url || "",
+          file_original_image_url: file.original_image_url || "",
           quantity: it.quantity,
           name: it.name,
           price: it.price,
           total: it.price * it.quantity,
+          isDownloadable: it.isDownloadable || false,
         };
       });
     selectedItems.forEach((item) => addProduct(item));
@@ -111,10 +113,10 @@ function SelectFileModal({
         <div className="h-full hidden flex-row w-full gap-5 justify-center overflow-y-auto lg:flex">
           <div className="h-[500px] flex items-center justify-center">
             <div className="w-80 h-80 flex justify-center">
-              {file?.imageUrl && (
+              {file?.image_url && (
                 <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
                   <Image
-                    src={file?.imageUrl}
+                    src={file?.image_url}
                     alt={file?.title}
                     layout="fill"
                     objectFit="contain"
@@ -141,9 +143,9 @@ function SelectFileModal({
                   {data.map((item) => (
                     <SelectFileTableRow
                       item={item}
-                      key={item._id}
-                      onPlus={() => handlePlus(item._id)}
-                      onMinus={() => handleMinus(item._id)}
+                      key={item.id}
+                      onPlus={() => handlePlus(item.id)}
+                      onMinus={() => handleMinus(item.id)}
                     />
                   ))}
                 </TableBody>
@@ -183,10 +185,10 @@ function SelectFileModal({
         </div>
         <div className="flex flex-col lg:hidden w-full justify-center items-center">
           <div className="w-40 h-40 flex justify-center">
-            {file?.imageUrl && (
+            {file?.image_url && (
               <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
                 <Image
-                  src={file?.imageUrl}
+                  src={file?.image_url}
                   alt={file?.title}
                   layout="fill"
                   objectFit="contain"
@@ -212,9 +214,9 @@ function SelectFileModal({
                   {data.map((item) => (
                     <SelectFileTableRow
                       item={item}
-                      key={item._id}
-                      onPlus={() => handlePlus(item._id)}
-                      onMinus={() => handleMinus(item._id)}
+                      key={item.id}
+                      onPlus={() => handlePlus(item.id)}
+                      onMinus={() => handleMinus(item.id)}
                     />
                   ))}
                 </TableBody>

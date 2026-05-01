@@ -7,15 +7,11 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import React, { useState } from "react";
-import { PartialSchool } from "@/models/School";
+import React, { Suspense, useState } from "react";
 import SchoolsSelect from "./SchoolsSelect";
 import CreateFolderModal from "./CreateFolderModal";
-import { IFolder } from "@/models/Folder";
 import { nameParser } from "@/lib/utilsFunctions";
-import { IGrade } from "@/models/Grade";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
-import { deleteFolder } from "@/server/folderAction";
 import { toast } from "sonner";
 import { Label } from "@/components/ui/label";
 import LevelSelect from "./LevelSelect";
@@ -31,6 +27,10 @@ import {
 import FolderDropDownMenu from "./FolderDropDownMenu";
 import { useRouter } from "next/navigation";
 import { Lock, LockOpen } from "lucide-react";
+import { School } from "@/supabase/models/school";
+import { Folder } from "@/supabase/models/folder";
+import { Grade } from "@/supabase/models/grade";
+import { useFolders } from "@/supabase/hooks/client/useFolders";
 
 function FoldersClientSide({
   schools,
@@ -38,23 +38,24 @@ function FoldersClientSide({
   folders,
   grades,
 }: {
-  schools: PartialSchool[];
+  schools: School[];
   selectedSchool?: string;
-  folders: IFolder[] | [];
-  grades: IGrade[];
+  folders: Folder[] | [];
+  grades: Grade[];
 }) {
+  const { deleteFolder } = useFolders();
   const router = useRouter();
   const [openFolderModal, setOpenFolderModal] = useState(false);
   const [openAlert, setOpenAlert] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedFolder, setSelectedFolder] = useState<IFolder | null>(null);
+  const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
 
-  const onDeleteFolder = (folder: IFolder) => {
+  const onDeleteFolder = (folder: Folder) => {
     setSelectedFolder(folder);
     setOpenAlert(true);
   };
 
-  const onEditFolder = (folder: IFolder) => {
+  const onEditFolder = (folder: Folder) => {
     setSelectedFolder(folder);
     setOpenFolderModal(true);
   };
@@ -77,15 +78,39 @@ function FoldersClientSide({
         <div className="flex items-center gap-5 justify-evenly">
           <div className="w-60 space-y-3">
             <Label>Colegio</Label>
-            <SchoolsSelect url="/admin/folders" schools={schools} />
+            <Suspense
+              fallback={
+                <div className="flex justify-center items-center h-screen">
+                  <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-[#139FDC]"></div>
+                </div>
+              }
+            >
+              <SchoolsSelect url="/admin/folders" schools={schools} />
+            </Suspense>
           </div>
           <div className="w-60 space-y-3">
             <Label>Nivel</Label>
-            <LevelSelect url="/admin/folders" />
+            <Suspense
+              fallback={
+                <div className="flex justify-center items-center h-screen">
+                  <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-[#139FDC]"></div>
+                </div>
+              }
+            >
+              <LevelSelect url="/admin/folders" />
+            </Suspense>
           </div>
           <div className="w-60 space-y-3">
             <Label>Año</Label>
-            <YearSelect url="/admin/folders" />
+            <Suspense
+              fallback={
+                <div className="flex justify-center items-center h-screen">
+                  <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-[#139FDC]"></div>
+                </div>
+              }
+            >
+              <YearSelect url="/admin/folders" />
+            </Suspense>
           </div>
         </div>
         <div className="flex flex-row flex-wrap gap-5 w-full py-10 mt-10">
@@ -103,12 +128,12 @@ function FoldersClientSide({
               {!!folders?.length ? (
                 folders?.map((folder) => (
                   <TableRow
-                    key={folder._id}
+                    key={folder.id}
                     className="hover:cursor-pointer"
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
-                      router.push(`/admin/folders/${folder._id}`);
+                      router.push(`/admin/folders/${folder.id}`);
                     }}
                   >
                     <TableCell className="text-gray-900  text-base">
@@ -121,7 +146,7 @@ function FoldersClientSide({
                       {folder.year || new Date().getFullYear().toString()}
                     </TableCell>
                     <TableCell>
-                      {folder.isPrivate ? (
+                      {folder.is_private ? (
                         <Lock className="text-red-500" />
                       ) : (
                         <LockOpen className="text-green-500" />
@@ -134,7 +159,7 @@ function FoldersClientSide({
                         onEditClick={() => onEditFolder(folder)}
                         onDeleteClick={() => onDeleteFolder(folder)}
                         onViewClick={() =>
-                          router.push(`/admin/folders/${folder._id}`)
+                          router.push(`/admin/folders/${folder.id}`)
                         }
                       />
                     </TableCell>
@@ -157,7 +182,7 @@ function FoldersClientSide({
           {!!folders?.length ? (
             folders?.map((folder) => (
               <FolderComponent
-                key={folder._id}
+                key={folder.id}
                 folder={folder}
                 onDeleteFolder={onDeleteFolder}
                 onEditFolder={onEditFolder}
@@ -199,7 +224,7 @@ function FoldersClientSide({
         onAccept={async () => {
           if (!selectedFolder) return;
           setLoading(true);
-          const response = await deleteFolder(selectedFolder?._id);
+          const response = await deleteFolder(selectedFolder?.id);
           if (response.success) {
             toast.success(response.message);
             setSelectedFolder(null);

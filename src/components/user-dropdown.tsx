@@ -81,7 +81,7 @@ export function UserDropdown() {
           Iniciar Sesión
         </Button>
         <Button
-          className="bg-green-400 text-black px-4 py-2 rounded-lg hover:bg-green-500 transition-colors duration-300 font-medium"
+          className="bg-[#139FDC] text-white px-4 py-2 rounded-lg hover:bg-[#139FDC] transition-colors duration-300 font-medium"
           onClick={() => {
             setOpenRegisterModal(true);
           }}
@@ -121,7 +121,7 @@ export function UserDropdown() {
     <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <button className="focus:outline-none focus:ring-2 focus:ring-[#139FDC] rounded-full">
-          <Avatar className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-[#139FDC] transition-all duration-200 border-2 border-[#139FDC]">
+          <Avatar className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-[#139FDC] transition-all duration-200">
             <AvatarImage
               src={currentUser.image_url}
               // className="object-cover w-full h-full"
@@ -157,7 +157,7 @@ export function UserDropdown() {
           asChild
           className="flex items-center space-x-2 text-neutral-300 data-[highlighted]:text-neutral-400 data-[highlighted]:bg-neutral-900 cursor-pointer transition-colors duration-200"
         >
-          <Link href={"/sstore/account"}>
+          <Link href={"/store/account"}>
             <User className="h-4 w-4 text-neutral-300" />
             <span>Mi Perfil</span>
           </Link>
@@ -166,7 +166,7 @@ export function UserDropdown() {
           asChild
           className="flex items-center space-x-2 text-neutral-300 data-[highlighted]:text-neutral-400 data-[highlighted]:bg-neutral-900 cursor-pointer transition-colors duration-200"
         >
-          <Link href={"/sstore"}>
+          <Link href={"/store"}>
             <Store className="h-4 w-4 text-neutral-300" />
             <span>Tienda</span>
           </Link>
@@ -212,7 +212,7 @@ export function UserDropdown() {
                 handleLogout();
                 router.push("/");
               }}
-              className="bg-green-500 text-white hover:bg-green-600"
+              className="bg-red-900 hover:bg-red-700 text-red-400 data-[highlighted]:text-red-300 data-[highlighted]:bg-red-900 cursor-pointer transition-colors duration-200"
             >
               Cerrar sesión
             </Button>

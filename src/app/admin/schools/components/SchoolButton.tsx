@@ -9,7 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { initialsParser } from "@/lib/utilsFunctions";
-import { PartialSchool } from "@/models/School";
+import { School } from "@/supabase/models/school";
 import { ExternalLink, Pencil, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React from "react";
@@ -18,7 +18,7 @@ function SchoolButton({
   school,
   onEdit,
 }: {
-  school: PartialSchool;
+  school: School;
   onEdit: () => void;
 }) {
   const router = useRouter();
@@ -27,7 +27,7 @@ function SchoolButton({
       <DropdownMenuTrigger asChild>
         <Avatar className="h-28 w-28 border-4">
           <AvatarImage
-            src={school.imageUrl}
+            src={school.image_url}
             alt={school.name}
             className="object-contain !aspect-square p-1"
           />
@@ -39,7 +39,7 @@ function SchoolButton({
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <DropdownMenuItem
-            onClick={() => router.push(`/admin/schools/${school._id}`)}
+            onClick={() => router.push(`/admin/schools/${school.id}`)}
           >
             <ExternalLink />
             Ver detalles

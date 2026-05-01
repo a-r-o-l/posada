@@ -8,19 +8,20 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import React, { useState } from "react";
-import { ISchoolPopulated } from "@/models/School";
 import CreateFolderModal from "../../components/CreateFolderModal";
 import { useRouter } from "next/navigation";
-import { IFolder } from "@/models/Folder";
-import { ArrowLeft, Folder } from "lucide-react";
-import { IFile } from "@/models/File";
+import { ArrowLeft, Folder as FolderIcon } from "lucide-react";
 import FileCreateModal from "./FileCreateModal";
 import FileComponent from "./FileComponent";
 import ShowImgModal from "./ShowImgModal";
 import FolderComponent from "../../components/FolderComponent";
-import { IGrade } from "@/models/Grade";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
-import { deleteFolder } from "@/server/folderAction";
+// import { deleteFolder } from "@/server/folderAction";
+import { SchoolFullDetails } from "@/supabase/models/school";
+import { Folder, FolderFullDetails } from "@/supabase/models/folder";
+import { File, FileFullDetails } from "@/supabase/models/file";
+import { Grade } from "@/supabase/models/grade";
+import { useFolders } from "@/supabase/hooks/client/useFolders";
 import { toast } from "sonner";
 
 function FolderDetailClientSide({
@@ -30,30 +31,28 @@ function FolderDetailClientSide({
   selectedFolder,
   grades,
 }: {
-  selectedSchool?: ISchoolPopulated;
-  folders?: IFolder[];
-  files?: IFile[];
-  selectedFolder?: IFolder;
-  grades: IGrade[];
+  selectedSchool?: SchoolFullDetails;
+  folders?: Folder[];
+  files?: File[];
+  selectedFolder?: Folder;
+  grades: Grade[];
 }) {
   const router = useRouter();
+  const { deleteFolder } = useFolders();
   const [openFolderModal, setOpenFolderModal] = useState(false);
   const [openUploadModal, setOpenUploadModal] = useState(false);
-  const [openShowModal, setOpenShowModal] = useState<IFile | null>(null);
+  const [openShowModal, setOpenShowModal] = useState<File | null>(null);
   const [openAlert, setOpenAlert] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [selectedSubfolder, setSelectedSubfolder] = useState<IFolder | null>(
-    null
-  );
+  const [selectedSubfolder, setSelectedSubfolder] =
+    useState<FolderFullDetails | null>(null);
 
-  console.log(selectedFolder);
-
-  const onDeleteFolder = (folder: IFolder) => {
+  const onDeleteFolder = (folder: FolderFullDetails) => {
     setSelectedSubfolder(folder);
     setOpenAlert(true);
   };
 
-  const onEditFolder = (folder: IFolder) => {
+  const onEditFolder = (folder: FolderFullDetails) => {
     setSelectedSubfolder(folder);
     setOpenFolderModal(true);
   };
@@ -70,14 +69,14 @@ function FolderDetailClientSide({
                 variant="outline"
                 onClick={() => {
                   router.push(
-                    `/admin/folders?school=${selectedFolder?.schoolId}`
+                    `/admin/folders?school=${selectedFolder?.school_id}`,
                   );
                 }}
               >
                 <ArrowLeft size={24} />
               </Button>
             </div>
-            <Folder size={48} />
+            <FolderIcon size={48} />
             <div>
               <CardTitle>{selectedFolder?.title}</CardTitle>
               <CardDescription>{selectedSchool?.description}</CardDescription>
@@ -107,7 +106,7 @@ function FolderDetailClientSide({
                 <div className="flex flex-wrap gap-5 py-5">
                   {folders?.map((folder) => (
                     <FolderComponent
-                      key={folder._id}
+                      key={folder.id}
                       folder={folder}
                       onDeleteFolder={onDeleteFolder}
                       onEditFolder={onEditFolder}
@@ -116,9 +115,11 @@ function FolderDetailClientSide({
                   {selectedFolder && !!files?.length ? (
                     files.map((file) => (
                       <FileComponent
-                        key={file._id}
+                        key={file.id}
                         file={file}
-                        onShowImage={(file: IFile) => setOpenShowModal(file)}
+                        onShowImage={(file: FileFullDetails) =>
+                          setOpenShowModal(file)
+                        }
                       />
                     ))
                   ) : (
@@ -148,8 +149,8 @@ function FolderDetailClientSide({
           setOpenFolderModal(false);
           setSelectedSubfolder(null);
         }}
-        schoolId={selectedFolder?.schoolId}
-        parentFolder={selectedFolder?._id || ""}
+        schoolId={selectedFolder?.school_id}
+        parentFolder={selectedFolder?.id || ""}
         type="child"
         grades={grades}
         folder={selectedSubfolder}
@@ -183,7 +184,7 @@ function FolderDetailClientSide({
         onAccept={async () => {
           if (!selectedSubfolder) return;
           setLoading(true);
-          const response = await deleteFolder(selectedSubfolder._id);
+          const response = await deleteFolder(selectedSubfolder.id);
           if (response.success) {
             toast.success(response.message);
             setSelectedSubfolder(null);

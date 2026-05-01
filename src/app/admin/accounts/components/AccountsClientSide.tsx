@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import React, { useMemo, useState } from "react";
-import { IAccountPopulated, IChildrenPopulated } from "@/models/Account";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -24,27 +23,26 @@ import PasswordInput from "@/components/PasswordInput";
 import CreateAccountModal from "./CreateAccountModal";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import {
-  changeDisabled,
-  removeChildFromAccount,
-  updateAccount,
-} from "@/server/accountAction";
+import { changeDisabled, updateAccount } from "@/server/accountAction";
 import { toast } from "sonner";
 import { CircleX, Search, Trash2 } from "lucide-react";
 import CreateChildren from "./CreateChildren";
 import { Checkbox } from "@/components/ui/checkbox";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import { IStudentPopulated } from "@/models/Student";
+import { Profile, ProfileFullDetails } from "@/supabase/models/profile";
+import { useProfileStudents } from "@/supabase/hooks/client/useProfileStudents";
 
 function AccountsClientSide({
   accounts,
   students,
 }: {
-  accounts: IAccountPopulated[];
+  accounts: ProfileFullDetails[];
   students: IStudentPopulated[];
 }) {
   const [selectedAccount, setSelectedAccount] =
-    useState<IAccountPopulated | null>(null);
+    useState<ProfileFullDetails | null>(null);
+  const { deleteProfileStudent } = useProfileStudents();
   const [openAccountModal, setOpenAccountModal] = useState(false);
   const [openChildrenModal, setOpenChildrenModal] = useState(false);
   const [openVerifiedDialog, setOpenVerifiedDialog] = useState(false);
@@ -53,11 +51,13 @@ function AccountsClientSide({
   const filteredAccounts = useMemo(() => {
     if (!accounts || !accounts.length) return [];
     if (!searchValue) return accounts;
-    return accounts.filter((account: IAccountPopulated) => {
+    return accounts.filter((account: Profile) => {
       const fullName = `${account.name} ${account.lastname}`.toLowerCase();
       return fullName.includes(searchValue.toLowerCase());
     });
   }, [accounts, searchValue]);
+
+  console.log(selectedAccount);
 
   const RenderBadge = ({ role }: { role: string }) => {
     if (!role) {
@@ -93,7 +93,7 @@ function AccountsClientSide({
   };
 
   return (
-    <Card className="w-full" key={accounts.map((a) => a._id).join(",")}>
+    <Card className="w-full" key={accounts.map((a) => a.id).join(",")}>
       <CardHeader className="flex flex-row justify-between">
         <div>
           <CardTitle>Cuentas</CardTitle>
@@ -143,9 +143,9 @@ function AccountsClientSide({
                 {filteredAccounts?.map((account) => (
                   <div
                     role="button"
-                    key={account._id}
+                    key={account.id}
                     className={`flex items-center justify-between w-full p-4 mb-2 rounded-md border ${
-                      selectedAccount?._id === account._id
+                      selectedAccount?.id === account.id
                         ? "bg-secondary"
                         : "bg-background hover:bg-accent"
                     }`}
@@ -177,8 +177,8 @@ function AccountsClientSide({
                         checked={!account?.disabled}
                         onCheckedChange={async () => {
                           const response = await changeDisabled(
-                            account._id,
-                            !account?.disabled
+                            account.id,
+                            !account?.disabled,
                           );
                           if (response?.success) {
                             toast.success(response?.message);
@@ -267,43 +267,43 @@ function AccountsClientSide({
                           </TableRow>
                         </TableHeader>
                         <TableBody>
-                          {selectedAccount.children.map(
-                            (child: IChildrenPopulated) => (
-                              <TableRow
-                                key={`${child?.name}${child?.lastname}${child?.gradeId}`}
-                              >
-                                <TableCell>{child?.name}</TableCell>
-                                <TableCell>{child?.lastname}</TableCell>
-                                <TableCell>{child?.schoolId?.name}</TableCell>
-                                <TableCell>
-                                  {child?.gradeId?.grade}{" "}
-                                  {child?.gradeId?.division}
-                                </TableCell>
-                                <TableCell>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    onClick={async () => {
-                                      const res = await removeChildFromAccount(
-                                        selectedAccount._id,
-                                        child
+                          {selectedAccount?.children?.map((child) => (
+                            <TableRow key={child?.student?.id}>
+                              <TableCell>{child?.student?.name}</TableCell>
+                              <TableCell>{child?.student?.lastname}</TableCell>
+                              <TableCell>
+                                {child?.student?.school?.name}
+                              </TableCell>
+                              <TableCell>
+                                {child?.student?.grade?.display_name}{" "}
+                                {child?.student?.grade?.division}
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={async () => {
+                                    const res = await deleteProfileStudent(
+                                      child.profile_id,
+                                      child.student_id,
+                                    );
+                                    if (res.success) {
+                                      toast.success(
+                                        "Menor eliminado correctamente",
                                       );
-                                      if (res.success) {
-                                        toast.success(res.message);
-                                      } else {
-                                        toast.error(
-                                          res.message ||
-                                            "Error al eliminar el menor de la cuenta"
-                                        );
-                                      }
-                                    }}
-                                  >
-                                    <Trash2 />
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            )
-                          )}
+                                    } else {
+                                      toast.error(
+                                        res.error ||
+                                          "Error al eliminar el menor de la cuenta",
+                                      );
+                                    }
+                                  }}
+                                >
+                                  <Trash2 />
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
                         </TableBody>
                       </Table>
                     </div>
@@ -323,7 +323,7 @@ function AccountsClientSide({
       <CreateChildren
         open={openChildrenModal}
         onClose={() => setOpenChildrenModal(false)}
-        accountId={selectedAccount?._id || ""}
+        accountId={selectedAccount?.id || ""}
         students={students}
       />
       <CreateAccountModal
@@ -342,7 +342,7 @@ function AccountsClientSide({
           }
           const formData = new FormData();
           formData.append("verified", String(!selectedAccount.verified));
-          const res = await updateAccount(selectedAccount._id, formData);
+          const res = await updateAccount(selectedAccount.id, formData);
           if (res.success) {
             toast.success(res.message);
             setOpenVerifiedDialog(false);

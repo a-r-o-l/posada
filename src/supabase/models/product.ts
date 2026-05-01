@@ -1,3 +1,5 @@
+import { School } from "./school";
+
 export interface Product {
   id: string;
   mongo_id: string;
@@ -8,4 +10,8 @@ export interface Product {
   is_downloadable: boolean;
   created_at: string | null;
   updated_at: string | null;
+}
+
+export interface ProductFullDetails extends Product {
+  school?: School;
 }
