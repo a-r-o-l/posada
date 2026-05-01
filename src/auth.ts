@@ -83,3 +83,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   trustHost: true,
 });
+
+// https://www.mercadopago.com.ar/checkout/v1/payment/redirect/9e5a5b2d-a910-4f6b-9106-44dcb31b5f8e/review/?preference-id=77404456-e70d7f1e-0739-4653-a5ec-5c6e0a8e5f36&router-request-id=7075079c-75c2-413d-93c7-3c7a20940a75&p=225cd0e3f69622d699cd36381e3256a7
+
+// https://fotosposada.com.ar/store/cart/checkout?collection_id=156519181999&collection_status=approved&payment_id=156519181999&status=approved&external_reference=796513783769&payment_type=account_money&merchant_order_id=40475935642&preference_id=77404456-e70d7f1e-0739-4653-a5ec-5c6e0a8e5f36&site_id=MLA&processing_mode=aggregator&merchant_account_id=null
