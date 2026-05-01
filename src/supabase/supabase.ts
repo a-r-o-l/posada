@@ -6,7 +6,13 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 const supabaseServiceRoleKey =
   process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!;
 
-export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    storageKey: "supabase-persist", // nombre fijo
+    storage: window.localStorage, // ← forzar localStorage
+  },
+});
 
 export const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey, {
   auth: {

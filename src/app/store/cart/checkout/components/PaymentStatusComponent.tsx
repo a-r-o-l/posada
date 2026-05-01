@@ -5,11 +5,55 @@ import React, { useEffect, useMemo, useState } from "react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
 import { useRouter } from "next/navigation";
+import { supabase } from "@/supabase/supabase";
+import { useAuthStore } from "@/zustand/auth-store";
 
 function PaymentStatusComponent({ status }: { status: boolean }) {
   const router = useRouter();
   const [dimensions, setDimensions] = useState({ height: 0, width: 0 });
   const { height, width } = useWindowSize();
+  const { setCurrentUser } = useAuthStore();
+
+  // 👇 RESTAURAR SESIÓN DESPUÉS DE MERCADO PAGO
+  useEffect(() => {
+    const restoreSessionAfterMP = async () => {
+      console.log("🔄 Intentando restaurar sesión después de MP...");
+
+      // 1. Intentar obtener la sesión actual
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      // 2. Si no hay sesión, intentar refrescar
+      if (!session) {
+        console.log("⚠️ No hay sesión, intentando refresh...");
+        const {
+          data: { session: refreshedSession },
+        } = await supabase.auth.refreshSession();
+
+        if (refreshedSession) {
+          console.log("✅ Sesión refrescada:", refreshedSession.user.email);
+          // 3. Obtener perfil y actualizar store
+          const { data: userData } = await supabase
+            .from("profile")
+            .select("*")
+            .eq("id", refreshedSession.user.id)
+            .single();
+
+          if (userData) {
+            setCurrentUser(userData);
+            console.log("✅ Usuario restaurado en el store:", userData.name);
+          }
+        } else {
+          console.log("❌ No se pudo refrescar la sesión");
+        }
+      } else {
+        console.log("✅ Sesión ya existente:", session.user.email);
+      }
+    };
+
+    restoreSessionAfterMP();
+  }, [setCurrentUser]);
 
   useEffect(() => {
     setDimensions({ height, width });
