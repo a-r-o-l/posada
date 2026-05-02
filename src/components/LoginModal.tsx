@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+"use client";
+
+import React, { useEffect, useRef, useState, useTransition } from "react";
 import {
   Dialog,
   DialogContent,
@@ -24,10 +26,11 @@ import { useAuthStore } from "@/zustand/auth-store";
 import { FcGoogle } from "react-icons/fc";
 import LoadingButton from "./LoadingButton";
 import { Loader2, LogIn } from "lucide-react";
+import { login } from "@/server/sb-auth-actions";
 
 const formSchema = z.object({
   email: z.string().email().min(4, {
-    message: "El nombre de usuario debe tener al menos 4 caracteres.",
+    message: "El email debe ser válido.",
   }),
   password: z.string().min(4, {
     message: "La contraseña debe tener al menos 4 caracteres.",
@@ -46,8 +49,8 @@ function LoginModal({
   additionalAction: () => void;
 }) {
   const emailInputRef = useRef<HTMLInputElement>(null);
-  const { login, isLoading, loginWithGoogle } = useAuthStore();
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const { loginWithGoogle, initializeAuth } = useAuthStore();
+  const [isPending, startTransition] = useTransition();
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
@@ -59,31 +62,33 @@ function LoginModal({
   });
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    setIsSubmitting(true);
-    const email = values.email.toLowerCase();
-    const success = await login(email.toLowerCase(), values.password);
+    const formData = new FormData();
+    formData.append("email", values.email);
+    formData.append("password", values.password);
 
-    if (success) {
-      toast.success(`Bienvenido de nuevo, ${email}!`);
-      onOpenChange(false);
-    } else {
-      toast.error("Credenciales incorrectas");
-      setIsSubmitting(false);
-    }
+    startTransition(async () => {
+      const result = await login(formData);
+
+      if (result?.error) {
+        toast.error(result.error);
+        form.reset();
+      } else {
+        // Login exitoso, actualizar el store
+        await initializeAuth();
+        toast.success(`Bienvenido de nuevo, ${values.email}!`);
+        onOpenChange(false);
+      }
+    });
   };
 
   useEffect(() => {
-    form.reset();
-  }, [open, form]);
-
-  useEffect(() => {
     if (open) {
-      // Pequeño delay para asegurar que el modal está completamente renderizado
+      form.reset();
       setTimeout(() => {
         emailInputRef.current?.focus();
       }, 100);
     }
-  }, [open]);
+  }, [open, form]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -163,8 +168,8 @@ function LoginModal({
                   title="Iniciar sesión"
                   type="submit"
                   classname="w-full rounded-full"
-                  loading={isSubmitting}
-                  disabled={isSubmitting || isLoading}
+                  loading={isPending}
+                  disabled={isPending || googleLoading}
                 >
                   <LogIn className="mr-2 h-4 w-4" />
                 </LoadingButton>
@@ -185,7 +190,7 @@ function LoginModal({
                     setGoogleLoading(false);
                   }}
                   size="lg"
-                  disabled={isSubmitting || googleLoading || isLoading}
+                  disabled={isPending || googleLoading}
                 >
                   {googleLoading ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -201,7 +206,7 @@ function LoginModal({
                 type="button"
                 variant="outline"
                 onClick={() => onOpenChange(false)}
-                disabled={isSubmitting || isLoading}
+                disabled={isPending || googleLoading}
                 size="lg"
               >
                 Cancelar

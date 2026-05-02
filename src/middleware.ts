@@ -3,6 +3,20 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  // Al principio del middleware
+  const url = request.nextUrl.pathname;
+  console.log("🔵 [Middleware] URL:", url);
+
+  // Detectar si venimos de Mercado Pago
+  const referer = request.headers.get("referer");
+  if (referer?.includes("mercadopago")) {
+    console.log("🟠 [Middleware] ¡VIENE DE MERCADO PAGO!");
+    console.log("🟠 [Middleware] Referer:", referer);
+    console.log(
+      "🟠 [Middleware] Todas las cookies:",
+      request.cookies.getAll().map((c) => c.name),
+    );
+  }
   console.log("🔵 [Middleware] Ejecutando para:", request.nextUrl.pathname);
 
   const allCookies = request.cookies.getAll();
@@ -50,7 +64,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
-  ],
+  matcher: ["/(.*)"], // ← Capturar TODAS las rutas sin excepción
 };

@@ -65,7 +65,7 @@ export const createPayment = async (data: FormData) => {
       } else {
         const preferenceResponse = (await response.json()) as IMPPreference;
         const updateFormData = new FormData();
-        updateFormData.append("preferenceId", preferenceResponse?.id);
+        updateFormData.append("preference_id", preferenceResponse?.id);
         await updateSale(res.sale.id, updateFormData);
         return {
           success: true,

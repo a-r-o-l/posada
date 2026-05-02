@@ -52,8 +52,8 @@ export async function POST(request: Request) {
           subject: "Compra Exitosa",
           to: [
             {
-              name: foundSale.accountId.name,
-              email: foundSale.accountId.email,
+              name: foundSale?.profile?.name,
+              email: foundSale?.profile?.email,
             },
           ],
           htmlContent: newTahnksEmailTemplate(foundSale, data),
