@@ -38,8 +38,10 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  // Refrescar la sesión si el token expiró
-  await supabase.auth.getUser();
+  // Refrescar la sesión si el token expiró.
+  // Usamos getSession() en vez de getUser() para evitar llamadas de red
+  // que puedan fallar y borrar las cookies de sesión por error.
+  await supabase.auth.getSession();
 
   return supabaseResponse;
 }
