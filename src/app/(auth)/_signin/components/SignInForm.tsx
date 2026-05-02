@@ -18,14 +18,12 @@ import {
   Form,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { login } from "@/server/loginAction";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z.object({
@@ -48,22 +46,24 @@ function SignInForm() {
     },
   });
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    const email = values.email.toLowerCase();
-    const response = await login(email, values.password);
-    if (response.success) {
-      toast.success(`Bienvenido ${values.email.toLowerCase()}`);
-      router.push("/admin");
-    } else {
-      toast.error(response.message);
-    }
-  }
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   const email = values.email.toLowerCase();
+  //   const response = await login(email, values.password);
+  //   if (response.success) {
+  //     toast.success(`Bienvenido ${values.email.toLowerCase()}`);
+  //     router.push("/admin");
+  //   } else {
+  //     toast.error(response.message);
+  //   }
+  // }
 
   return (
     <div>
       <Card>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form
+          // onSubmit={form.handleSubmit(onSubmit)}
+          >
             <CardHeader>
               <CardTitle className="text-2xl font-bold">
                 Inicia sesión en tu cuenta

@@ -24,15 +24,14 @@ import WhatsAppLogo from "@/icons/whatsappsvg";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Student } from "@/supabase/models/student";
 import { useSchools } from "@/supabase/hooks/client/useSchools";
-import { useUser } from "@/hooks/use-user";
 import { useProfileStudents } from "@/supabase/hooks/client/useProfileStudents";
+import { useAuthStore } from "@/zustand/auth-store";
 
 export default function OnboardingPage() {
   const router = useRouter();
   const { schools, fetchSchools, loading } = useSchools();
-  const { user, logout } = useUser();
+  const { currentUser: user, logout } = useAuthStore();
 
-  console.log("user ", user);
   const { createProfileStudents } = useProfileStudents();
   const [students, setStudents] = useState<Partial<Student>[]>([]);
   const [saving, setSaving] = useState(false);

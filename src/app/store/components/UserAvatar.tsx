@@ -10,14 +10,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useUser } from "@/hooks/use-user";
+import { useAuthStore } from "@/zustand/auth-store";
 import { LogOutIcon, Package2, User } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 function UserAvatar() {
   const router = useRouter();
-  const { user, logout } = useUser();
+  const { currentUser: user, logout } = useAuthStore();
   const [openAlert, setOpenAlert] = useState(false);
 
   if (!user) return null;

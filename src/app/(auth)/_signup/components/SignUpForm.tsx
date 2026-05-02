@@ -18,7 +18,6 @@ import {
   Form,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useUser } from "@/hooks/use-user";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ArrowLeft, UserPlus } from "lucide-react";
 import Link from "next/link";
@@ -28,6 +27,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 import { FcGoogle } from "react-icons/fc";
+import { useAuthStore } from "@/zustand/auth-store";
 
 interface SignupData {
   email: string;
@@ -68,7 +68,7 @@ const formSchema = z.object({
 
 function SignUpForm() {
   const router = useRouter();
-  const { signup, loginWithGoogle, isLoading } = useUser();
+  const { register, loginWithGoogle } = useAuthStore();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -90,8 +90,8 @@ function SignUpForm() {
       phone: values.phone,
       password: values.password,
     };
-    const { success } = await signup(formData);
-    if (success) {
+    const res = await register(formData);
+    if (res) {
       toast.success(
         "Cuenta creada exitosamente. Por favor, completa tus datos adicionales.",
       );
