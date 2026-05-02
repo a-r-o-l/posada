@@ -7,6 +7,7 @@ export function AuthInitializer() {
   const initializeAuth = useAuthStore((state) => state.initializeAuth);
 
   useEffect(() => {
+    console.log("se ejecuta el initializeAuth");
     initializeAuth();
   }, [initializeAuth]);
 
