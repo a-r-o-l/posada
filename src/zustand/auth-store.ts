@@ -273,9 +273,6 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/auth/callback`,
-        },
       });
       if (error) {
         console.error("Error en login con Google:", error);
