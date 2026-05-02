@@ -10,6 +10,7 @@ export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
+    flowType: "implicit",
     storage: {
       getItem: (key: string) => {
         if (typeof window === "undefined") return null;
