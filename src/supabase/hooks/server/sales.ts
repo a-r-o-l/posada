@@ -1,5 +1,6 @@
 import { generateRandomNumber } from "@/lib/utilsFunctions";
 import { createClient } from "@/supabase/server";
+import { supabaseAdmin } from "@/supabase/supabase";
 // import { serverUploadFile } from "@/supabase/serverStorage";
 
 interface GetAllSalesByDateParams {
@@ -64,8 +65,12 @@ export async function getSaleById(id: string) {
   return { data: sale, error: null };
 }
 
-export async function updateSale(id: string, payload: FormData) {
-  const supabase = await createClient();
+export async function updateSale(
+  id: string,
+  payload: FormData,
+  useAdmin = false,
+) {
+  const supabase = useAdmin ? supabaseAdmin : await createClient();
   const formData = Object.fromEntries(payload.entries());
 
   // Parsear payer si existe
@@ -103,8 +108,8 @@ export async function updateSale(id: string, payload: FormData) {
   };
 }
 
-export async function getSale(id: string) {
-  const supabase = await createClient();
+export async function getSale(id: string, useAdmin = false) {
+  const supabase = useAdmin ? supabaseAdmin : await createClient();
   const { data, error } = await supabase
     .from("sales")
     .select("*, profile:profile(*)")

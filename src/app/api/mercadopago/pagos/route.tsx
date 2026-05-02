@@ -16,8 +16,8 @@ export async function POST(request: Request) {
     const saleId = payment.metadata.sale;
 
     // Obtener la venta completa de la base de datos
-    const { sale: foundSale } = await getSale(saleId);
-    const { data } = await getSaleItemsBySaleId(saleId);
+    const { sale: foundSale } = await getSale(saleId, true);
+    const { data } = await getSaleItemsBySaleId(saleId, true);
 
     if (!foundSale) {
       console.error("Venta no encontrada:", saleId);
@@ -44,7 +44,7 @@ export async function POST(request: Request) {
 
     if (payment.status === "approved") {
       formData.append("status", "approved");
-      const res = await updateSale(saleId, formData);
+      const res = await updateSale(saleId, formData, true);
 
       // Si la actualización fue exitosa, enviar email
       if (res.success) {

@@ -1,8 +1,12 @@
 import { createClient } from "@/supabase/server";
+import { supabaseAdmin } from "@/supabase/supabase";
 // import { serverUploadFile } from "@/supabase/serverStorage";
 
-export const getSaleItemsBySaleId = async (saleId: string) => {
-  const supabase = await createClient();
+export const getSaleItemsBySaleId = async (
+  saleId: string,
+  useAdmin = false,
+) => {
+  const supabase = useAdmin ? supabaseAdmin : await createClient();
   const { data, error } = await supabase
     .from("sale_items")
     .select("*")

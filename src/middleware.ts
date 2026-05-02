@@ -3,6 +3,10 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  if (request.nextUrl.pathname.startsWith("/api/mercadopago")) {
+    console.log("⏩ [Middleware] Excluyendo webhook de MP");
+    return NextResponse.next();
+  }
   // Al principio del middleware
   const url = request.nextUrl.pathname;
   console.log("🔵 [Middleware] URL:", url);
@@ -64,5 +68,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/(.*)"], // ← Capturar TODAS las rutas sin excepción
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+  ],
 };
