@@ -9,7 +9,7 @@ export const getSaleItemsBySaleId = async (
   const supabase = useAdmin ? supabaseAdmin : await createClient();
   const { data, error } = await supabase
     .from("sale_items")
-    .select("*")
+    .select("*, product:product_id(*), file:file_id(*, folder:folder_id(*, school:school_id(*)))")
     .eq("sale_id", saleId);
 
   if (error) {

@@ -376,7 +376,7 @@ export const newTahnksEmailTemplate = (
         <div style="background-color: #f0f8ff; border-left: 4px solid #4CAF50; padding: 15px; margin: 20px 0; border-radius: 5px;">
             <h4 style="margin: 0 0 10px 0; color: #2c5530;">📞 Atención al Cliente</h4>
             <p style="margin: 0 0 8px 0;">Si tiene alguna consulta sobre su pedido, nuestro equipo está disponible para ayudarle a través de WhatsApp.</p>
-            <p style="margin: 0; font-weight: bold; color: #25D366;">📱 WhatsApp: +54 9 11 5403-2747</p>
+            <p style="margin: 0; font-weight: bold; color: #25D366;">📱 WhatsApp: +54 9 11 4143-4032</p>
         </div>
         
         <div style="background-color: #fff3cd; border: 1px solid #ffeaa7; padding: 12px; border-radius: 5px; margin: 20px 0;">

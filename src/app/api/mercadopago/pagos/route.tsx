@@ -67,7 +67,7 @@ export async function POST(request: Request) {
     } else {
       // Si el pago no es approved, actualizar con el estado que tenga
       formData.append("status", payment.status || "");
-      const res = await updateSale(saleId, formData);
+      const res = await updateSale(saleId, formData, true);
 
       if (res.success) {
         return new Response(null, { status: 200 });
