@@ -1,13 +1,21 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./components/app-sidebar";
 import { AuthInitializer } from "@/components/auth-initializer";
-// import { redirect } from "next/navigation";
+import { redirect } from "next/navigation";
+import { getCurrentProfile } from "@/zustand/auth-store-server";
 
 export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const currentUser = await getCurrentProfile();
+
+  if (!currentUser) {
+    redirect("/");
+  } else if (currentUser.role !== "admin") {
+    redirect("/store");
+  }
   return (
     <div>
       <SidebarProvider>

@@ -60,7 +60,7 @@ export const useFolders = () => {
       setError(null);
       const { data, error } = await supabase
         .from("folders")
-        .select("*, school:schools(*), files:files(*)")
+        .select("*, school:schools(*)")
         .eq("id", id)
         .single();
       if (error) throw error;

@@ -149,11 +149,11 @@ function SchoolStoreDetailClient({ school }: { school: School }) {
             />
           </Link>
           <div className="w-96 px-5 text-center">
-            <Label>Año</Label>
+            <Label className="text-xs md:text-base">Año</Label>
             <div className="flex items-center gap-2">
               <Calendar size={24} />
               <Select value={year} onValueChange={handleYearChange}>
-                <SelectTrigger className="border-[#139FDC] border-2 w-full">
+                <SelectTrigger className="border-[#139FDC] border-2 w-full text-xs md:text-base">
                   <SelectValue>{year}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>
@@ -167,11 +167,11 @@ function SchoolStoreDetailClient({ school }: { school: School }) {
             </div>
           </div>
           <div className="w-96 px-5 text-center">
-            <Label>División</Label>
+            <Label className="text-xs md:text-base">División</Label>
             <div className="flex items-center gap-2">
               <Layers size={24} />
               <Select value={division} onValueChange={handleDivisionChange}>
-                <SelectTrigger className="border-[#139FDC] border-2 w-full">
+                <SelectTrigger className="border-[#139FDC] border-2 w-full text-xs md:text-base">
                   <SelectValue>{division}</SelectValue>
                 </SelectTrigger>
                 <SelectContent>

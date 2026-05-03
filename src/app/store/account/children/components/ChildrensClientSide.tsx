@@ -88,11 +88,11 @@ function ChildrensClientSide() {
     <div className="flex flex-col gap-10">
       <Card>
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="text-sm md:text-base">
             <UserPlus className="inline mr-2 w-5 h-5" />
             Agregar un Menor
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-xs md:text-sm">
             Complete el formulario para buscar un menor
           </CardDescription>
         </CardHeader>
@@ -100,9 +100,9 @@ function ChildrensClientSide() {
           <div className="space-y-5">
             <div className="flex items-center justify-between gap-5">
               <div className="space-y-2 w-full">
-                <Label>Año</Label>
+                <Label className="text-xs md:text-base">Año</Label>
                 <Select value={year} onValueChange={setYear}>
-                  <SelectTrigger className="capitalize w-full">
+                  <SelectTrigger className="capitalize w-full text-xs md:text-base">
                     <SelectValue placeholder="Seleccionar Año" />
                   </SelectTrigger>
                   <SelectContent>
@@ -113,12 +113,12 @@ function ChildrensClientSide() {
                 </Select>
               </div>
               <div className="space-y-2 w-full">
-                <Label>Escuela</Label>
+                <Label className="text-xs md:text-base">Escuela</Label>
                 <Select
                   value={selectedSchool}
                   onValueChange={setSelectedSchool}
                 >
-                  <SelectTrigger className="capitalize w-full">
+                  <SelectTrigger className="capitalize w-full text-xs md:text-base">
                     <SelectValue placeholder="Seleccionar escuela" />
                   </SelectTrigger>
                   <SelectContent>
@@ -135,13 +135,13 @@ function ChildrensClientSide() {
                 </Select>
               </div>
               <div className="space-y-2 w-full">
-                <Label>Curso</Label>
+                <Label className="text-xs md:text-base">Curso</Label>
                 <Select
                   value={selectedGrade}
                   onValueChange={setSelectedGrade}
                   disabled={!selectedSchool}
                 >
-                  <SelectTrigger className="capitalize w-full">
+                  <SelectTrigger className="capitalize w-full text-xs md:text-base">
                     <SelectValue placeholder="Seleccionar curso" />
                   </SelectTrigger>
                   <SelectContent>
@@ -160,10 +160,13 @@ function ChildrensClientSide() {
             </div>
             <div className="flex items-center justify-between gap-5">
               <div className="space-y-2 md:col-span-2 w-full">
-                <Label>Buscar Estudiante</Label>
+                <Label className="text-xs md:text-base">
+                  Buscar Estudiante
+                </Label>
                 <Input
                   value={searchParam}
                   onChange={(val) => setSearchParam(val.target.value)}
+                  className="text-xs md:text-base"
                 />
               </div>
               <div>
@@ -181,14 +184,16 @@ function ChildrensClientSide() {
       </Card>
       <Card>
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="text-sm md:text-base">
             <Users className="inline mr-2 w-5 h-5" />
             Mis Menores
           </CardTitle>
-          <CardDescription>Lista de mi menores registrados</CardDescription>
+          <CardDescription className="text-xs md:text-sm">
+            Lista de mi menores registrados
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
+          <Table className="text-xs md:text-base">
             <TableHeader>
               <TableRow>
                 <TableHead>Colegio</TableHead>

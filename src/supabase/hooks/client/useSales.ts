@@ -26,6 +26,38 @@ export const useSales = () => {
     }
   };
 
+  const fetchSalesByDate = async (
+    start: string,
+    end: string,
+    state: string,
+  ) => {
+    try {
+      setQueryLoading(true);
+      setError(null);
+      let query = supabase.from("sales").select("*, profile:profile(*)");
+      if (start) {
+        query = query.gte("date_created::date", start);
+      }
+      if (end) {
+        query = query.lte("date_created::date", end);
+      }
+      if (state && state !== "all") {
+        query = query.eq("status", state);
+      }
+      const { data: sales, error } = await query.order("date_created", {
+        ascending: false,
+      });
+      if (error) throw error;
+      setSales(sales || []);
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error al obtener las ventas",
+      );
+    } finally {
+      setQueryLoading(false);
+    }
+  };
+
   const createSale = async (
     sale: Omit<SaleFullDetails, "id" | "created_at">,
   ) => {
@@ -154,5 +186,6 @@ export const useSales = () => {
     updateSale,
     deleteSale,
     updateSaleStatus,
+    fetchSalesByDate,
   };
 };

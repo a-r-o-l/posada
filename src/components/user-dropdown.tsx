@@ -121,11 +121,8 @@ export function UserDropdown() {
     <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
       <DropdownMenuTrigger asChild>
         <button className="focus:outline-none focus:ring-2 focus:ring-[#139FDC] rounded-full">
-          <Avatar className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-[#139FDC] transition-all duration-200">
-            <AvatarImage
-              src={currentUser.image_url}
-              // className="object-cover w-full h-full"
-            />
+          <Avatar className="w-10 h-10 md:w-12 md:h-12 cursor-pointer hover:ring-2 hover:ring-[#139FDC] transition-all duration-200">
+            <AvatarImage src={currentUser.image_url} />
             <AvatarFallback className="bg-[#139FDC] text-black font-bold text-lg">
               {getInitials(currentUser.name)}
             </AvatarFallback>

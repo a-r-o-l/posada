@@ -14,7 +14,7 @@ import WhatsAppLogo from "@/icons/whatsappsvg";
 import Section6 from "@/components/rootsComponents/section6/Section6";
 import Section6Mini from "@/components/rootsComponents/section6/Section6Mini";
 
-const ready = false;
+const ready = true;
 
 function page() {
   if (ready) {

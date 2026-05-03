@@ -7,7 +7,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { format } from "date-fns";
+import { addMonths, format } from "date-fns";
 import React, { useEffect, useMemo, useState } from "react";
 import {
   Table,
@@ -22,13 +22,10 @@ import { Button } from "@/components/ui/button";
 import { es } from "date-fns/locale";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import DatePicker from "./DatePicker";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import { useSales } from "@/supabase/hooks/client/useSales";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
-import StateSelect from "./StateSelect";
-import DeliveredSelect from "./DeliveredSelect";
 import { priceParserToString } from "@/lib/utilsFunctions";
 import { Input } from "@/components/ui/input";
 import {
@@ -39,6 +36,8 @@ import {
   Search,
   Trash2,
   School as School2,
+  CalendarIcon,
+  X,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -52,27 +51,42 @@ import {
 import { SaleFullDetails } from "@/supabase/models/sale";
 import { School } from "@/supabase/models/school";
 import PaymentBadge from "@/app/store/account/purchases/components/PaymentBadge";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
+import { Calendar } from "@/components/ui/calendar";
+import { DateRange } from "react-day-picker";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 // import { updateSale } from "@/supabase/hooks/server/sales";
 
-function OrdersClientSide({
-  sales = [],
-  schools = [],
-}: {
-  sales?: SaleFullDetails[] | [];
-  schools?: School[] | [];
-}) {
+function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
   const { updateSale, deleteSale } = useSales();
   const router = useRouter();
   const [selectedSale, setSelectedSale] = useState<SaleFullDetails | null>(
     null,
   );
-  const [openAlert, setOpenAlert] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const [searchParams, setSearchParams] = useState("");
   const [order, setOrder] = useState("");
   const [openEditOrderModal, setOpenEditOrderModal] = useState(false);
   const [selectedSchools, setSelectedSchools] = useState<string[]>([]);
+  const [date, setDate] = useState<DateRange | undefined>({
+    from: addMonths(new Date(), -1),
+    to: new Date(),
+  });
+  const [state, setState] = useState("all");
+  const { fetchSalesByDate, sales } = useSales();
 
   // Mostrar todos los colegios disponibles
   const allSchools = useMemo(() => {
@@ -85,6 +99,16 @@ function OrdersClientSide({
       setSelectedSchools(allSchools.map((school) => school.id));
     }
   }, [allSchools, selectedSchools.length]);
+
+  useEffect(() => {
+    if (state && date) {
+      fetchSalesByDate(
+        date?.from?.toISOString().split("T")[0] || "",
+        date?.to?.toISOString().split("T")[0] || "",
+        "all",
+      );
+    }
+  }, [date, state]);
 
   // useEffect(() => {
   //   if (selectedSale && selectedSale.is_new_sale) {
@@ -113,7 +137,7 @@ function OrdersClientSide({
     // if (selectedSchools.length > 0) {
     //   console.log("selectedSchools.length > 0");
     //   filtered = filtered.filter((sale) => {
-    //     const schoolId = sale.products?.[0]?.productId?.schoolId;
+    //     const schoolId = sale.products?.[0]?.;
     //     return (
     //       typeof schoolId === "string" && selectedSchools.includes(schoolId)
     //     );
@@ -156,8 +180,6 @@ function OrdersClientSide({
     setSelectedSchools(allSchools.map((school) => school.id));
   };
 
-  // Eliminar la función de deseleccionar todos
-
   return (
     <Card>
       <div className="w-full flex justify-end">
@@ -185,15 +207,70 @@ function OrdersClientSide({
             </div>
             <div className="flex flex-col space-y-2 justify-center items-center w-60">
               <Label>Filtrar por fecha</Label>
-              <DatePicker url="/admin/orders" />
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    id="date"
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !date && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon />
+                    {date?.from ? (
+                      date.to ? (
+                        <>
+                          {format(date.from, "LLL dd, y", { locale: es })} /{" "}
+                          {format(date.to, "LLL dd, y", { locale: es })}
+                        </>
+                      ) : (
+                        format(date.from, "LLL dd, y", { locale: es })
+                      )
+                    ) : (
+                      <span>Selecciona fechas</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="range"
+                    defaultMonth={date?.from}
+                    selected={date}
+                    onSelect={setDate}
+                    numberOfMonths={3}
+                    locale={es}
+                  />
+                  {date && (
+                    <div className="p-2">
+                      <Button
+                        onClick={() => setDate(undefined)}
+                        variant="outline"
+                        size="sm"
+                      >
+                        Limpiar
+                        <X />
+                      </Button>
+                    </div>
+                  )}
+                </PopoverContent>
+              </Popover>
             </div>
             <div className="flex flex-col space-y-2 justify-center items-center w-60">
               <Label>Filtrar por estado de pago</Label>
-              <StateSelect url="/admin/orders" />
-            </div>
-            <div className="flex flex-col space-y-2 justify-center items-center w-60">
-              <Label>Filtrar por estado de entrega</Label>
-              <DeliveredSelect url="/admin/orders" />
+              <Select value={state} onValueChange={(e) => setState(e)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Seleccionar estado" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="all">Todos</SelectItem>
+                    <SelectItem value="approved">Pagado</SelectItem>
+                    <SelectItem value="pending">Pendiente</SelectItem>
+                    <SelectItem value="failed">Fallado</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -214,6 +291,7 @@ function OrdersClientSide({
               placeholder="Buscar por email"
               className="w-60 pl-10"
               value={searchParams}
+              autoComplete="off"
               onKeyDown={(e) => {
                 if (e.key === "Escape") {
                   setSearchParams("");
@@ -272,8 +350,7 @@ function OrdersClientSide({
               <TableHead>Cliente</TableHead>
               <TableHead>Total</TableHead>
               <TableHead>Estado</TableHead>
-              <TableHead>Entrega</TableHead>
-              <TableHead></TableHead>
+              <TableHead align="right" className="text-end"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -286,7 +363,10 @@ function OrdersClientSide({
                   } cursor-pointer ${
                     selectedSale?.id === sale.id ? "bg-gray-200" : ""
                   }`}
-                  onClick={() => setSelectedSale(sale)}
+                  onClick={() => {
+                    setSelectedSale(sale);
+                    console.log(sale);
+                  }}
                 >
                   <TableCell>{sale.order}</TableCell>
                   <TableCell>
@@ -310,16 +390,7 @@ function OrdersClientSide({
                       transferProofUrl={sale?.transfer_proof_url || ""}
                     />
                   </TableCell>
-                  <TableCell>
-                    <Checkbox
-                      checked={sale.delivered ? true : false}
-                      onClick={() => {
-                        setSelectedSale(sale);
-                        setOpenAlert(true);
-                      }}
-                    />
-                  </TableCell>
-                  <TableCell align="right">
+                  <TableCell align="right" className="text-end">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <Button
@@ -399,33 +470,6 @@ function OrdersClientSide({
           </TableFooter>
         </Table>
       </CardContent>
-      <CustomAlertDialog
-        open={openAlert}
-        onClose={() => {
-          setOpenAlert(false);
-          setSelectedSale(null);
-        }}
-        title="Actualizar estado"
-        description="Estas seguro de actualizar el estado de este pedido?"
-        onAccept={async () => {
-          if (!selectedSale) return;
-          setUpdateLoading(true);
-          const currentState = selectedSale?.delivered;
-          const res = await updateSale(selectedSale.id, {
-            delivered: !currentState,
-          });
-          if (res.success) {
-            toast.success("Venta actualizada");
-            setOpenAlert(false);
-            setSelectedSale(null);
-            setUpdateLoading(false);
-          } else {
-            toast.error("Error al actualizar la venta");
-            setUpdateLoading(false);
-          }
-        }}
-        loading={updateLoading}
-      />
       <CustomAlertDialog
         open={openDeleteDialog}
         onClose={() => setOpenDeleteDialog(false)}

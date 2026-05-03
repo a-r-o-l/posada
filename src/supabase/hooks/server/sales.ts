@@ -14,11 +14,10 @@ export async function getAllSalesByDate({
   start,
   end,
   state,
-  delivered,
 }: GetAllSalesByDateParams = {}) {
   const supabase = await createClient();
 
-  let query = supabase.from("sales").select("*");
+  let query = supabase.from("sales").select("*, profile:profile(*)");
 
   // Usar cast a date (igual que funcionó en SQL)
   if (start) {
@@ -32,11 +31,6 @@ export async function getAllSalesByDate({
   if (state && state !== "all") {
     query = query.eq("status", state);
   }
-
-  if (delivered !== undefined && delivered !== "all") {
-    query = query.eq("delivered", delivered === "delivered" ? true : false);
-  }
-
   const { data: sales, error } = await query.order("date_created", {
     ascending: false,
   });

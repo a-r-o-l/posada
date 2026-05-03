@@ -24,6 +24,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Product } from "@/supabase/models/product";
 import { File } from "@/supabase/models/file";
+import PublicFile from "./PublicFile";
 
 interface IProductWithQuantity extends Product {
   quantity: number;
@@ -114,15 +115,16 @@ function SelectFileModal({
           <div className="h-[500px] flex items-center justify-center">
             <div className="w-80 h-80 flex justify-center">
               {file?.image_url && (
-                <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
-                  <Image
-                    src={file?.image_url}
-                    alt={file?.title}
-                    layout="fill"
-                    objectFit="contain"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                </AspectRatio>
+                <PublicFile file={file} onClick={() => {}} fullWidth={true} />
+                // <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
+                //   <Image
+                //     src={file?.image_url}
+                //     alt={file?.title}
+                //     layout="fill"
+                //     objectFit="contain"
+                //     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                //   />
+                // </AspectRatio>
               )}
             </div>
           </div>

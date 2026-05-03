@@ -10,11 +10,14 @@ import PublicFile from "./PublicFile";
 import SelectFileModal from "./SelectFileModal";
 import { useProducts } from "@/supabase/hooks/client/useProducts";
 import { File } from "@/supabase/models/file";
+import { useFiles } from "@/supabase/hooks/client/useFiles";
+import { Loader2 } from "lucide-react";
 
 function FolderStoreDetailClient({ folderId }: { folderId: string }) {
   const router = useRouter();
   const { fetchFolderById, folder } = useFolders();
   const { fetchProductsBySchoolId, products } = useProducts();
+  const { fetchFilesByFolderId, files, loading } = useFiles();
   // const [needAccess, setNeedAccess] = useState(false);
   const [fileModal, setFileModal] = useState<File | null>(null);
 
@@ -23,13 +26,11 @@ function FolderStoreDetailClient({ folderId }: { folderId: string }) {
     return folder.school;
   }, [folder]);
 
-  const files = useMemo(() => {
-    if (!folder) return [];
-    return folder.files || [];
-  }, [folder]);
-
   useEffect(() => {
-    if (folderId) fetchFolderById(folderId);
+    if (folderId) {
+      fetchFolderById(folderId);
+      fetchFilesByFolderId(folderId);
+    }
   }, [folderId]);
 
   useEffect(() => {
@@ -121,7 +122,11 @@ function FolderStoreDetailClient({ folderId }: { folderId: string }) {
       lg:border-t-0
       lg:rounded-r-3xl items-start lg:border-l-8 border-[#139FDC] h-full overflow-y-auto justify-center lg:justify-normal"
       >
-        {!!files.length ? (
+        {loading ? (
+          <div className="w-full h-60 justify-center items-center flex">
+            <Loader2 className="animate-spin h-8 w-8" />
+          </div>
+        ) : !!files.length ? (
           files?.map((file) => (
             <PublicFile file={file} key={file.id} onClick={onClickFile} />
           ))

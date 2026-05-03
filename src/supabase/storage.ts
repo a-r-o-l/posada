@@ -113,7 +113,7 @@ export const createManyFilesSpb = async (
           // Subir imagen original
           if (fileData.imageFile) {
             const fileName = fileData.imageFile.name;
-            const filePathOriginal = `folders/${folderId}/original/${Date.now()}_${fileName}`;
+            const filePathOriginal = `folders/${folderId}/original/${fileName}`;
 
             const uploadResult = await uploadFileWithRetry(
               fileData.imageFile,
@@ -133,7 +133,7 @@ export const createManyFilesSpb = async (
 
             // Subir marca de agua
             if (fileData.watermarkedFile) {
-              const filePath = `folders/${folderId}/${Date.now()}_${fileName}`;
+              const filePath = `folders/${folderId}/${fileName}`;
               const watermarkResult = await uploadFileWithRetry(
                 fileData.watermarkedFile,
                 filePath,

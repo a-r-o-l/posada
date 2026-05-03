@@ -16,7 +16,7 @@ function HeaderShoppingCart() {
         </div>
       </Link> */}
       <Link href={"/store/cart"}>
-        <Avatar className="w-12 h-12 cursor-pointer hover:ring-2 hover:ring-[#139FDC] transition-all duration-200 border-2 border-[#139FDC] justify-center items-center bg-[#139FDC]">
+        <Avatar className="w-10 h-10 md:w-12 md:h-12 cursor-pointer hover:ring-2 hover:ring-[#139FDC] transition-all duration-200 border-2 border-[#139FDC] justify-center items-center bg-[#139FDC]">
           <ShoppingCart className="h-6 w-6 bg-[#139FDC]" />
         </Avatar>
         {cartItems.length > 0 && (

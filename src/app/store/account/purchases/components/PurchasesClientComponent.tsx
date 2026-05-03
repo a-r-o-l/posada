@@ -37,11 +37,12 @@ import { toast } from "sonner";
 import { useAuthStore } from "@/zustand/auth-store";
 import { useSales } from "@/supabase/hooks/client/useSales";
 import { SaleFullDetails } from "@/supabase/models/sale";
+import LoadingTable from "@/components/LoadingTable";
 
 function PurchasesClientComponent() {
   const router = useRouter();
   const { currentUser: user } = useAuthStore();
-  const { fetchSaleItemsByAccountId, sales } = useSales();
+  const { fetchSaleItemsByAccountId, sales, queryLoading } = useSales();
   // const [sales, setSales] = useState([]);
   const [selectedSale, setSelectedSale] = useState<SaleFullDetails | null>(
     null,
@@ -54,26 +55,19 @@ function PurchasesClientComponent() {
   useEffect(() => {
     if (user) {
       fetchSaleItemsByAccountId(user.id);
-      // const fetchSales = async () => {
-      //   const res = await getSalesByAccount(user.id);
-      //   if (res.success) {
-      //     setSales(res.sales);
-      //   }
-      // };
-      // fetchSales();
     }
   }, [user]);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Mis Compras</CardTitle>
-        <CardDescription>
+    <Card className="p-0">
+      <CardHeader className="p-3 md:p-6">
+        <CardTitle className="text-sm md:text-base">Mis Compras</CardTitle>
+        <CardDescription className="text-xs md:text-base">
           Historial de todas las compras que realizaste
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <Table>
+      <CardContent className="p-3 text-xs">
+        <Table className="text-xs md:text-base">
           <TableHeader>
             <TableRow>
               <TableHead>Fecha</TableHead>
@@ -86,7 +80,9 @@ function PurchasesClientComponent() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {!!sales.length ? (
+            {queryLoading ? (
+              <LoadingTable span={7} />
+            ) : !!sales.length ? (
               sales.map((sale: SaleFullDetails, index) => {
                 const isTransfer = sale.payment_type_id === "transfer";
                 return (

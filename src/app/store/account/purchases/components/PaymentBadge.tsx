@@ -19,7 +19,7 @@ function PaymentBadge({
   if (state === "approved") {
     return (
       <Badge
-        className="border-green-500 text-green-500 w-24 justify-center"
+        className="border-green-500 text-green-500 text-xs md:text-sm md:w-24 w-20 justify-center"
         variant="outline"
       >
         Pagado
@@ -30,17 +30,17 @@ function PaymentBadge({
   if (state === "pending" && paymentTypeId === "transfer" && transferProofUrl) {
     return (
       <Badge
-        className="w-24 justify-center border-yellow-500 text-yellow-500"
+        className="text-xs md:text-sm md:w-24 w-20 justify-center border-yellow-500 text-yellow-500"
         variant="outline"
       >
-        En proceso
+        Pendiente
       </Badge>
     );
   }
   if (state === "pending") {
     return (
       <Badge
-        className="w-24 justify-center border-blue-500 text-blue-500"
+        className="text-xs md:text-sm md:w-24 w-20 justify-center border-blue-500 text-blue-500"
         variant="outline"
       >
         Pendiente
@@ -50,7 +50,7 @@ function PaymentBadge({
   if (state === "cancelled") {
     return (
       <Badge
-        className="w-24 justify-center border-red-500 text-red-500"
+        className="text-xs md:text-sm md:w-24 w-20 justify-center border-red-500 text-red-500"
         variant="outline"
       >
         Cancelado
@@ -59,7 +59,7 @@ function PaymentBadge({
   }
   return (
     <Badge
-      className="w-24 justify-center border-red-500 text-red-500"
+      className="text-xs md:text-sm md:w-24 w-20 justify-center border-red-500 text-red-500"
       variant="outline"
     >
       Rechazado

@@ -28,29 +28,47 @@ function MyAccountClientSide() {
 
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>
+      <CardHeader className="p-3 md:p-6">
+        <CardTitle className="text-sm md:text-base">
           <User className="inline mr-2 w-5 h-5" />
           Mi Cuenta
         </CardTitle>
-        <CardDescription>Informacion de mi cuenta</CardDescription>
+        <CardDescription className="text-xs md:text-sm">
+          Informacion de mi cuenta
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col gap-4">
           <div className="space-y-2">
-            <Label>Nombre</Label>
-            <Input value={user?.name} readOnly />
+            <Label className="text-xs md:text-base">Nombre</Label>
+            <Input
+              value={user?.name}
+              readOnly
+              className="text-xs md:text-base"
+            />
           </div>
           <div className="space-y-2">
-            <Label>Apellido</Label>
-            <Input value={user?.lastname} readOnly />
+            <Label className="text-xs md:text-base">Apellido</Label>
+            <Input
+              value={user?.lastname}
+              readOnly
+              className="text-xs md:text-base"
+            />
           </div>
           <div className="space-y-2">
-            <Label>Email</Label>
-            <Input value={user?.email} readOnly />
+            <Label className="text-xs md:text-base">Email</Label>
+            <Input
+              value={user?.email}
+              readOnly
+              className="text-xs md:text-base"
+            />
           </div>
           <div className="space-y-2 flex w-full justify-end">
-            <Button size="sm" variant="outline" onClick={() => setOpen(true)}>
+            <Button
+              variant="outline"
+              onClick={() => setOpen(true)}
+              className="text-xs md:text-base"
+            >
               Cambiar mi Contraseña
             </Button>
           </div>
