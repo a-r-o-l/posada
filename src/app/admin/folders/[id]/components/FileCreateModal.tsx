@@ -115,28 +115,20 @@ function FileCreateModal({
     canvas.height = height;
     ctx.drawImage(img, 0, 0, width, height);
 
-    let text = file.name;
-    if (text.length > 30) text = text.slice(0, 27) + "...";
-
-    const fontSize = Math.max(20, Math.min(width / 6, 40));
+    const fontSize = Math.max(30, Math.min(width / 2, 80));
     ctx.font = `bold ${fontSize}px Arial`;
-    ctx.fillStyle = `rgba(255, 255, 255, 0.75)`;
+    ctx.fillStyle = `rgba(255, 255, 255, 0.8)`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    // Repetir el texto en una grilla cubriendo toda la imagen
-    const stepX = width / 2;
-    const stepY = height / 3;
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate((-30 * Math.PI) / 180);
 
-    for (let x = stepX / 2; x < width; x += stepX) {
-      for (let y = stepY / 2; y < height; y += stepY) {
-        ctx.save();
-        ctx.translate(x, y);
-        ctx.rotate((-30 * Math.PI) / 180);
-        ctx.fillText(text, 0, 0);
-        ctx.restore();
-      }
-    }
+    let text = file.name;
+    if (text.length > 30) text = text.slice(0, 27) + "...";
+    ctx.fillText(text, 0, 0);
+    ctx.restore();
 
     const watermarkedPreview = canvas.toDataURL("image/jpeg", 0.5);
     const response = await fetch(watermarkedPreview);
