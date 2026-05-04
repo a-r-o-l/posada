@@ -35,7 +35,8 @@ export const useFiles = () => {
       const query = supabase
         .from("files")
         .select("*")
-        .eq("folder_id", folderId);
+        .eq("folder_id", folderId)
+        .order("file_name", { ascending: true });
       const { data, error } = await query;
       if (error) throw error;
       setFiles(data || []);

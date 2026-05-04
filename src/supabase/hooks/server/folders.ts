@@ -22,7 +22,12 @@ export async function getFoldersBySchoolId(
 
   const supabase = await createClient();
 
-  let query = supabase.from("folders").select("*").eq("school_id", id);
+  let query = supabase
+    .from("folders")
+    .select("*")
+    .eq("school_id", id)
+    .order("year", { ascending: false })
+    .order("title", { ascending: true });
 
   if (level !== undefined) {
     query = query.eq("level", level);

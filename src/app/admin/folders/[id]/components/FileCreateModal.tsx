@@ -33,10 +33,12 @@ function FileCreateModal({
   open,
   onClose,
   folder,
+  onRefresh,
 }: {
   open: boolean;
   onClose: () => void;
   folder?: FolderFullDetails;
+  onRefresh: () => void;
 }) {
   // const { fetchSchool, school } = useSchools();
   const [images, setImages] = useState<ImageInfo[]>([]);
@@ -179,10 +181,12 @@ function FileCreateModal({
         toast.success(
           `✅ ${result.files?.length || 0} archivos subidos correctamente`,
         );
+
         if (result.errors?.length) {
           toast.warning(`⚠️ ${result.errors.length} archivos fallaron`);
           console.error("Errores:", result.errors);
         }
+        onRefresh();
         onClose();
       } else {
         toast.error(result.message || "Error al subir los archivos");

@@ -58,6 +58,7 @@ function FolderDetailClientSide({
       fetchFilesByFolderId(selectedFolder.id);
     }
   }, [selectedFolder]);
+
   useEffect(() => {
     if (selectedFolder) {
       refreshData();
@@ -155,6 +156,7 @@ function FolderDetailClientSide({
         folder={selectedFolder}
         open={openUploadModal}
         onClose={() => setOpenUploadModal(false)}
+        onRefresh={() => refreshData()}
       />
       <ShowImgModal
         img={openShowModal}

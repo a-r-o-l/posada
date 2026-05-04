@@ -1,6 +1,12 @@
 "use client";
 
-import { BadgeCheck, ChevronsUpDown, LogOut, Server } from "lucide-react";
+import {
+  BadgeCheck,
+  ChevronsUpDown,
+  LogOut,
+  Server,
+  Store,
+} from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -84,6 +90,10 @@ export function NavUser({
               <DropdownMenuItem>
                 <BadgeCheck />
                 Cuenta
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => router.push("/store")}>
+                <Store />
+                Tienda
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => router.push("/admin/services")}>
                 <Server />
