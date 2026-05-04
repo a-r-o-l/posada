@@ -12,9 +12,10 @@ import {
 import { Link, Trash2 } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
-import { deleteFileInParentFolder } from "@/server/fileAction";
 import { toast } from "sonner";
 import { FileFullDetails } from "@/supabase/models/file";
+import { useFiles } from "@/supabase/hooks/client/useFiles";
+import { useRouter } from "next/navigation";
 
 function ShowImgModal({
   img,
@@ -25,8 +26,10 @@ function ShowImgModal({
   open: boolean;
   onClose: () => void;
 }) {
+  const router = useRouter();
   const [openAlert, setOpenAlert] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const { deleteFile } = useFiles();
 
   if (!img) {
     return <></>;
@@ -85,12 +88,13 @@ function ShowImgModal({
         onAccept={async () => {
           try {
             setDeleting(true);
-            const response = await deleteFileInParentFolder(img.id);
+            const response = await deleteFile(img.id);
             if (response.success) {
               toast.success(response.message);
               setOpenAlert(false);
               setDeleting(false);
               onClose();
+              router.refresh();
             } else {
               toast.error(response.message);
               setOpenAlert(false);

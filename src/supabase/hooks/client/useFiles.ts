@@ -35,8 +35,7 @@ export const useFiles = () => {
       const query = supabase
         .from("files")
         .select("*")
-        .eq("folder_id", folderId)
-        .order("file_name", { ascending: true });
+        .eq("folder_id", folderId);
       const { data, error } = await query;
       if (error) throw error;
       setFiles(data || []);
@@ -72,6 +71,46 @@ export const useFiles = () => {
     }
   };
 
+  const deleteFile = async (id: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { error } = await supabase.from("files").delete().eq("id", id);
+      if (error) {
+        return { success: false, message: error.message };
+      }
+      return { success: true, message: "Archivo eliminado correctamente" };
+    } catch (err) {
+      return {
+        success: false,
+        message:
+          err instanceof Error ? err.message : "Error al eliminar el archivo",
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteManyFiles = async (ids: string[]) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { error } = await supabase.from("files").delete().in("id", ids);
+      if (error) {
+        return { success: false, message: error.message };
+      }
+      return { success: true, message: "Archivos eliminados correctamente" };
+    } catch (err) {
+      return {
+        success: false,
+        message:
+          err instanceof Error ? err.message : "Error al eliminar los archivos",
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     files,
     file,
@@ -80,5 +119,7 @@ export const useFiles = () => {
     fetchFiles,
     fetchFileById,
     fetchFilesByFolderId,
+    deleteFile,
+    deleteManyFiles,
   };
 };

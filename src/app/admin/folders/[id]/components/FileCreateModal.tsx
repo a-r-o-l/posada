@@ -231,11 +231,14 @@ function FileCreateModal({
         </DialogHeader>
         <div className="w-full flex items-center justify-center flex-wrap gap-5 max-h-96 overflow-y-auto mt-10">
           {processing ? (
-            <div className="w-full flex flex-col items-center justify-center">
-              <span className="text-gray-600 mb-2">Cargando imágenes...</span>
-              <div className="w-full bg-gray-200 rounded-full h-2.5 dark:bg-gray-700">
-                <Progress value={progress} />
-              </div>
+            <div className="w-full flex flex-col items-center justify-center p-4">
+              <span className="text-gray-600 mb-2">
+                Procesando imágenes... {Math.round(progress)}%
+              </span>
+              <Progress value={progress} className="w-full" />
+              <span className="text-xs text-gray-400 mt-2">
+                Esto puede tomar unos minutos para muchas imágenes
+              </span>
             </div>
           ) : !images.length ? (
             <div className="w-full flex items-center justify-center">
@@ -297,18 +300,6 @@ function FileCreateModal({
             ))
           )}
           <canvas ref={canvasRef} style={{ display: "none" }} />
-          {processing && (
-            <div className="w-full flex flex-col items-center justify-center p-4">
-              <span className="text-gray-600 mb-2">
-                Procesando imágenes... {Math.round(progress)}%
-              </span>
-              <Progress value={progress} className="w-full" />
-              <span className="text-xs text-gray-400 mt-2">
-                Esto puede tomar unos minutos para muchas imágenes
-              </span>
-            </div>
-          )}
-
           {loading && !processing && (
             <div className="w-full flex flex-col items-center justify-center p-4">
               <span className="text-gray-600 mb-2">
