@@ -37,7 +37,6 @@ import {
   Trash2,
   School as School2,
   CalendarIcon,
-  X,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -105,18 +104,10 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
       fetchSalesByDate(
         date?.from?.toISOString().split("T")[0] || "",
         date?.to?.toISOString().split("T")[0] || "",
-        "all",
+        state,
       );
     }
   }, [date, state]);
-
-  // useEffect(() => {
-  //   if (selectedSale && selectedSale.is_new_sale) {
-  //     const runReadSale = async () =>
-  //       await updateSale(selectedSale.id, { is_new_sale: false });
-  //     runReadSale();
-  //   }
-  // }, [selectedSale]);
 
   const filteredSales = useMemo(() => {
     if (!sales || !sales.length) return [];
@@ -206,53 +197,64 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
               />
             </div>
             <div className="flex flex-col space-y-2 justify-center items-center w-60">
-              <Label>Filtrar por fecha</Label>
+              <Label>Desde</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
-                    id="date"
                     variant={"outline"}
                     className={cn(
                       "w-full justify-start text-left font-normal",
-                      !date && "text-muted-foreground",
+                      !date?.from && "text-muted-foreground",
                     )}
                   >
                     <CalendarIcon />
                     {date?.from ? (
-                      date.to ? (
-                        <>
-                          {format(date.from, "LLL dd, y", { locale: es })} /{" "}
-                          {format(date.to, "LLL dd, y", { locale: es })}
-                        </>
-                      ) : (
-                        format(date.from, "LLL dd, y", { locale: es })
-                      )
+                      format(date.from, "LLL dd, y", { locale: es })
                     ) : (
-                      <span>Selecciona fechas</span>
+                      <span>Selecciona fecha</span>
                     )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
-                    mode="range"
-                    defaultMonth={date?.from}
-                    selected={date}
-                    onSelect={setDate}
-                    numberOfMonths={3}
+                    mode="single"
+                    selected={date?.from}
+                    onSelect={(day) =>
+                      setDate((prev) => ({ from: day, to: prev?.to }))
+                    }
                     locale={es}
                   />
-                  {date && (
-                    <div className="p-2">
-                      <Button
-                        onClick={() => setDate(undefined)}
-                        variant="outline"
-                        size="sm"
-                      >
-                        Limpiar
-                        <X />
-                      </Button>
-                    </div>
-                  )}
+                </PopoverContent>
+              </Popover>
+            </div>
+            <div className="flex flex-col space-y-2 justify-center items-center w-60">
+              <Label>Hasta</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-full justify-start text-left font-normal",
+                      !date?.to && "text-muted-foreground",
+                    )}
+                  >
+                    <CalendarIcon />
+                    {date?.to ? (
+                      format(date.to, "LLL dd, y", { locale: es })
+                    ) : (
+                      <span>Selecciona fecha</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={date?.to}
+                    onSelect={(day) =>
+                      setDate((prev) => ({ from: prev?.from, to: day }))
+                    }
+                    locale={es}
+                  />
                 </PopoverContent>
               </Popover>
             </div>
@@ -365,7 +367,6 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
                   }`}
                   onClick={() => {
                     setSelectedSale(sale);
-                    console.log(sale);
                   }}
                 >
                   <TableCell>{sale.order}</TableCell>

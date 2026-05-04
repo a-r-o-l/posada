@@ -117,7 +117,7 @@ function FileCreateModal({
 
     const fontSize = Math.max(30, Math.min(width / 2, 80));
     ctx.font = `bold ${fontSize}px Arial`;
-    ctx.fillStyle = `rgba(255, 255, 255, 0.8)`;
+    ctx.fillStyle = `rgba(255, 255, 255, 0.6)`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 

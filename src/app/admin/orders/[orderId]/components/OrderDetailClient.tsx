@@ -27,7 +27,7 @@ import { es } from "date-fns/locale";
 import { ArrowLeft, Download } from "lucide-react";
 import NextImage from "next/image";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import TransferProofModal from "./TransferProofModal";
@@ -53,11 +53,23 @@ function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
   const [approving, setApproving] = React.useState(false);
   const [proofUrl, setProofUrl] = React.useState<string>("");
 
+  const changeIsNewSaleToFalse = useCallback(async () => {
+    if (sale.is_new_sale) {
+      const { success } = await updateSale(sale.id, { is_new_sale: false });
+      if (!success) {
+        console.log("Error al actualizar is_new_sale a false");
+      }
+    }
+  }, [sale]);
+
   useEffect(() => {
     if (sale) {
       fetchProfileStudentsByAccountId(sale.account_id);
       fetchSaleItemsBySaleId(sale.id);
       fetchDigitaldownloadsBySaleId(sale.id);
+      if (sale.is_new_sale) {
+        changeIsNewSaleToFalse();
+      }
     }
   }, [sale]);
   // Función para aprobar la orden
