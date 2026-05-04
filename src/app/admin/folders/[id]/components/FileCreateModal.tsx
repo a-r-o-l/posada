@@ -108,33 +108,37 @@ function FileCreateModal({
       img.onload = resolve;
     });
 
-    // ✅ REDUCIR TAMAÑO aún más
-    const scaleFactor = 4; // Más pequeño = más rápido
+    const scaleFactor = 4;
     const width = img.width / scaleFactor;
     const height = img.height / scaleFactor;
     canvas.width = width;
     canvas.height = height;
     ctx.drawImage(img, 0, 0, width, height);
 
-    // Texto más pequeño
-    const fontSize = Math.max(20, Math.min(width / 4, 50));
-    ctx.font = `${fontSize}px Arial`;
-    ctx.fillStyle = `rgba(255, 255, 255, 0.6)`;
+    let text = file.name;
+    if (text.length > 30) text = text.slice(0, 27) + "...";
+
+    const fontSize = Math.max(20, Math.min(width / 6, 40));
+    ctx.font = `bold ${fontSize}px Arial`;
+    ctx.fillStyle = `rgba(255, 255, 255, 0.75)`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
-    ctx.save();
-    ctx.translate(canvas.width / 2, canvas.height / 2);
-    ctx.rotate((-30 * Math.PI) / 180);
+    // Repetir el texto en una grilla cubriendo toda la imagen
+    const stepX = width / 2;
+    const stepY = height / 3;
 
-    // Texto limitado y con ajuste de línea
-    let text = file.name;
-    if (text.length > 30) text = text.slice(0, 27) + "...";
-    ctx.fillText(text, 0, 0);
-    ctx.restore();
+    for (let x = stepX / 2; x < width; x += stepX) {
+      for (let y = stepY / 2; y < height; y += stepY) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.rotate((-30 * Math.PI) / 180);
+        ctx.fillText(text, 0, 0);
+        ctx.restore();
+      }
+    }
 
-    // ✅ COMPRESIÓN MÁS AGRESIVA
-    const watermarkedPreview = canvas.toDataURL("image/jpeg", 0.5); // calidad 50%
+    const watermarkedPreview = canvas.toDataURL("image/jpeg", 0.5);
     const response = await fetch(watermarkedPreview);
     const blob = await response.blob();
     return new File([blob], file.name, { type: "image/jpeg" });

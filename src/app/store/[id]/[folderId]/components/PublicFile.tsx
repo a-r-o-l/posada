@@ -55,7 +55,7 @@ function PublicFile({
           }
         />
         {/* Overlay oscuro */}
-        <div className="absolute inset-0 bg-black/35 rounded-xl pointer-events-none" />
+        {/* <div className="absolute inset-0 bg-black/35 rounded-xl pointer-events-none" /> */}
       </AspectRatio>
     </div>
   );
