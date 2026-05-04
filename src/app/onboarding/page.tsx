@@ -55,6 +55,19 @@ export default function OnboardingPage() {
   const [selectedSchool, setSelectedSchool] = useState<string>("");
   const [selectedGrade, setSelectedGrade] = useState<string>("");
   const [year, setYear] = useState<string>("2026");
+  const [childrenAdded, setChildrenAdded] = useState<StudentFullDetails[] | []>(
+    [],
+  );
+
+  const addStudent = (student: StudentFullDetails) => {
+    if (!children.some((s) => s.id === student.id)) {
+      setChildrenAdded((prev) => [...prev, student]);
+      toast.success("Menor agregado");
+      setCreateChildrenModal(false);
+    } else {
+      toast.error("El menor ya fue agregado");
+    }
+  };
 
   const availableGrades = useMemo(() => {
     if (!selectedSchool) return [];
@@ -412,6 +425,7 @@ export default function OnboardingPage() {
                 setSearchParam={setSearchParam}
                 onUpdate={fetchProfileStudentsByAccountId}
                 accountId={user?.id || ""}
+                func={addStudent}
               />
             </div>
             <div className="flex items-center justify-center mt-5">

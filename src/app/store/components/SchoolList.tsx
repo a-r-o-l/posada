@@ -4,10 +4,19 @@ import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { School } from "@/supabase/models/school";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useAuthStore } from "@/zustand/auth-store";
 
 function SchoolList({ schools }: { schools: School[] }) {
+  const { currentUser } = useAuthStore();
   const router = useRouter();
-  const [availableSchools, setAvailableSchools] = useState<string[]>([]);
+  const [open, setOpen] = useState(false);
 
   // useEffect(() => {
   //   if (user?.id) {
@@ -31,7 +40,10 @@ function SchoolList({ schools }: { schools: School[] }) {
           variant="outline"
           className={`w-40 h-40 lg:w-60 lg:h-60 rounded-xl flex flex-col items-center gap-5`}
           onClick={() => {
-            router.push(`/store/${school.id}`);
+            if (currentUser?.role === "admin") {
+              router.push(`/store/${school.id}`);
+            }
+            setOpen(true);
           }}
         >
           <Avatar className="w-20 h-20 lg:w-40 lg:h-40">
@@ -48,6 +60,41 @@ function SchoolList({ schools }: { schools: School[] }) {
           </div>
         </Button>
       ))}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="p-0 pb-10" showCloseButton={false}>
+          <DialogHeader className="p-0">
+            <DialogTitle></DialogTitle>
+            <DialogDescription></DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col items-center justify-center text-center px-4">
+            <div
+              style={{ backgroundImage: "url(/logoposada.png)" }}
+              className="w-60 h-60 bg-contain bg-center bg-no-repeat"
+            ></div>
+            <h1 className="font-black text-5xl mt-4">
+              🚧 Tienda en construcción
+            </h1>
+            <p className="text-lg text-gray-700 mt-4 max-w-md">
+              Estamos trabajando para ofrecerte una mejor experiencia.
+            </p>
+            <p className="text-md text-gray-600 mt-2">📅 Vuelve pronto </p>
+            <div
+              style={{ backgroundImage: "url(/underConstruction.png)" }}
+              className="w-96 h-60 bg-contain bg-center bg-no-repeat mt-2"
+            ></div>
+            <div className="w-full">
+              <Button
+                className="w-full"
+                onClick={() => {
+                  setOpen(false);
+                }}
+              >
+                Cerrar
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

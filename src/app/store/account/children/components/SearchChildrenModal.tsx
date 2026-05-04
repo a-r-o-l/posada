@@ -31,6 +31,7 @@ function SearchChildrenModal({
   setSearchParam,
   onUpdate,
   accountId,
+  func,
 }: {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -39,6 +40,7 @@ function SearchChildrenModal({
   setSearchParam: React.Dispatch<React.SetStateAction<string>>;
   onUpdate: (id: string) => Promise<void>;
   accountId: string;
+  func?: (student: StudentFullDetails) => void;
 }) {
   const { fetchStudentsByGradeIdAndFullName, students, loading } =
     useStudents();
@@ -134,6 +136,10 @@ function SearchChildrenModal({
                     toast.error("Debe seleccionar un estudiante");
                     return;
                   }
+                  if (!!func) {
+                    func(selectedStudent);
+                    return;
+                  }
                   const { success } = await createProfileStudent({
                     student_id: selectedStudent.id,
                     profile_id: accountId,
@@ -154,7 +160,7 @@ function SearchChildrenModal({
                 {mutationLoading ? (
                   <Loader2 className="animate-spin h-5 w-5" />
                 ) : (
-                  "Agregar a mi cuenta"
+                  "Agregar menor"
                 )}
               </Button>
             </div>
