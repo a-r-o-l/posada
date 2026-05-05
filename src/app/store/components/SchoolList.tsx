@@ -42,6 +42,7 @@ function SchoolList({ schools }: { schools: School[] }) {
           onClick={() => {
             if (currentUser?.role === "admin") {
               router.push(`/store/${school.id}`);
+              return;
             }
             setOpen(true);
           }}
