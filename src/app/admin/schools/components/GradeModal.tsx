@@ -22,6 +22,7 @@ import { School } from "@/supabase/models/school";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useGrades } from "@/supabase/hooks/client/useGrades";
+import { useRouter } from "next/navigation";
 
 const initialValues = {
   grade: "",
@@ -44,6 +45,8 @@ function GradeModal({
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
 
+  const router = useRouter();
+
   const handleSubmit = async () => {
     setLoading(true);
     if (!school?.id) {
@@ -61,6 +64,7 @@ function GradeModal({
           toast.success(res.message);
           setLoading(false);
           onClose();
+          router.refresh();
         } else {
           toast.error(res.message);
           setLoading(false);
@@ -77,6 +81,7 @@ function GradeModal({
           toast.success(res.message);
           setLoading(false);
           onClose();
+          router.refresh();
         } else {
           toast.error(res.message);
           setLoading(false);

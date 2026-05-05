@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import { useStudents } from "@/supabase/hooks/client/useStudents";
 import { School } from "@/supabase/models/school";
 import { StudentFullDetails } from "@/supabase/models/student";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -38,6 +39,8 @@ function StudentModal({
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
 
+  const router = useRouter();
+
   const handleSubmit = async () => {
     setLoading(true);
     if (!school?.id || !grade) {
@@ -54,6 +57,7 @@ function StudentModal({
           toast.success(res.message);
           setLoading(false);
           onClose();
+          router.refresh();
         } else {
           toast.error(res.message);
           setLoading(false);
@@ -70,6 +74,7 @@ function StudentModal({
           toast.success(res.message);
           setLoading(false);
           onClose();
+          router.refresh();
         } else {
           toast.error(res.message);
           setLoading(false);

@@ -57,8 +57,8 @@ export const useGrades = () => {
           grade: formData.get("grade") as string,
           division: formData.get("division") as string,
           year: formData.get("year") as string,
-          display_name: formData.get("displayName") as string,
-          school_id: formData.get("schoolId") as string,
+          display_name: formData.get("display_name") as string,
+          school_id: formData.get("school_id") as string,
         })
         .select()
         .single();
