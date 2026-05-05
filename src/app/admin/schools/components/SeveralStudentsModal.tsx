@@ -19,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { createManyStudents } from "@/server/studentAction";
+import { useStudents } from "@/supabase/hooks/client/useStudents";
 import { Trash2, Upload } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -43,6 +43,7 @@ function SeveralStudentsModal({
 }) {
   const [fileSelected, setFileSelected] = useState<File | null>(null);
   const [page, setPage] = useState("0");
+  const { createManyStudents } = useStudents();
   const [students, setStudents] = useState<Student[] | []>([]);
   const [process, setProcess] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -57,14 +58,15 @@ function SeveralStudentsModal({
 
   const handleFileUpload = async (page: number) => {
     if (!fileSelected) return;
-
     const reader = new FileReader();
     reader.onload = async (e) => {
       const data = e.target?.result;
       const workbook = XLSX.read(data, { type: "binary" });
       const sheetName = workbook.SheetNames[page];
       const sheet = workbook.Sheets[sheetName];
-      const jsonData: any[] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+      const jsonData = XLSX.utils.sheet_to_json(sheet, {
+        header: 1,
+      }) as string[][];
 
       for (let i = 4; i < jsonData.length; i++) {
         const studentData = jsonData[i][0];
@@ -97,9 +99,9 @@ function SeveralStudentsModal({
     const parseStudents = students.map((student) => ({
       name: student.name,
       lastname: student.lastname,
-      displayName: `${student.name} ${student.lastname}`,
-      schoolId: school,
-      gradeId: grade,
+      display_name: `${student.name} ${student.lastname}`,
+      school_id: school,
+      grade_id: grade,
     }));
 
     const response = await createManyStudents(parseStudents);
@@ -197,7 +199,7 @@ function SeveralStudentsModal({
                                 variant="outline"
                                 onClick={() => {
                                   setStudents((prev) =>
-                                    prev.filter((_, i) => i !== index)
+                                    prev.filter((_, i) => i !== index),
                                   );
                                 }}
                               >

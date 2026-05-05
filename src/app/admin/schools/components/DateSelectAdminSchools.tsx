@@ -36,7 +36,7 @@ function DateSelectAdminSchools({ url }: { url: string }) {
         <div className="flex items-center gap-2">
           <Calendar size={24} />
           <Select value={year} onValueChange={setYear}>
-            <SelectTrigger className="border-[#139FDC] border-2">
+            <SelectTrigger className="border-[#139FDC] border-2 w-full">
               <SelectValue>{year}</SelectValue>
             </SelectTrigger>
             <SelectContent>

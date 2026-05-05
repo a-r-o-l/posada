@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { supabase } from "@/supabase/supabase";
-import { StudentFullDetails } from "@/supabase/models/student";
+import { Student, StudentFullDetails } from "@/supabase/models/student";
 
 export const useStudents = () => {
   const [students, setStudents] = useState<StudentFullDetails[]>([]);
   const [student, setStudent] = useState<StudentFullDetails | null>(null);
   const [loading, setLoading] = useState(false);
+  const [loadingMutation, setLoadingMutation] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchStudents = async () => {
@@ -238,6 +239,61 @@ export const useStudents = () => {
     }
   };
 
+  const createManyStudents = async (students: Partial<Student>[]) => {
+    try {
+      const { data, error } = await supabase
+        .from("students")
+        .upsert(students, {
+          onConflict: "id", // o el campo que identifique duplicados
+          ignoreDuplicates: false, // false: actualiza, true: ignora
+        })
+        .select();
+
+      if (error) {
+        throw error;
+      }
+      return {
+        success: true,
+        message: "Estudiantes creados/actualizados",
+        data: data,
+      };
+    } catch (error) {
+      console.error("Error creando estudiantes:", error);
+      return {
+        success: false,
+        message: "Error al crear los estudiantes",
+        error: error instanceof Error ? error.message : "Unknown error",
+      };
+    }
+  };
+
+  const deleteStudent = async (id: string) => {
+    try {
+      setLoadingMutation(true);
+      setError(null);
+
+      const { error } = await supabase.from("students").delete().eq("id", id);
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        message: "Estudiante eliminado exitosamente",
+      };
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Error al eliminar estudiante",
+      );
+      return {
+        success: false,
+        message:
+          err instanceof Error ? err.message : "Error al eliminar estudiante",
+      };
+    } finally {
+      setLoadingMutation(false);
+    }
+  };
+
   return {
     students,
     student,
@@ -250,5 +306,8 @@ export const useStudents = () => {
     fetchStudentsByGradeIdAndFullName,
     createStudent,
     updateStudent,
+    createManyStudents,
+    deleteStudent,
+    loadingMutation,
   };
 };

@@ -23,7 +23,6 @@ import { ArrowLeft, FileSpreadsheet, Pencil, Trash2 } from "lucide-react";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import StudentModal from "./StudentModal";
 import GradeModal from "./GradeModal";
-import { deleteStudent } from "@/server/studentAction";
 import { toast } from "sonner";
 import { initialsParser, nameParser } from "@/lib/utilsFunctions";
 import CustomDropDownMenu from "@/components/CustomDropDownMenu";
@@ -34,6 +33,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { School } from "@/supabase/models/school";
 import { Grade } from "@/supabase/models/grade";
 import { StudentFullDetails } from "@/supabase/models/student";
+import { useStudents } from "@/supabase/hooks/client/useStudents";
 
 function StudentsClientSide({
   schools,
@@ -49,6 +49,7 @@ function StudentsClientSide({
   students: StudentFullDetails[];
 }) {
   const router = useRouter();
+  const { deleteStudent, loadingMutation } = useStudents();
   const [studentModal, setStudentModal] = useState(false);
   const [gradeModal, setGradeModal] = useState(false);
   const [openSeveralStudentsModal, setOpenSeveralStudentsModal] =
@@ -286,6 +287,7 @@ function StudentsClientSide({
             toast.success(res.message);
             setOpenDeleteAlert(false);
             setSelectedStudent(null);
+            router.refresh();
           } else {
             toast.error(res.message);
           }
@@ -306,6 +308,7 @@ function StudentsClientSide({
             toast.error(res.message);
           }
         }}
+        loading={loadingMutation}
       />
       <StudentModal
         open={studentModal}
