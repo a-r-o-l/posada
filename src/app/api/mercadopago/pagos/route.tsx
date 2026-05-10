@@ -6,6 +6,16 @@ import { sendEmail } from "@/lib/brevo";
 import { newTahnksEmailTemplate } from "@/templates/thanksEmail";
 import { getSaleItemsBySaleId } from "@/supabase/hooks/server/sale_items";
 
+type BrevoHttpError = {
+  message?: string;
+  statusCode?: number;
+  body?: unknown;
+  response?: {
+    statusCode?: number;
+    body?: unknown;
+  };
+};
+
 export async function POST(request: Request) {
   try {
     const body: { data: { id: string } } = await request.json();
@@ -59,9 +69,15 @@ export async function POST(request: Request) {
             htmlContent: newTahnksEmailTemplate(foundSale, data),
           });
         } catch (emailError) {
+          const brevoError = emailError as BrevoHttpError;
           console.error(
             "Venta actualizada pero fallo el envio de email en Brevo:",
-            emailError,
+            {
+              message: brevoError.message,
+              statusCode:
+                brevoError.statusCode ?? brevoError.response?.statusCode,
+              body: brevoError.body ?? brevoError.response?.body,
+            },
           );
         }
 

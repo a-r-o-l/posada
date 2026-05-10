@@ -27,8 +27,8 @@ import {
 import { ThemeButton } from "@/components/ThemeButton";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import { useState } from "react";
-import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/zustand/auth-store";
 
 export function NavUser({
   user,
@@ -41,6 +41,11 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar();
   const [open, setOpen] = useState(false);
+  const { logout } = useAuthStore();
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   const router = useRouter();
 
@@ -113,10 +118,9 @@ export function NavUser({
         onClose={() => setOpen(false)}
         title="Cerrar Sesión"
         description="¿Estás seguro que deseas cerrar sesión?"
-        onAccept={async () => {
-          await signOut({
-            redirectTo: "/signin",
-          });
+        onAccept={() => {
+          handleLogout();
+          router.push("/");
         }}
       />
     </SidebarMenu>

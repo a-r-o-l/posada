@@ -4,12 +4,18 @@ import {
   TransactionalEmailsApiApiKeys,
 } from "@getbrevo/brevo";
 
-const apiInstance = new TransactionalEmailsApi();
+const getApiInstance = () => {
+  const apiKey = process.env.BREVO_API_KEY?.trim();
 
-apiInstance.setApiKey(
-  TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY as string,
-);
+  if (!apiKey) {
+    throw new Error("BREVO_API_KEY no esta configurada en el entorno");
+  }
+
+  const apiInstance = new TransactionalEmailsApi();
+  apiInstance.setApiKey(TransactionalEmailsApiApiKeys.apiKey, apiKey);
+
+  return apiInstance;
+};
 
 interface params {
   subject: string;
@@ -31,7 +37,7 @@ export async function sendEmail({ subject, to, htmlContent }: params) {
   smtpEmail.htmlContent = htmlContent;
   smtpEmail.sender = { name: "POSADA", email: "contacto@fotosposada.com.ar" };
 
-  await apiInstance.sendTransacEmail(smtpEmail);
+  await getApiInstance().sendTransacEmail(smtpEmail);
 }
 
 export async function sendEmailFromUser({
@@ -54,5 +60,5 @@ export async function sendEmailFromUser({
     email: senderEmail,
   };
 
-  await apiInstance.sendTransacEmail(smtpEmail);
+  await getApiInstance().sendTransacEmail(smtpEmail);
 }
