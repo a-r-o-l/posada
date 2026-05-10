@@ -1,6 +1,7 @@
 "use server";
 
 import fetch from "node-fetch";
+import { headers } from "next/headers";
 // import { createSale, getSale, updateSale } from "./saleAction";
 import { updateSale, createSale, getSale } from "@/supabase/hooks/server/sales";
 import { IMPPreference } from "@/types/mercadopago";
@@ -18,15 +19,50 @@ interface ISaleProduct {
 }
 
 const MERCADOPAGO_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN as string;
-const MERCADOPAGO_SUCCESS = process.env.MP_SUCCESS as string;
-const MERCADOPAGO_FAILURE = process.env.MP_FAILURE as string;
-const MERCADOPAGO_PENDING = process.env.MP_PENDING as string;
+
+const getBaseUrl = async () => {
+  const headerStore = await headers();
+  const origin = headerStore.get("origin");
+
+  if (origin) {
+    return origin;
+  }
+
+  const referer = headerStore.get("referer");
+  if (referer) {
+    return new URL(referer).origin;
+  }
+
+  const forwardedHost = headerStore.get("x-forwarded-host");
+  if (forwardedHost) {
+    const protocol = headerStore.get("x-forwarded-proto") ?? "https";
+    return `${protocol}://${forwardedHost}`;
+  }
+
+  return (
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    process.env.NEXTAUTH_URL ??
+    "http://localhost:3000"
+  );
+};
+
+const getBackUrls = async () => {
+  const baseUrl = await getBaseUrl();
+  const checkoutUrl = new URL("/checkout", baseUrl);
+
+  return {
+    success: `${checkoutUrl.toString()}?status=success`,
+    failure: `${checkoutUrl.toString()}?status=failure`,
+    pending: `${checkoutUrl.toString()}?status=pending`,
+  };
+};
 
 export const createPayment = async (data: FormData) => {
   if (!MERCADOPAGO_ACCESS_TOKEN) {
     throw new Error("El token de acceso de MercadoPago no está configurado.");
   }
   try {
+    const backUrls = await getBackUrls();
     const res = await createSale(data);
     if (res.success) {
       const prods = JSON.parse(data.get("products") as string);
@@ -42,11 +78,7 @@ export const createPayment = async (data: FormData) => {
         metadata: {
           sale: res.sale.id.toString(),
         },
-        back_urls: {
-          success: MERCADOPAGO_SUCCESS,
-          failure: MERCADOPAGO_FAILURE,
-          pending: MERCADOPAGO_PENDING,
-        },
+        back_urls: backUrls,
         auto_return: "approved",
       };
 

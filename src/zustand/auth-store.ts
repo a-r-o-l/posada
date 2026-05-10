@@ -47,6 +47,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       } = await supabase.auth.getUser();
 
       if (error) {
+        if (error.name === "AuthSessionMissingError") {
+          set({
+            currentUser: null,
+            isAuthenticated: false,
+            isLoading: false,
+          });
+          return;
+        }
+
         console.error("Error obteniendo sesión:", error);
         set({ isLoading: false });
         return;
@@ -109,8 +118,20 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         error,
       } = await supabase.auth.getUser();
 
-      if (error || !us) {
+      if (error) {
+        if (error.name === "AuthSessionMissingError") {
+          set({
+            currentUser: null,
+            isAuthenticated: false,
+          });
+          return;
+        }
+
         console.error("Error obteniendo sesión:", error);
+        return;
+      }
+
+      if (!us) {
         return;
       }
 
