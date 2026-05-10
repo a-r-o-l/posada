@@ -101,7 +101,9 @@ function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
     }
 
     // Extraer todos los nombres de colegios
-    const schoolNames = profileStudents.map((child) => child?.school?.name);
+    const schoolNames = profileStudents.map(
+      (child) => child?.student?.school?.name,
+    );
 
     // Eliminar duplicados usando Set
     return [...new Set(schoolNames)];
@@ -303,7 +305,7 @@ function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
       profileStudents.forEach((child) => {
         // Divide el texto en dos partes
         const nombreApellido = `${child?.student?.name} ${child?.student?.lastname} - `;
-        const gradoDivision = `${child?.grade?.grade} ${child?.grade?.division}`;
+        const gradoDivision = `${child?.student?.grade?.grade} ${child?.student?.grade?.division}`;
 
         // Calcula el ancho del nombre y apellido
         const nombreApellidoWidth = doc.getTextWidth(nombreApellido);
@@ -351,7 +353,13 @@ function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
           >
             <ArrowLeft />
           </Button>
-          <Button variant="outline" onClick={generatePDF}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              console.log(sale);
+              generatePDF();
+            }}
+          >
             <Download />
             Descargar
           </Button>

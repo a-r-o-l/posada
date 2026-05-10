@@ -32,7 +32,7 @@ function PaymentStatusComponent({ status }: { status: boolean }) {
             </Button>
             <Button
               variant="outline"
-              onClick={() => router.push("/store/purchases")}
+              onClick={() => router.push("/store/account/purchases")}
             >
               Ir a mis compras
             </Button>
@@ -69,7 +69,7 @@ function PaymentStatusComponent({ status }: { status: boolean }) {
           </Button>
           <Button
             variant="outline"
-            onClick={() => router.push("/store/purchases")}
+            onClick={() => router.push("/store/account/purchases")}
           >
             Ir a mis compras
           </Button>

@@ -55,7 +55,7 @@ function UserAvatar() {
             </DropdownMenuItem>
             <DropdownMenuItem
               className="flex items-center justify-between"
-              onClick={() => router.push("/store/purchases")}
+              onClick={() => router.push("/store/account/purchases")}
             >
               Mis compras
               <Package2 />

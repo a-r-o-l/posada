@@ -65,7 +65,7 @@ const api = {
         if (preference.id) {
           updateFormData.append("preference_id", preference.id);
         }
-        await updateSale(res.sale._id, updateFormData);
+        await updateSale(res.sale.id, updateFormData);
         return {
           success: true,
           message: res.message,
