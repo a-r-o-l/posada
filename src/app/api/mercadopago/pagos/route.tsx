@@ -49,6 +49,8 @@ export async function POST(request: Request) {
       formData.append("status", "approved");
       const res = await updateSale(saleId, formData, true);
 
+      console.log("RES -> ", res);
+
       // Si la actualización fue exitosa, enviar email
       if (res.success) {
         await sendEmail({
