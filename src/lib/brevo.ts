@@ -8,10 +8,8 @@ const apiInstance = new TransactionalEmailsApi();
 
 apiInstance.setApiKey(
   TransactionalEmailsApiApiKeys.apiKey,
-  process.env.BREVO_API_KEY as string
+  process.env.BREVO_API_KEY as string,
 );
-
-const smtpEmail = new SendSmtpEmail();
 
 interface params {
   subject: string;
@@ -27,6 +25,7 @@ interface ContactFormParams {
 }
 
 export async function sendEmail({ subject, to, htmlContent }: params) {
+  const smtpEmail = new SendSmtpEmail();
   smtpEmail.subject = subject;
   smtpEmail.to = to;
   smtpEmail.htmlContent = htmlContent;
@@ -41,6 +40,7 @@ export async function sendEmailFromUser({
   title,
   content,
 }: ContactFormParams) {
+  const smtpEmail = new SendSmtpEmail();
   smtpEmail.subject = title;
   smtpEmail.to = [
     {

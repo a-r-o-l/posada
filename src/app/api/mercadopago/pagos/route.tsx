@@ -47,16 +47,23 @@ export async function POST(request: Request) {
 
       // Si la actualización fue exitosa, enviar email
       if (res.success) {
-        await sendEmail({
-          subject: "Compra Exitosa",
-          to: [
-            {
-              name: foundSale?.profile?.name,
-              email: foundSale?.profile?.email,
-            },
-          ],
-          htmlContent: newTahnksEmailTemplate(foundSale, data),
-        });
+        try {
+          await sendEmail({
+            subject: "Compra Exitosa",
+            to: [
+              {
+                name: foundSale?.profile?.name,
+                email: foundSale?.profile?.email,
+              },
+            ],
+            htmlContent: newTahnksEmailTemplate(foundSale, data),
+          });
+        } catch (emailError) {
+          console.error(
+            "Venta actualizada pero fallo el envio de email en Brevo:",
+            emailError,
+          );
+        }
 
         return new Response(null, { status: 200 });
       } else {
