@@ -143,7 +143,9 @@ function SelectFileModal({
                     <SelectFileTableRow
                       item={item}
                       key={item.id}
-                      disabled={file?.is_group && item.order === 1}
+                      disabled={
+                        (file?.is_group && item?.order === 1) ?? undefined
+                      }
                       onPlus={() => {
                         if (file?.is_group && item.order === 1) {
                           toast.error(
