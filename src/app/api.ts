@@ -27,6 +27,7 @@ const api = {
     ): Promise<{ success: boolean; message: string; sale: SaleFullDetails }> {
       const saleId = formdata.get("saleId") as string;
       const res = await updateSale(saleId, formdata);
+      console.log("sale from api ", res);
       return res;
     },
     async submit(prods: IProd[], accountId: string, total: string) {
