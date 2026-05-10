@@ -27,26 +27,35 @@ export const useSales = () => {
   };
 
   const fetchSalesByDate = async (
-    start: string,
-    end: string,
+    start: string, // "2026-04-10"
+    end: string, // "2026-05-10"
     state: string,
   ) => {
     try {
       setQueryLoading(true);
       setError(null);
       let query = supabase.from("sales").select("*, profile:profile(*)");
+
       if (start) {
-        query = query.gte("date_created::date", start);
+        // Desde las 00:00:00 del día START (en UTC)
+        const startDate = new Date(`${start}T00:00:00.000Z`);
+        query = query.gte("date_created", startDate.toISOString());
       }
+
       if (end) {
-        query = query.lte("date_created::date", end);
+        // Hasta las 23:59:59.999 del día END (en UTC)
+        const endDate = new Date(`${end}T23:59:59.999Z`);
+        query = query.lte("date_created", endDate.toISOString());
       }
+
       if (state && state !== "all") {
         query = query.eq("status", state);
       }
+
       const { data: sales, error } = await query.order("date_created", {
         ascending: false,
       });
+
       if (error) throw error;
       setSales(sales || []);
     } catch (err) {
