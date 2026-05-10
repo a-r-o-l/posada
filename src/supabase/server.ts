@@ -15,7 +15,12 @@ export const createClient = async () => {
         },
         setAll(cookiesToSet) {
           for (const { name, value, options } of cookiesToSet) {
-            cookieStore.set(name, value, options);
+            try {
+              cookieStore.set(name, value, options);
+            } catch {
+              // Server Components can read cookies but cannot always write them.
+              // Middleware is responsible for refreshing persisted auth cookies.
+            }
           }
         },
       },

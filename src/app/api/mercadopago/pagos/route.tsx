@@ -14,8 +14,6 @@ export async function POST(request: Request) {
     // Obtener el ID de la venta desde la metadata
     // Ahora es un string, no un objeto completo
     const saleId = payment.metadata.sale;
-    console.log("saleId -> ", saleId);
-    console.log("type -> ", typeof saleId);
     // Obtener la venta completa de la base de datos
     const { sale: foundSale } = await getSale(saleId, true);
     const { data } = await getSaleItemsBySaleId(saleId, true);
@@ -39,8 +37,6 @@ export async function POST(request: Request) {
     formData.append("payment_type_id", payment.payment_type_id || "");
     formData.append("collector_id", payment.collector_id?.toString() || "");
 
-    console.log("PAYMENT -> ", payment);
-
     if (payment.payer) {
       formData.append("payer", JSON.stringify(payment.payer));
     }
@@ -48,8 +44,6 @@ export async function POST(request: Request) {
     if (payment.status === "approved") {
       formData.append("status", "approved");
       const res = await updateSale(saleId, formData, true);
-
-      console.log("RES -> ", res);
 
       // Si la actualización fue exitosa, enviar email
       if (res.success) {
