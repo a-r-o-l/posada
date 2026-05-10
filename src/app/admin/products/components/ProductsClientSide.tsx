@@ -45,6 +45,12 @@ function ProductsClientSide({
   const [openDeleteAlert, setOpenDeleteAlert] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
+  const sortedProducts = useMemo(() => {
+    return products.sort((a, b) => {
+      return a.order - b.order;
+    });
+  }, [products]);
+
   const selectedSchool = useMemo(() => {
     return schools.find((school) => school.id === selectedSchoolId);
   }, [selectedSchoolId, schools]);
@@ -119,12 +125,13 @@ function ProductsClientSide({
                     <TableHead>Descripcion</TableHead>
                     <TableHead>Precio</TableHead>
                     <TableHead>Descargable</TableHead>
+                    <TableHead>orden</TableHead>
                     <TableHead></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {!!products?.length ? (
-                    products.map((product) => (
+                  {!!sortedProducts?.length ? (
+                    sortedProducts.map((product) => (
                       <TableRow
                         key={product.id}
                         onClick={() => setSelectedProduct(product)}
@@ -147,6 +154,9 @@ function ProductsClientSide({
                           ) : (
                             <X className="text-red-500" />
                           )}
+                        </TableCell>
+                        <TableCell className="max-w-60 truncate">
+                          <p className="truncate">{product.order || "-"}</p>
                         </TableCell>
                         <TableCell className="text-end">
                           <ProductDropDownMenu
@@ -200,6 +210,7 @@ function ProductsClientSide({
           if (res.success) {
             toast.success(res.message);
             setOpenDeleteAlert(false);
+            router.refresh();
           } else {
             toast.error(res.message);
           }

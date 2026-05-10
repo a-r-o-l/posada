@@ -2,21 +2,35 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import React, { useState } from "react";
+import React, { useMemo } from "react";
 import { School } from "@/supabase/models/school";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { useAuthStore } from "@/zustand/auth-store";
+import { toast } from "sonner";
 
 function SchoolList({ schools }: { schools: School[] }) {
   const { currentUser } = useAuthStore();
   const router = useRouter();
-  const [open, setOpen] = useState(false);
+
+  const availableSchool = useMemo(() => {
+    if (!currentUser) {
+      return null;
+    }
+    if (currentUser) {
+      const schoolId = currentUser.schools?.[0];
+      return schoolId;
+    }
+    return null;
+  }, [currentUser]);
+
+  const isAdmin = useMemo(() => {
+    if (!currentUser) {
+      return false;
+    }
+    if (currentUser.role === "admin") {
+      return true;
+    }
+    return false;
+  }, [currentUser]);
 
   // useEffect(() => {
   //   if (user?.id) {
@@ -38,13 +52,16 @@ function SchoolList({ schools }: { schools: School[] }) {
         <Button
           key={school.id}
           variant="outline"
-          className={`w-40 h-40 lg:w-60 lg:h-60 rounded-xl flex flex-col items-center gap-5`}
+          className={`w-40 h-40 lg:w-60 lg:h-60 rounded-xl flex flex-col items-center gap-5 ${!isAdmin && availableSchool !== school.id ? "opacity-40 cursor-not-allowed" : "hover:bg-primary/10"}`}
           onClick={() => {
-            if (currentUser?.role === "admin") {
+            if (isAdmin) {
               router.push(`/store/${school.id}`);
               return;
+            } else if (availableSchool !== school.id) {
+              toast.error("No tienes acceso a este colegio");
+              return;
             }
-            setOpen(true);
+            router.push(`/store/${school.id}`);
           }}
         >
           <Avatar className="w-20 h-20 lg:w-40 lg:h-40">
@@ -61,7 +78,7 @@ function SchoolList({ schools }: { schools: School[] }) {
           </div>
         </Button>
       ))}
-      <Dialog open={open} onOpenChange={setOpen}>
+      {/* <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="p-0 pb-10" showCloseButton={false}>
           <DialogHeader className="p-0">
             <DialogTitle></DialogTitle>
@@ -95,7 +112,7 @@ function SchoolList({ schools }: { schools: School[] }) {
             </div>
           </div>
         </DialogContent>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 }

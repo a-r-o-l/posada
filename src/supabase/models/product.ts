@@ -10,6 +10,7 @@ export interface Product {
   is_downloadable: boolean;
   created_at: string | null;
   updated_at: string | null;
+  order: number;
 }
 
 export interface ProductFullDetails extends Product {

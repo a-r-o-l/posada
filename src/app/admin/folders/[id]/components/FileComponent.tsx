@@ -2,6 +2,7 @@
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { cn } from "@/lib/utils";
 import { FileFullDetails } from "@/supabase/models/file";
+import { Group } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 
@@ -27,7 +28,7 @@ function FileComponent({
   const [isLoading, setIsLoading] = useState(true);
   return (
     <div
-      className="w-40 flex justify-center items-center rounded-md hover:opacity-70 cursor-pointer"
+      className={`w-40 flex justify-center items-center rounded-md hover:opacity-70 cursor-pointer ${file.is_group ? "border-2 border-red-500" : ""}`}
       onClick={() => {
         onShowImage(file);
       }}

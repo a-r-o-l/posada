@@ -83,15 +83,17 @@ function Section6() {
               <p className="text-xl">
                 Los recibis por WhatsApp, al número registrado cuando creaste tu
                 cuenta o el que pusiste en el sobre. Las fotos se entregan en
-                alta resolución. Estamos trabajando para habilitar descarga
-                directa después del pago.
+                alta resolución.
               </p>
               <p className="text-xl mt-5">Te los enviamos:</p>
               <ul className="list-disc pl-5 text-xl">
                 <li>
                   Dentro de los 5 días tras el retiro de sobres (viernes).
                 </li>
-                <li>Dentro de los 4 días si el pedido fue por la web.</li>
+                <li>
+                  {`Inmediatamente despues de aprobar el pago, encontraras tus
+                  fotos en la seccion "Mis Fotos".`}
+                </li>
               </ul>
             </AccordionContent>
           </AccordionItem>
@@ -108,7 +110,8 @@ function Section6() {
               <p className="text-xl font-medium underline">Carpeta:</p>
               <ul className="list-disc pl-5 text-xl">
                 <li>
-                  Contiene dos fotos 20x25 cm: retrato individual y foto grupal{" "}
+                  Contiene dos fotos 20x25 cm: retrato individual y foto
+                  grupal{" "}
                 </li>
                 <li>Cartulina blanca de 27 x 44 cm (abierta).</li>
                 <li>Escudo del colegio impreso en la tapa.</li>
@@ -184,7 +187,8 @@ function Section6() {
                       viernes).
                     </li>
                     <li>
-                      Dentro de los 4 días si el pedido se hizo desde la web.
+                      {`Inmediatamente despues de aprobar el pago, encontraras tus
+                  fotos en la seccion "Mis Fotos".`}
                     </li>
                   </ul>
                 </li>

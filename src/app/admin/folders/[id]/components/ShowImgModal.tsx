@@ -16,20 +16,24 @@ import { toast } from "sonner";
 import { FileFullDetails } from "@/supabase/models/file";
 import { useFiles } from "@/supabase/hooks/client/useFiles";
 import { useRouter } from "next/navigation";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
 function ShowImgModal({
   img,
   open,
   onClose,
+  onRefresh,
 }: {
   img: FileFullDetails | null;
   open: boolean;
   onClose: () => void;
+  onRefresh: () => void;
 }) {
   const router = useRouter();
   const [openAlert, setOpenAlert] = useState(false);
   const [deleting, setDeleting] = useState(false);
-  const { deleteFile } = useFiles();
+  const { deleteFile, updateFile } = useFiles();
 
   if (!img) {
     return <></>;
@@ -58,7 +62,26 @@ function ShowImgModal({
               </AspectRatio>
             </div>
           )}
-          <div className="flex justify-end w-full gap-5">
+          <div className="flex justify-between w-full gap-5">
+            <div className="flex items-center gap-2">
+              <Label>Es grupal?</Label>
+              <Switch
+                checked={img.is_group || false}
+                onCheckedChange={async () => {
+                  const { success } = await updateFile(img.id, {
+                    is_group: !img.is_group,
+                  });
+                  if (success) {
+                    toast.success("Archivo actualizado");
+                    onClose();
+                    onRefresh();
+                    // router.refresh();
+                  } else {
+                    toast.error("Error al actualizar el archivo");
+                  }
+                }}
+              />
+            </div>
             <Button
               className="rounded-full"
               variant="outline"

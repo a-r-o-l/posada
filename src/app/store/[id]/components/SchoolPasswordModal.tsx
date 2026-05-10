@@ -65,7 +65,8 @@ function SchoolPasswordModal({
         <SchoolDialogHeader>
           <SchoolDialogTitle>{nameParser(school.name)}</SchoolDialogTitle>
           <SchoolDialogDescription>
-            Debe ingresar la contraseña para acceder a este colegio
+            Debe ingresar la contraseña que le envió el colegio para poder
+            acceder.
           </SchoolDialogDescription>
         </SchoolDialogHeader>
         <div className="space-y-2 mt-5">

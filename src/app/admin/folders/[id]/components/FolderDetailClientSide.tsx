@@ -162,6 +162,7 @@ function FolderDetailClientSide({
         img={openShowModal}
         open={!!openShowModal}
         onClose={() => setOpenShowModal(null)}
+        onRefresh={() => refreshData()}
       />
       <CustomAlertDialog
         title="Eliminar carpeta"

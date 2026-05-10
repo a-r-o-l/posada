@@ -22,6 +22,7 @@ export interface Profile {
   available_grades: string[];
   verified: boolean;
   disabled: boolean;
+  schools: string[];
 }
 
 export interface ProfileFullDetails extends Profile {

@@ -11,6 +11,7 @@ export interface File {
   original_image_url: string | null;
   price: number | null;
   is_new: boolean | null;
+  is_group: boolean | null;
   created_at: string | null;
   updated_at: string | null;
 }

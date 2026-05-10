@@ -16,7 +16,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import Image from "next/image";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import SelectFileTableRow from "./SelectFileTableRow";
 import { Button } from "@/components/ui/button";
 import { useCartStore } from "@/zustand/useCartStore";
@@ -100,6 +100,12 @@ function SelectFileModal({
     }
   };
 
+  const sortedProducts = useMemo(() => {
+    return data.sort((a, b) => {
+      return a.order - b.order;
+    });
+  }, [data]);
+
   return (
     <Drawer open={open} onOpenChange={onClose} dismissible={false}>
       <DrawerContent className="">
@@ -116,15 +122,6 @@ function SelectFileModal({
             <div className="w-80 h-80 flex justify-center">
               {file?.image_url && (
                 <PublicFile file={file} onClick={() => {}} fullWidth={true} />
-                // <AspectRatio ratio={1 / 1} className="w-full rounded-xl">
-                //   <Image
-                //     src={file?.image_url}
-                //     alt={file?.title}
-                //     layout="fill"
-                //     objectFit="contain"
-                //     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                //   />
-                // </AspectRatio>
               )}
             </div>
           </div>
@@ -142,12 +139,29 @@ function SelectFileModal({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data.map((item) => (
+                  {sortedProducts.map((item) => (
                     <SelectFileTableRow
                       item={item}
                       key={item.id}
-                      onPlus={() => handlePlus(item.id)}
-                      onMinus={() => handleMinus(item.id)}
+                      disabled={file?.is_group && item.order === 1}
+                      onPlus={() => {
+                        if (file?.is_group && item.order === 1) {
+                          toast.error(
+                            "Este producto no esta habilitado para fotos grupales",
+                          );
+                          return;
+                        }
+                        handlePlus(item.id);
+                      }}
+                      onMinus={() => {
+                        if (file?.is_group && item.order === 1) {
+                          toast.error(
+                            "Este producto no esta habilitado para fotos grupales",
+                          );
+                          return;
+                        }
+                        handleMinus(item.id);
+                      }}
                     />
                   ))}
                 </TableBody>

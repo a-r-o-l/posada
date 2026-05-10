@@ -112,6 +112,28 @@ export const useFiles = () => {
     }
   };
 
+  const updateFile = async (id: string, updates: Partial<FileFullDetails>) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { error } = await supabase
+        .from("files")
+        .update(updates)
+        .eq("id", id)
+        .single();
+      if (error) throw error;
+      return { success: true, message: "Archivo actualizado correctamente" };
+    } catch (err) {
+      return {
+        success: false,
+        message:
+          err instanceof Error ? err.message : "Error al actualizar el archivo",
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     files,
     file,
@@ -122,5 +144,6 @@ export const useFiles = () => {
     fetchFilesByFolderId,
     deleteFile,
     deleteManyFiles,
+    updateFile,
   };
 };

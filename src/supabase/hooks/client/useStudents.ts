@@ -88,7 +88,10 @@ export const useStudents = () => {
       setLoading(true);
       setError(null);
 
-      let query = supabase.from("students").select("*").eq("grade_id", id);
+      let query = supabase
+        .from("students")
+        .select("*, grade:grades(*), school:schools(*)")
+        .eq("grade_id", id);
 
       if (fullName && fullName.trim()) {
         const searchTerm = fullName.trim().toLowerCase();

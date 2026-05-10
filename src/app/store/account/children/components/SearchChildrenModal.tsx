@@ -76,7 +76,6 @@ function SearchChildrenModal({
                 <TableHead></TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Apellido</TableHead>
-                <TableHead>Curso</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -102,7 +101,6 @@ function SearchChildrenModal({
                     </TableCell>
                     <TableCell>{student.name}</TableCell>
                     <TableCell>{student.lastname}</TableCell>
-                    <TableCell>{student.grade?.display_name}</TableCell>
                   </TableRow>
                 ))
               ) : (

@@ -18,10 +18,12 @@ function SelectFileTableRow({
   item,
   onPlus,
   onMinus,
+  disabled,
 }: {
   item: IProductWithQuantity;
   onPlus: () => void;
   onMinus: () => void;
+  disabled?: boolean;
 }) {
   return (
     <TableRow>
@@ -48,9 +50,13 @@ function SelectFileTableRow({
           </Popover>
         )}
       </TableCell>
-      <TableCell>{item.name}</TableCell>
-      <TableCell className="whitespace-nowrap">
-        <span className="inline-flex items-center gap-1">
+      <TableCell className={`${disabled && "line-through"}`}>
+        {item.name}
+      </TableCell>
+      <TableCell className={`whitespace-nowrap`}>
+        <span
+          className={`inline-flex items-center gap-1 ${disabled && "line-through"}`}
+        >
           $ {item.price.toLocaleString("es-ES", { minimumFractionDigits: 0 })}
         </span>
       </TableCell>

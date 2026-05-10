@@ -15,6 +15,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useProducts } from "@/supabase/hooks/client/useProducts";
 import { Product } from "@/supabase/models/product";
 import { School } from "@/supabase/models/school";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { toast } from "sonner";
 
@@ -23,6 +24,7 @@ const initialValues = {
   description: "",
   price: "",
   isDownloadable: false,
+  order: "1",
 };
 
 function ProductModal({
@@ -39,7 +41,7 @@ function ProductModal({
   const { createProduct, updateProduct } = useProducts();
   const [loading, setLoading] = useState(false);
   const [values, setValues] = useState(initialValues);
-
+  const router = useRouter();
   const handleSubmit = async () => {
     setLoading(true);
     if (!school) {
@@ -48,6 +50,7 @@ function ProductModal({
     try {
       const formData = new FormData();
       formData.append("name", values.name);
+      formData.append("order", values.order);
       formData.append("description", values.description);
       formData.append("price", values.price);
       formData.append("school_id", school.id);
@@ -59,6 +62,7 @@ function ProductModal({
         toast.success(res.message);
         setLoading(false);
         onClose();
+        router.refresh();
       } else {
         toast.error(res.message);
         setLoading(false);
@@ -76,6 +80,7 @@ function ProductModal({
         description: product?.description || "",
         price: product.price.toString(),
         isDownloadable: product.is_downloadable,
+        order: !!product?.order ? product?.order?.toString() : "1",
       });
     } else {
       setValues(initialValues);
@@ -93,6 +98,13 @@ function ProductModal({
           <DialogDescription>colegio: {school?.name}</DialogDescription>
         </DialogHeader>
         <div className="flex flex-col gap-5">
+          <div className="space-y-2">
+            <Label>Orden</Label>
+            <Input
+              value={values.order}
+              onChange={(e) => setValues({ ...values, order: e.target.value })}
+            />
+          </div>
           <div className="space-y-2">
             <Label>Nombre</Label>
             <Input
@@ -135,7 +147,7 @@ function ProductModal({
 
         <div className="flex w-full justify-evenly mt-10 gap-5">
           <LoadingButton
-            title="Crear"
+            title={product ? "Actualizar producto" : "Crear producto"}
             loading={loading}
             onClick={handleSubmit}
             disabled={!values.name || !values.price}

@@ -80,6 +80,7 @@ export const useProducts = () => {
           name: formData.get("name") as string,
           description: formData.get("description") as string,
           price: Number(formData.get("price")),
+          order: Number(formData.get("order")),
           school_id: formData.get("school_id") as string,
           is_downloadable: isDownloadable,
         })
@@ -113,6 +114,7 @@ export const useProducts = () => {
           name: formData.get("name") as string,
           description: formData.get("description") as string,
           price: Number(formData.get("price")),
+          order: Number(formData.get("order")),
           is_downloadable: isDownloadable,
         })
         .eq("id", id)
