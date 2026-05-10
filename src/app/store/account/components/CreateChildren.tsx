@@ -8,16 +8,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { addChildToAccount } from "@/server/accountAction";
 import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 import { useSchools } from "@/supabase/hooks/client/useSchools";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -50,7 +46,6 @@ function CreateChildren({
   accountId: string;
   onChildAdded?: (child: StudentFullDetails) => void;
 }) {
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [searchParam, setSearchParam] = useState("");
   const { fetchSchools, schools } = useSchools();
@@ -59,7 +54,6 @@ function CreateChildren({
   const { fetchStudentsByGradeId, students } = useStudents();
   const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
   const [openPop, setOpenPop] = useState(false);
-  const [coin, setCoin] = useState("ARS");
 
   const filteredStudents = useMemo(() => {
     if (!searchParam) {
@@ -85,27 +79,27 @@ function CreateChildren({
     );
   }, [selectedSchool, schools]);
 
-  const handleAddChild = async (child: Student) => {
-    try {
-      setLoading(true);
-      const res = await addChildToAccount(accountId, child.id);
+  // const handleAddChild = async (child: Student) => {
+  //   try {
+  //     setLoading(true);
+  //     const res = await addChildToAccount(accountId, child.id);
 
-      if (res.success) {
-        toast.success(res.message);
-        onChildAdded?.(child);
-        setLoading(false);
-        onClose();
-        router.refresh();
-      } else {
-        toast.error(res.message || "Error al agregar el menor");
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Error adding child:", error);
-      toast.error("Error inesperado");
-      setLoading(false);
-    }
-  };
+  //     if (res.success) {
+  //       toast.success(res.message);
+  //       onChildAdded?.(child);
+  //       setLoading(false);
+  //       onClose();
+  //       router.refresh();
+  //     } else {
+  //       toast.error(res.message || "Error al agregar el menor");
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding child:", error);
+  //     toast.error("Error inesperado");
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     if (selectedGrade) {
@@ -264,7 +258,7 @@ function CreateChildren({
             <div className="flex justify-center">
               <Button
                 type="button"
-                onClick={() => handleAddChild(selectedStudent)}
+                // onClick={() => handleAddChild(selectedStudent)}
                 className="w-full"
               >
                 Agregar Estudiante

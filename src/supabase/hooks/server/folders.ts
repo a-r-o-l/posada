@@ -60,3 +60,13 @@ export async function getFolder(id: string) {
 
   return folder;
 }
+
+export async function deleteFolder(id: string) {
+  const supabase = await createClient();
+
+  const { error } = await supabase.from("folders").delete().eq("id", id);
+
+  if (error) throw new Error(error.message);
+
+  return { success: true, message: "Carpeta eliminada correctamente" };
+}

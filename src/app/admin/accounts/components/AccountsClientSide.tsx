@@ -23,26 +23,27 @@ import PasswordInput from "@/components/PasswordInput";
 import CreateAccountModal from "./CreateAccountModal";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
-import { changeDisabled, updateAccount } from "@/server/accountAction";
 import { toast } from "sonner";
 import { CircleX, Search, Trash2 } from "lucide-react";
 import CreateChildren from "./CreateChildren";
 import { Checkbox } from "@/components/ui/checkbox";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
-import { IStudentPopulated } from "@/models/Student";
 import { Profile, ProfileFullDetails } from "@/supabase/models/profile";
 import { useProfileStudents } from "@/supabase/hooks/client/useProfileStudents";
+import { useProfile } from "@/supabase/hooks/client/useProfile";
+import { StudentFullDetails } from "@/supabase/models/student";
 
 function AccountsClientSide({
   accounts,
   students,
 }: {
   accounts: ProfileFullDetails[];
-  students: IStudentPopulated[];
+  students: StudentFullDetails[];
 }) {
   const [selectedAccount, setSelectedAccount] =
     useState<ProfileFullDetails | null>(null);
   const { deleteProfileStudent } = useProfileStudents();
+  const { updateProfile } = useProfile();
   const [openAccountModal, setOpenAccountModal] = useState(false);
   const [openChildrenModal, setOpenChildrenModal] = useState(false);
   const [openVerifiedDialog, setOpenVerifiedDialog] = useState(false);
@@ -176,12 +177,12 @@ function AccountsClientSide({
                       <Switch
                         checked={!account?.disabled}
                         onCheckedChange={async () => {
-                          const response = await changeDisabled(
-                            account.id,
-                            !account?.disabled,
-                          );
+                          const response = await updateProfile({
+                            id: account.id,
+                            disabled: !account?.disabled,
+                          });
                           if (response?.success) {
-                            toast.success(response?.message);
+                            toast.success("Cuenta actualizada correctamente");
                           }
                         }}
                         onClick={(e) => e.stopPropagation()}
@@ -342,12 +343,15 @@ function AccountsClientSide({
           }
           const formData = new FormData();
           formData.append("verified", String(!selectedAccount.verified));
-          const res = await updateAccount(selectedAccount.id, formData);
+          const res = await updateProfile({
+            verified: !selectedAccount.verified,
+            id: selectedAccount.id,
+          });
           if (res.success) {
-            toast.success(res.message);
+            toast.success("Cuenta actualizada correctamente");
             setOpenVerifiedDialog(false);
           } else {
-            toast.error(res.message || "Error al actualizar la cuenta");
+            toast.error("Error al actualizar la cuenta");
           }
         }}
       />

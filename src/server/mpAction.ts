@@ -4,7 +4,18 @@ import fetch from "node-fetch";
 // import { createSale, getSale, updateSale } from "./saleAction";
 import { updateSale, createSale, getSale } from "@/supabase/hooks/server/sales";
 import { IMPPreference } from "@/types/mercadopago";
-import { ISaleProduct } from "@/models/Sale";
+
+interface ISaleProduct {
+  id: string;
+  fileId: string;
+  productId: string;
+  fileTitle: string;
+  fileImageUrl: string;
+  quantity: number;
+  name: string;
+  price: number;
+  total: number;
+}
 
 const MERCADOPAGO_ACCESS_TOKEN = process.env.MP_ACCESS_TOKEN as string;
 const MERCADOPAGO_SUCCESS = process.env.MP_SUCCESS as string;

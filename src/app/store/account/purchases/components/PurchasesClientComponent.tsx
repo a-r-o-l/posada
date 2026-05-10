@@ -38,11 +38,13 @@ import { useAuthStore } from "@/zustand/auth-store";
 import { useSales } from "@/supabase/hooks/client/useSales";
 import { SaleFullDetails } from "@/supabase/models/sale";
 import LoadingTable from "@/components/LoadingTable";
+import { serverUploadFile } from "@/supabase/serverStorage";
 
 function PurchasesClientComponent() {
   const router = useRouter();
   const { currentUser: user } = useAuthStore();
-  const { fetchSaleItemsByAccountId, sales, queryLoading } = useSales();
+  const { fetchSaleItemsByAccountId, sales, queryLoading, updateSale } =
+    useSales();
   // const [sales, setSales] = useState([]);
   const [selectedSale, setSelectedSale] = useState<SaleFullDetails | null>(
     null,
@@ -196,22 +198,24 @@ function PurchasesClientComponent() {
         }}
         onUpload={async (file: File) => {
           if (!saleToUpload) return;
-          const formData = new FormData();
-          formData.append("transferProof", file);
-          // Puedes crear un endpoint updateTransferProof en saleAction
-          const res = await (
-            await import("@/server/saleAction")
-          ).updateTransferProof(saleToUpload.id, formData);
-          if (res.success) {
+
+          const folder = "transfer";
+          const filename = `${Date.now()}_${file.name}`;
+          const { url } = await serverUploadFile(file, `${folder}/${filename}`);
+          const { success } = await updateSale(saleToUpload.id, {
+            transfer_proof_url: url || undefined,
+            transfer_status: url ? "uploaded" : "pending",
+          });
+
+          if (success) {
             toast.success(
               "¡Comprobante enviado! Tu compra estará pendiente hasta que el administrador la apruebe.",
             );
-            // Opcional: refrescar ventas
-            // const updatedSales = await getSalesByAccount(user?.id || "");
-            // if (updatedSales.success) setSales(updatedSales.sales);
           } else {
-            toast.error(res.message || "Error al subir el comprobante");
+            toast.error("Error al subir el comprobante, intente nuevamente");
           }
+          setOpenProofModal(false);
+          setSaleToUpload(null);
         }}
       />
     </Card>

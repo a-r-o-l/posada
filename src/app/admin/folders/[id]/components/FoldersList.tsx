@@ -1,14 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { IFolder } from "@/models/Folder";
 import { Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import FolderDropDownMenu from "../../components/FolderDropDownMenu";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
-import { deleteFolder } from "@/server/folderAction";
 import { toast } from "sonner";
 import FolderModal from "./FolderModal";
+import { deleteFolder } from "@/supabase/hooks/server/folders";
+import { FolderFullDetails } from "@/supabase/models/folder";
 
 const initialDeleteFolderState = {
   open: false,
@@ -16,7 +16,7 @@ const initialDeleteFolderState = {
 };
 const initialEditFolderState: {
   open: boolean;
-  folder: IFolder | null;
+  folder: FolderFullDetails | null;
   type: "edit" | "view";
 } = {
   open: false,
@@ -28,15 +28,15 @@ function FoldersList({
   folders,
   selectedFolder,
 }: {
-  folders?: IFolder[];
-  selectedFolder?: IFolder;
+  folders?: FolderFullDetails[];
+  selectedFolder?: FolderFullDetails;
 }) {
   const router = useRouter();
   const [openDeleteFolderModal, setOpenDeleteFolderModal] = useState(
-    initialDeleteFolderState
+    initialDeleteFolderState,
   );
   const [openEditFolderModal, setOpenEditFolderModal] = useState(
-    initialEditFolderState
+    initialEditFolderState,
   );
   const [deleteLoading, setDeleteLoading] = useState(false);
   return (
@@ -45,21 +45,21 @@ function FoldersList({
         folders?.map((folder) => {
           return (
             <Button
-              key={folder._id}
+              key={folder.id}
               variant={
-                selectedFolder?._id === folder._id ? "secondary" : "outline"
+                selectedFolder?.id === folder.id ? "secondary" : "outline"
               }
               className="w-full justify-start text-left mb-2 py-10"
               onClick={() => {
                 const currentUrl = new URL(window.location.href);
                 const params = new URLSearchParams(currentUrl.search);
-                params.set("folder", folder._id);
+                params.set("folder", folder.id);
                 router.push(`${currentUrl.pathname}?${params.toString()}`);
               }}
             >
               <div className="flex items-center space-x-2 w-full justify-between">
                 <div className="flex items-center gap-5">
-                  {folder.isPrivate ? <Lock /> : <></>}
+                  {folder.is_private ? <Lock /> : <></>}
                   <div>
                     <div className="font-semibold">{folder.title}</div>
                     <div className="text-sm text-gray-500">
@@ -71,13 +71,13 @@ function FoldersList({
                   onClick={() => {
                     const currentUrl = new URL(window.location.href);
                     const params = new URLSearchParams(currentUrl.search);
-                    params.set("folder", folder._id);
+                    params.set("folder", folder.id);
                     router.push(`${currentUrl.pathname}?${params.toString()}`);
                   }}
                   onDeleteClick={() =>
                     setOpenDeleteFolderModal({
                       open: true,
-                      folderId: folder._id,
+                      folderId: folder.id,
                     })
                   }
                   onEditClick={() =>

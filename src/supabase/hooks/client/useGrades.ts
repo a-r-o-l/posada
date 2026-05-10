@@ -105,6 +105,23 @@ export const useGrades = () => {
     }
   };
 
+  const deleteGrade = async (id: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { error } = await supabase.from("grades").delete().eq("id", id);
+      if (error) throw error;
+      return { success: true, message: "Curso eliminado correctamente" };
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Error al eliminar el curso";
+      setError(message);
+      return { success: false, message };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     grades,
     grade,
@@ -114,5 +131,6 @@ export const useGrades = () => {
     fetchGradesBySchoolId,
     createGrade,
     updateGrade,
+    deleteGrade,
   };
 };

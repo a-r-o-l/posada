@@ -1,5 +1,5 @@
-import { IProduct } from "@/models/Product";
-import { ISale } from "@/models/Sale";
+import { Product } from "@/supabase/models/product";
+import { Sale } from "@/supabase/models/sale";
 
 export interface IMPPreference {
   id: string;
@@ -15,8 +15,8 @@ export interface IMPPreference {
     quantity: number;
   }[];
   metadata?: {
-    products: IProduct[];
-    sale: ISale;
+    products: Product[];
+    sale: Sale;
   };
   back_urls?: {
     success: string;

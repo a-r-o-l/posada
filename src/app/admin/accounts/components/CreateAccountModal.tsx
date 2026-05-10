@@ -20,11 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ISchool } from "@/models/School";
-import { createAccount } from "@/server/accountAction";
-import { getAllSchools } from "@/server/schoolAction";
+import { useProfile } from "@/supabase/hooks/client/useProfile";
+import { School } from "@/supabase/models/school";
 import React, { useEffect, useState } from "react";
-import { toast } from "sonner";
 
 function CreateAccountModal({
   open,
@@ -35,35 +33,36 @@ function CreateAccountModal({
 }) {
   const [loading, setLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState("admin");
-  const [schools, setSchools] = useState<[] | ISchool[]>([]);
+  const [schools, setSchools] = useState<[] | School[]>([]);
+  const {} = useProfile();
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    try {
-      setLoading(true);
-      const formData = new FormData(event.currentTarget);
-      const response = await createAccount(formData, true);
-      if (response.success) {
-        toast.success(response.message);
-        onClose();
-      } else {
-        toast.error(response.message);
-      }
-    } catch (error) {
-      console.error("Error: ", error);
-      toast.error("Error en el servidor, intente nuevamente");
-    } finally {
-      setLoading(false);
-    }
-  }
+  // async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  //   event.preventDefault();
+  //   try {
+  //     setLoading(true);
+  //     const formData = new FormData(event.currentTarget);
+  //     const response = await createAccount(formData, true);
+  //     if (response.success) {
+  //       toast.success(response.message);
+  //       onClose();
+  //     } else {
+  //       toast.error(response.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error: ", error);
+  //     toast.error("Error en el servidor, intente nuevamente");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // }
 
-  useEffect(() => {
-    const fetchSchools = async () => {
-      const { schools } = await getAllSchools();
-      setSchools(schools);
-    };
-    fetchSchools();
-  }, []);
+  // useEffect(() => {
+  //   const fetchSchools = async () => {
+  //     const { schools } = await getAllSchools();
+  //     setSchools(schools);
+  //   };
+  //   fetchSchools();
+  // }, []);
 
   useEffect(() => {
     if (open) {
@@ -74,7 +73,7 @@ function CreateAccountModal({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={() => {}}>
           <DialogHeader>
             <DialogTitle>Crear cuenta</DialogTitle>
             <DialogDescription>
@@ -112,7 +111,7 @@ function CreateAccountModal({
                   </SelectTrigger>
                   <SelectContent>
                     {schools?.map((school) => (
-                      <SelectItem key={school._id} value={school._id}>
+                      <SelectItem key={school.id} value={school.id}>
                         {school.name}
                       </SelectItem>
                     ))}

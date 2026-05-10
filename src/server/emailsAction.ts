@@ -1,12 +1,8 @@
 "use server";
 
 import { sendEmail, sendEmailFromUser } from "@/lib/brevo";
-import { ISalePopulated } from "@/models/Sale";
 import { sendEmail as sendEmailFromServer } from "@/lib/brevo";
-import {
-  newTahnksEmailTemplate,
-  tahnksEmailTemplate,
-} from "@/templates/thanksEmail";
+import { newTahnksEmailTemplate } from "@/templates/thanksEmail";
 import { SaleFullDetails } from "@/supabase/models/sale";
 import { SaleItemsFullDetails } from "@/supabase/models/sale_items";
 
@@ -34,22 +30,6 @@ export const handleSendEmailFromUser = async (formdata: FormData) => {
     senderEmail,
     title,
     content,
-  });
-  return { success: true, message: "Email enviado" };
-};
-
-export const sendEmailToUserAfterApproveTransfer = async (
-  sale: ISalePopulated,
-) => {
-  await sendEmailFromServer({
-    subject: "Compra Exitosa",
-    to: [
-      {
-        name: sale.accountId.name,
-        email: sale.accountId.email,
-      },
-    ],
-    htmlContent: tahnksEmailTemplate(sale),
   });
   return { success: true, message: "Email enviado" };
 };

@@ -18,8 +18,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { IStudentPopulated } from "@/models/Student";
-import { addChildToAccount } from "@/server/accountAction";
+import { StudentFullDetails } from "@/supabase/models/student";
 import { Loader2 } from "lucide-react";
 import React, { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -33,7 +32,7 @@ function CreateChildren({
   open: boolean;
   onClose: () => void;
   accountId: string;
-  students?: IStudentPopulated[];
+  students?: StudentFullDetails[];
 }) {
   const [loading, setLoading] = useState(false);
   const [searchParam, setSearchParam] = useState("");
@@ -41,31 +40,31 @@ function CreateChildren({
   const filteredChildren = useMemo(() => {
     if (!students || !students.length) return [];
     if (!searchParam) return students;
-    return students.filter((child: IStudentPopulated) => {
-      const fullName = `${child.name} ${child.lastname}`.toLowerCase();
+    return students.filter((child: StudentFullDetails) => {
+      const fullName = `${child?.name} ${child?.lastname}`.toLowerCase();
       return fullName.includes(searchParam.toLowerCase());
     });
   }, [students, searchParam]);
 
-  const handleAddChild = async (child: IStudentPopulated) => {
-    try {
-      setLoading(true);
-      const res = await addChildToAccount(accountId, child._id);
+  // const handleAddChild = async (child: IStudentPopulated) => {
+  //   try {
+  //     setLoading(true);
+  //     const res = await addChildToAccount(accountId, child._id);
 
-      if (res.success) {
-        toast.success(res.message);
-        setLoading(false);
-        onClose();
-      } else {
-        toast.error(res.message || "Error al agregar el menor");
-        setLoading(false);
-      }
-    } catch (error) {
-      console.error("Error adding child:", error);
-      toast.error("Error inesperado");
-      setLoading(false);
-    }
-  };
+  //     if (res.success) {
+  //       toast.success(res.message);
+  //       setLoading(false);
+  //       onClose();
+  //     } else {
+  //       toast.error(res.message || "Error al agregar el menor");
+  //       setLoading(false);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error adding child:", error);
+  //     toast.error("Error inesperado");
+  //     setLoading(false);
+  //   }
+  // };
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -102,17 +101,17 @@ function CreateChildren({
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {filteredChildren.map((child: IStudentPopulated) => (
-                    <TableRow key={child._id}>
-                      <TableCell>{child.name}</TableCell>
-                      <TableCell>{child.lastname}</TableCell>
-                      <TableCell>{child?.schoolId?.name || ""}</TableCell>
-                      <TableCell>{child?.gradeId?.grade || ""}</TableCell>
+                  {filteredChildren.map((child: StudentFullDetails) => (
+                    <TableRow key={child.id}>
+                      <TableCell>{child?.name}</TableCell>
+                      <TableCell>{child?.lastname}</TableCell>
+                      <TableCell>{child?.school?.name || ""}</TableCell>
+                      <TableCell>{child?.grade?.grade || ""}</TableCell>
                       <TableCell>
                         <Button
                           variant="link"
                           disabled={loading}
-                          onClick={() => handleAddChild(child)}
+                          // onClick={() => handleAddChild(child)}
                         >
                           agregar
                         </Button>

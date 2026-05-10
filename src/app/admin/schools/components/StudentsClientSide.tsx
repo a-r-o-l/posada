@@ -28,12 +28,12 @@ import { initialsParser, nameParser } from "@/lib/utilsFunctions";
 import CustomDropDownMenu from "@/components/CustomDropDownMenu";
 import SeveralStudentsModal from "./SeveralStudentsModal";
 import DateSelectAdminSchools from "./DateSelectAdminSchools";
-import { deleteGrade } from "@/server/gradeAction";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { School } from "@/supabase/models/school";
 import { Grade } from "@/supabase/models/grade";
 import { StudentFullDetails } from "@/supabase/models/student";
 import { useStudents } from "@/supabase/hooks/client/useStudents";
+import { useGrades } from "@/supabase/hooks/client/useGrades";
 
 function StudentsClientSide({
   schools,
@@ -50,6 +50,7 @@ function StudentsClientSide({
 }) {
   const router = useRouter();
   const { deleteStudent, loadingMutation } = useStudents();
+  const { deleteGrade } = useGrades();
   const [studentModal, setStudentModal] = useState(false);
   const [gradeModal, setGradeModal] = useState(false);
   const [openSeveralStudentsModal, setOpenSeveralStudentsModal] =

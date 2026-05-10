@@ -1,6 +1,6 @@
-import { ISale } from "@/models/Sale";
 // import { createSale, getSale, updateSale } from "@/server/saleAction";
 import { createSale, getSale, updateSale } from "@/supabase/hooks/server/sales";
+import { SaleFullDetails } from "@/supabase/models/sale";
 import { MercadoPagoConfig, Preference } from "mercadopago";
 
 interface IProd {
@@ -24,7 +24,7 @@ const api = {
   product: {
     async update(
       formdata: FormData,
-    ): Promise<{ success: boolean; message: string; sale: ISale }> {
+    ): Promise<{ success: boolean; message: string; sale: SaleFullDetails }> {
       const saleId = formdata.get("saleId") as string;
       const res = await updateSale(saleId, formdata);
       return res;

@@ -13,7 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { IFolder } from "@/models/Folder";
+import { FolderFullDetails } from "@/supabase/models/folder";
 import React, { useEffect, useState } from "react";
 
 const initialValues = {
@@ -31,7 +31,7 @@ function FolderModal({
 }: {
   open: boolean;
   onClose: () => void;
-  folder?: IFolder | null;
+  folder?: FolderFullDetails | null;
   type: "edit" | "view";
 }) {
   const [values, setValues] = useState(initialValues);
@@ -42,7 +42,7 @@ function FolderModal({
         title: folder?.title,
         description: folder?.description || "",
         password: folder?.password || "",
-        isPrivate: folder?.isPrivate || false,
+        isPrivate: folder?.is_private || false,
       });
     } else {
       setValues(initialValues);
