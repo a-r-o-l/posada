@@ -13,6 +13,7 @@ import Section2Mini from "@/components/rootsComponents/section2/Section2Mini";
 import WhatsAppLogo from "@/icons/whatsappsvg";
 import Section6 from "@/components/rootsComponents/section6/Section6";
 import Section6Mini from "@/components/rootsComponents/section6/Section6Mini";
+import WelcomeTutorialModal from "@/components/WelcomeTutorialModal";
 
 const ready = true;
 
@@ -20,6 +21,7 @@ function page() {
   if (ready) {
     return (
       <main className="flex flex-col flex-1 bg-[#F0F1FF]">
+        <WelcomeTutorialModal />
         {/* <RootHeader /> */}
         {/* <MiniRootHeader /> */}
         <div className="py-20" id="quienes-somos">
