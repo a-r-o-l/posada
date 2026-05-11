@@ -5,6 +5,7 @@ interface WelcomeTutorialState {
   hasSeenTutorial: boolean;
   hasHydrated: boolean;
   markTutorialAsSeen: () => void;
+  resetTutorial: () => void;
   setHasHydrated: (value: boolean) => void;
 }
 
@@ -14,6 +15,7 @@ export const useWelcomeTutorialStore = create<WelcomeTutorialState>()(
       hasSeenTutorial: false,
       hasHydrated: false,
       markTutorialAsSeen: () => set({ hasSeenTutorial: true }),
+      resetTutorial: () => set({ hasSeenTutorial: false }),
       setHasHydrated: (value: boolean) => set({ hasHydrated: value }),
     }),
     {

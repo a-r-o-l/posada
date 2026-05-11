@@ -25,35 +25,33 @@ type TutorialStep = {
 
 const tutorialSteps: TutorialStep[] = [
   {
-    title: "Volvimos Con Novedades",
+    title: "Volvimos con novedades",
     description:
-      "Nos alegra tenerte de vuelta en Fotos Posada. Actualizamos la tienda con nuevas funciones para que comprar y gestionar tus fotos sea mas rapido, claro y comodo. Este mini tutorial te va a mostrar lo mas importante en menos de un minuto.",
+      "Nos alegra tenerte de vuelta en Fotos Posada. Actualizamos la tienda con nuevas funciones para que comprar y gestionar tus fotos sea más rápido, claro y cómodo. Este mini tutorial te va a mostrar lo más importante en menos de un minuto.",
     image: "/ui/products/random2.jpeg",
     imageAlt: "Bienvenida a Fotos Posada",
     badge: "Bienvenida",
   },
   {
-    title: "Completa tus preferencias por unica vez",
+    title: "Completa tus preferencias por única vez",
     description:
-      "Cuando ingreses a la tienda vas a pasar por un proceso donde actualizaremos tu informacion adicional. Primero vas a elegir el colegio al que pertenecen tus hijos y despues actualizaras los datos nuevamente de cada uno. Eso nos permite mostrarte contenido personalizado correctamente.",
+      "Cuando ingreses a la tienda vas a pasar por un proceso donde actualizaremos tu información adicional. Primero vas a elegir el colegio al que pertenecen tus hijos y después actualizarás los datos nuevamente de cada uno. Esto nos permite mostrarte contenido personalizado correctamente.",
     image: "/ui/products/random1.jpeg",
     imageAlt: "Onboarding de colegio e hijos",
     badge: "Paso 1",
   },
   {
-    title: "Nueva Seccion Mis Fotos",
-    description: `Ahora podés encontrar y descargar todas las fotos digitales que compres en el sitio, directamente desde la sección "Mis Fotos".
-¿Cómo funciona?
-Cuando realices una compra, las fotos aparecerán en esta sección, pero permanecerán pendientes y deshabilitadas para descargar hasta que se apruebe el pago.
-Una vez que el pago esté confirmado, las fotos se habilitarán automáticamente y las podrás descargar cuando quieras, las veces que necesites.`,
+    title: "Nueva sección Mis Fotos",
+    description:
+      'Ahora podés encontrar y descargar todas las fotos digitales que compres en el sitio, directamente desde la sección "Mis Fotos".\n¿Cómo funciona?\nCuando realices una compra, las fotos aparecerán en esta sección, pero permanecerán pendientes y deshabilitadas para descargar hasta que se apruebe el pago.\nUna vez que el pago esté confirmado, las fotos se habilitarán automáticamente y las podrás descargar cuando quieras, las veces que necesites.',
     image: "/ui/products/random2.jpeg",
     imageAlt: "Seccion Mis Fotos",
     badge: "Paso 2",
   },
   {
-    title: "Entregas de Fotos Impresas Sin Cambios",
+    title: "Entregas de fotos impresas sin cambios",
     description:
-      "Los demas productos (impresos en papel fotografico) se seguiran enviando al colegio correspondiente, como de costumbre. En esta nueva version de la web, el unico cambio en el proceso de entrega aplica a los archivos digitales, todo lo demas mantiene exactamente la misma modalidad de siempre.",
+      "Los demás productos (impresos en papel fotográfico) se seguirán enviando al colegio correspondiente, como de costumbre. En esta nueva versión de la web, el único cambio en el proceso de entrega aplica a los archivos digitales, todo lo demás mantiene exactamente la misma modalidad de siempre.",
     image: "/ui/products/random1.jpeg",
     imageAlt: "Entrega de productos impresos en colegio",
     badge: "Paso 3",

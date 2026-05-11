@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { supabase } from "@/supabase/supabase";
 import { Profile } from "@/supabase/models/profile";
+import { useWelcomeTutorialStore } from "@/zustand/useWelcomeTutorialStore";
 
 interface AuthStore {
   // Estado actual
@@ -218,6 +219,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     try {
       await supabase.auth.signOut();
+
+      useWelcomeTutorialStore.getState().resetTutorial();
 
       set({
         currentUser: null,
