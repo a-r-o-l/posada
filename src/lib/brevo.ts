@@ -35,7 +35,8 @@ export async function sendEmail({ subject, to, htmlContent }: params) {
   smtpEmail.subject = subject;
   smtpEmail.to = to;
   smtpEmail.htmlContent = htmlContent;
-  smtpEmail.sender = { name: "POSADA", email: "contacto@fotosposada.com.ar" };
+  smtpEmail.sender = { name: "POSADA", email: "crisposada22@gmail.com" };
+  // "contacto@fotosposada.com.ar"
 
   await getApiInstance().sendTransacEmail(smtpEmail);
 }
