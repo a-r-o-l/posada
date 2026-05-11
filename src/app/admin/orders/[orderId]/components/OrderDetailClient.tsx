@@ -233,6 +233,7 @@ function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
 
       // Agregar productos en una tabla
       const tableColumn = [
+        "Miniatura",
         "Archivo",
         "Producto",
         "Colegio",
@@ -243,8 +244,25 @@ function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
       ];
       const tableRows: string[][] = [];
 
+      // Pre-cargar miniaturas para poder dibujarlas dentro de la tabla
+      const thumbnailByRowIndex = new Map<number, string>();
+      await Promise.all(
+        saleItems.map(async (product, index) => {
+          const imageUrl = product?.file?.image_url;
+          if (!imageUrl) return;
+
+          try {
+            const thumbBase64 = await getImageBase64(imageUrl);
+            thumbnailByRowIndex.set(index, thumbBase64 as string);
+          } catch (error) {
+            console.error("No se pudo cargar miniatura para el PDF:", error);
+          }
+        }),
+      );
+
       saleItems.forEach((product) => {
         const productData: string[] = [
+          "",
           product?.file?.title || "",
           product?.product?.name || "",
           product?.product?.school?.name || "",
@@ -260,6 +278,18 @@ function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
         startY: startY + 80,
         head: [tableColumn],
         body: tableRows,
+        didDrawCell: (data) => {
+          if (data.section !== "body" || data.column.index !== 0) return;
+
+          const thumbnail = thumbnailByRowIndex.get(data.row.index);
+          if (!thumbnail) return;
+
+          const imgSize = 10;
+          const x = data.cell.x + (data.cell.width - imgSize) / 2;
+          const y = data.cell.y + (data.cell.height - imgSize) / 2;
+
+          doc.addImage(thumbnail, "PNG", x, y, imgSize, imgSize);
+        },
       });
 
       const finalY = startY + 160;
