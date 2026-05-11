@@ -135,7 +135,7 @@ export default function WelcomeTutorialModal() {
 
       <DialogContent
         showCloseButton={false}
-        className="max-w-3xl p-0 overflow-hidden border-0 bg-transparent shadow-none"
+        className="max-w-3xl p-0 overflow-y-auto max-h-[95dvh] border-0 bg-transparent shadow-none"
       >
         <div className="rounded-3xl border border-slate-200 bg-white shadow-[0_24px_80px_-24px_rgba(15,23,42,0.55)] overflow-hidden">
           <div className="relative bg-[linear-gradient(120deg,#0f172a_0%,#1e3a8a_58%,#16a34a_100%)] px-6 py-5 sm:px-8 sm:py-6">
@@ -161,7 +161,7 @@ export default function WelcomeTutorialModal() {
           </div>
 
           <div className="grid gap-0 md:grid-cols-[1.08fr_1fr]">
-            <div className="relative min-h-[240px] bg-slate-100 md:min-h-[360px]">
+            <div className="relative min-h-[140px] sm:min-h-[200px] bg-slate-100 md:min-h-[360px]">
               <Image
                 src={step.image}
                 alt={step.imageAlt}
@@ -172,16 +172,16 @@ export default function WelcomeTutorialModal() {
               <div className="absolute inset-0 bg-gradient-to-t from-black/35 to-transparent" />
             </div>
 
-            <div className="p-6 sm:p-8 flex flex-col">
+            <div className="p-4 sm:p-8 flex flex-col">
               <DialogHeader className="space-y-4 text-left">
                 <div
                   style={{ backgroundImage: "url(/logoposada.png)" }}
                   className="h-14 w-40 bg-contain bg-left bg-no-repeat"
                 />
-                <DialogTitle className="text-2xl font-black leading-tight text-slate-900">
+                <DialogTitle className="text-lg sm:text-2xl font-black leading-tight text-slate-900">
                   {step.title}
                 </DialogTitle>
-                <DialogDescription className="text-[15px] leading-relaxed text-slate-700">
+                <DialogDescription className="text-xs sm:text-[15px] leading-relaxed text-slate-700">
                   {step.description}
                 </DialogDescription>
               </DialogHeader>
