@@ -164,6 +164,7 @@ export default function WelcomeTutorialModal() {
                 src={step.image}
                 alt={step.imageAlt}
                 fill
+                sizes="(max-width: 768px) 100vw, 52vw"
                 className="object-cover"
                 priority={isFirstStep}
               />

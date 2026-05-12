@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useTransition } from "react";
 import {
   Dialog,
   DialogContent,
@@ -25,6 +25,7 @@ import { FcGoogle } from "react-icons/fc";
 import LoadingButton from "./LoadingButton";
 import { Loader2, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { loginToSyncCookies } from "@/server/sb-auth-actions";
 
 interface SignupData {
   email: string;
@@ -73,8 +74,8 @@ function RegisterModal({
   switchModal: () => void;
 }) {
   const router = useRouter();
-  const { loginWithGoogle, register } = useAuthStore();
-  const [loadingRegister, setLoadingRegister] = useState(false);
+  const { loginWithGoogle, register, initializeAuth, login } = useAuthStore();
+  const [isPending, startTransition] = useTransition();
   const [googleLoading, setGoogleLoading] = useState(false);
 
   const formRegister = useForm<z.infer<typeof formSchemaRegister>>({
@@ -88,25 +89,52 @@ function RegisterModal({
     },
   });
 
-  async function onSubmitRegister(values: z.infer<typeof formSchemaRegister>) {
-    setLoadingRegister(true);
-    const formData: SignupData = {
-      name: values.namer,
-      lastname: values.lastnamer,
-      email: values.emailr,
-      phone: values.phoner,
-      password: values.passwordr,
-    };
-    const success = await register(formData);
-    if (success) {
-      toast.success(
-        "Cuenta creada exitosamente. Por favor, completa tus datos adicionales.",
-      );
-      router.push(`/onboarding`);
-    } else {
-      toast.error("Error al crear la cuenta. Inténtalo de nuevo.");
-      setLoadingRegister(false);
-    }
+  function onSubmitRegister(values: z.infer<typeof formSchemaRegister>) {
+    startTransition(async () => {
+      try {
+        const formData: SignupData = {
+          name: values.namer,
+          lastname: values.lastnamer,
+          email: values.emailr,
+          phone: values.phoner,
+          password: values.passwordr,
+        };
+
+        const registerSuccess = await register(formData);
+
+        if (!registerSuccess) {
+          toast.error("Error al crear la cuenta. Inténtalo de nuevo.");
+          return;
+        }
+
+        const loginSuccess = await login(values.emailr, values.passwordr);
+
+        if (!loginSuccess) {
+          toast.error(
+            "La cuenta se creó, pero no se pudo iniciar sesión automáticamente.",
+          );
+          return;
+        }
+
+        await initializeAuth();
+
+        // Sincronizar cookies en servidor para que middleware los vea
+        const syncResult = await loginToSyncCookies(
+          values.emailr,
+          values.passwordr,
+        );
+        if (syncResult?.error) {
+          console.error("Error sincronizando cookies:", syncResult.error);
+        }
+
+        toast.success("¡Cuenta creada! Redirigiendo a configuración...");
+        onOpenChange(false);
+        router.push(`/onboarding`);
+      } catch (error) {
+        console.error("Error en flujo de registro:", error);
+        toast.error("Ocurrió un error al crear la cuenta. Inténtalo de nuevo.");
+      }
+    });
   }
 
   useEffect(() => {
@@ -150,6 +178,7 @@ function RegisterModal({
                       <Input
                         placeholder="Juan"
                         {...field}
+                        disabled={isPending}
                         autoComplete="off"
                         className="text-xs md:text-base"
                       />
@@ -170,6 +199,7 @@ function RegisterModal({
                       <Input
                         placeholder="Pérez"
                         {...field}
+                        disabled={isPending}
                         autoComplete="off"
                         className="text-xs md:text-base"
                       />
@@ -191,6 +221,7 @@ function RegisterModal({
                       <Input
                         placeholder="+54 9 11-1234-1234"
                         {...field}
+                        disabled={isPending}
                         autoComplete="off"
                         type="number"
                         className="text-xs md:text-base"
@@ -212,6 +243,7 @@ function RegisterModal({
                       <Input
                         placeholder="juanperez@ejemplo.com"
                         {...field}
+                        disabled={isPending}
                         autoComplete="off"
                         className="text-xs md:text-base"
                       />
@@ -232,6 +264,7 @@ function RegisterModal({
                       <Input
                         placeholder="********"
                         {...field}
+                        disabled={isPending}
                         autoComplete="off"
                         type="password"
                         className="text-xs md:text-base"
@@ -245,13 +278,13 @@ function RegisterModal({
 
             <div className="flex flex-col space-y-5 mt-10">
               <LoadingButton
-                loading={loadingRegister}
+                loading={isPending}
                 title="Crear Cuenta"
                 type="submit"
                 classname="rounded-full text-xs md:text-base w-full"
-                disabled={loadingRegister}
+                disabled={isPending}
               >
-                {!loadingRegister && <UserPlus className="mr-2 h-4 w-4" />}
+                {!isPending && <UserPlus className="mr-2 h-4 w-4" />}
               </LoadingButton>
 
               <div className="relative">
@@ -270,7 +303,7 @@ function RegisterModal({
                   await loginWithGoogle();
                   setGoogleLoading(false);
                 }}
-                disabled={loadingRegister || googleLoading}
+                disabled={isPending || googleLoading}
               >
                 {googleLoading ? (
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -283,7 +316,7 @@ function RegisterModal({
                 className="w-full rounded-full text-xs md:text-base"
                 type="button"
                 variant="outline"
-                disabled={loadingRegister}
+                disabled={isPending}
                 onClick={() => onOpenChange(false)}
               >
                 Cancelar
