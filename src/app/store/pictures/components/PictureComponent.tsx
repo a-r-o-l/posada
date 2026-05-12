@@ -3,6 +3,7 @@
 import { DigitalDownload } from "@/supabase/models/digital_downloads";
 import { Download, Lock, Image as ImageIcon, CheckCircle } from "lucide-react";
 import Image from "next/image";
+import { toast } from "sonner";
 
 interface DigitalDownloadsGridProps {
   download: DigitalDownload;
@@ -16,22 +17,43 @@ export function DigitalDownloadsGrid({
   return (
     <div className="group relative bg-white rounded-lg shadow-sm overflow-hidden transition-all duration-300 hover:cursor-pointer w-60">
       {/* Contenedor de la imagen */}
-      <div className="relative aspect-square bg-gray-100 overflow-hidden">
+      <div
+        className="relative aspect-square bg-gray-100 overflow-hidden"
+        onClick={() => {
+          if (download.status !== "approved") {
+            toast.info(
+              "Cuando el pago sea aprobado, podrás descargar esta imagen",
+            );
+          }
+        }}
+      >
         {download?.url ? (
           <div
             className="relative w-full h-full"
             onContextMenu={(e) => e.preventDefault()}
             onDragStart={(e) => e.preventDefault()}
           >
-            <Image
-              src={download?.url}
-              alt={download?.file_name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              onContextMenu={(e) => e.preventDefault()}
-              onDragStart={(e) => e.preventDefault()}
-              unoptimized
-            />
+            {download?.status === "approved" ? (
+              <Image
+                src={download?.url}
+                alt={download?.file_name}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                unoptimized
+              />
+            ) : (
+              <Image
+                src={download?.url}
+                alt={download?.file_name}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105 grayscale"
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                unoptimized
+              />
+            )}
           </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center">

@@ -1,6 +1,11 @@
 import { supabase } from "./supabase";
 
-const BUCKET_NAME = "posadasbucket";
+export const BUCKET_NAME = "posadasbucket";
+
+export const extractBucketPath = (url: string): string | null => {
+  const match = url.match(/\/object\/public\/[^/]+\/(.+)$/);
+  return match ? match[1] : null;
+};
 
 const BATCH_SIZE = 5; // Procesar 5 imágenes a la vez
 const DELAY_BETWEEN_BATCHES = 1000; // 1 segundo entre batches
@@ -24,7 +29,7 @@ export async function uploadFile(
     const { error: uploadError } = await supabase.storage
       .from(BUCKET_NAME)
       .upload(filePath, file, {
-        upsert: false,
+        upsert: true,
       });
 
     if (uploadError) {
@@ -218,6 +223,32 @@ export const createManyFilesSpb = async (
           error: error instanceof Error ? error.message : "Error desconocido",
         },
       ],
+    };
+  }
+};
+
+export const deleteFileFromBucket = async (filePath: string) => {
+  try {
+    const { error } = await supabase.storage
+      .from(BUCKET_NAME)
+      .remove([filePath]);
+
+    if (error) {
+      console.error("Error al eliminar el archivo:", error);
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
+
+    return {
+      success: true,
+    };
+  } catch (error) {
+    console.error("Error deleting file:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Error desconocido",
     };
   }
 };

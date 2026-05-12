@@ -32,8 +32,9 @@ function FilesTable({
   loading: boolean;
   onRefresh: () => void;
 }) {
-  const [selectedFiles, setSelectedFiles] = useState<string[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [openAlert, setOpenAlert] = useState(false);
+  const [loadingMutation, setLoadingMutation] = useState(false);
   const { deleteManyFiles } = useFiles();
 
   return (
@@ -68,8 +69,8 @@ function FilesTable({
                   }
                   onCheckedChange={(checked) => {
                     if (checked) {
-                      // Seleccionar todos los IDs
-                      setSelectedFiles(files.map((file) => file.id));
+                      // Seleccionar todos los archivos completos
+                      setSelectedFiles([...files]);
                     } else {
                       // Limpiar selección
                       setSelectedFiles([]);
@@ -99,15 +100,19 @@ function FilesTable({
                   </TableCell>
                   <TableCell>
                     <Checkbox
-                      checked={selectedFiles.includes(file.id)}
+                      checked={selectedFiles.some(
+                        (selected) => selected.id === file.id,
+                      )}
                       onCheckedChange={(checked) => {
                         if (checked) {
-                          // Agregar el id al array
-                          setSelectedFiles([...selectedFiles, file.id]);
+                          // Agregar el archivo completo al array
+                          setSelectedFiles([...selectedFiles, file]);
                         } else {
-                          // Remover el id del array
+                          // Remover el archivo del array por id
                           setSelectedFiles(
-                            selectedFiles.filter((id) => id !== file.id),
+                            selectedFiles.filter(
+                              (selected) => selected.id !== file.id,
+                            ),
                           );
                         }
                       }}
@@ -130,8 +135,9 @@ function FilesTable({
         description={`¿Estás seguro de que deseas eliminar ${selectedFiles.length} archivos? Esta acción no se puede deshacer.`}
         open={openAlert}
         onClose={() => setOpenAlert(false)}
-        loading={false}
+        loading={loadingMutation}
         onAccept={async () => {
+          setLoadingMutation(true);
           const { success } = await deleteManyFiles(selectedFiles);
           if (success) {
             toast.success("Archivos eliminados correctamente");
@@ -142,6 +148,7 @@ function FilesTable({
             toast.error("Error al eliminar los archivos, intenta de nuevo");
             setOpenAlert(false);
           }
+          setLoadingMutation(false);
         }}
       />
     </Card>

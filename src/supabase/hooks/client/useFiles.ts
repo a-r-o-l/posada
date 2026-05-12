@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { supabase } from "@/supabase/supabase";
 import { FileFullDetails } from "@/supabase/models/file";
+import { deleteFileFromBucket, extractBucketPath } from "@/supabase/storage";
 
 export const useFiles = () => {
   const [files, setFiles] = useState<FileFullDetails[]>([]);
@@ -92,15 +93,77 @@ export const useFiles = () => {
     }
   };
 
-  const deleteManyFiles = async (ids: string[]) => {
+  const deleteManyFiles = async (filesToDelete: FileFullDetails[]) => {
     try {
       setLoading(true);
       setError(null);
-      const { error } = await supabase.from("files").delete().in("id", ids);
-      if (error) {
-        return { success: false, message: error.message };
+
+      // PASO 1: Eliminar archivos del bucket (originales y con marca de agua)
+      const bucketErrors: Array<{
+        fileId: string;
+        fileName: string;
+        error: string;
+      }> = [];
+
+      for (const file of filesToDelete) {
+        // Construir las rutas según tu estructura de carpetas
+        const pathsToDelete: string[] = [];
+
+        // Ruta de la foto con marca de agua (la que se muestra en la tienda)
+        if (file.image_url) {
+          const path = extractBucketPath(file.image_url);
+          if (path) pathsToDelete.push(path);
+        }
+
+        if (file.original_image_url) {
+          const path = extractBucketPath(file.original_image_url);
+          if (path) pathsToDelete.push(path);
+        }
+
+        // Eliminar cada archivo del bucket
+        for (const path of pathsToDelete) {
+          const result = await deleteFileFromBucket(path);
+          if (!result.success) {
+            bucketErrors.push({
+              fileId: file.id,
+              fileName: file.title || file.id,
+              error:
+                result?.error || "Error desconocido al eliminar del bucket",
+            });
+          }
+        }
       }
-      return { success: true, message: "Archivos eliminados correctamente" };
+
+      // PASO 2: Eliminar los registros de la base de datos
+      const fileIds = filesToDelete.map((file) => file.id);
+      const { error: dbError } = await supabase
+        .from("files")
+        .delete()
+        .in("id", fileIds);
+
+      if (dbError) {
+        // Si falló la eliminación en DB, pero algunos archivos ya se borraron del bucket
+        // queda inconsistencia. Mejor avisar y revertir? (complicado)
+        return {
+          success: false,
+          message: `Error al eliminar registros: ${dbError.message}`,
+          bucketErrors: bucketErrors.length > 0 ? bucketErrors : undefined,
+        };
+      }
+
+      // PASO 3: Reportar resultados
+      if (bucketErrors.length > 0) {
+        return {
+          success: true, // Los registros se eliminaron, pero hubo errores en el bucket
+          message: `Archivos eliminados, pero ${bucketErrors.length} archivo(s) no pudieron eliminarse del almacenamiento. Pueden quedar huérfanos.`,
+          bucketErrors,
+        };
+      }
+
+      return {
+        success: true,
+        message: `${filesToDelete.length} archivo(s) eliminados correctamente`,
+      };
     } catch (err) {
       return {
         success: false,
