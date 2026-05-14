@@ -22,25 +22,17 @@ import PaymentBadge from "./PaymentBadge";
 import { Button } from "@/components/ui/button";
 
 import PaymentModal from "./PaymentModal";
-import UploadProofModal from "./UploadProofModal";
-import { toast } from "sonner";
 import { useAuthStore } from "@/zustand/auth-store";
 import { useSales } from "@/supabase/hooks/client/useSales";
 import { SaleFullDetails } from "@/supabase/models/sale";
 import LoadingTable from "@/components/LoadingTable";
-import { uploadFile } from "@/supabase/storage";
 
 function PurchasesClientComponent() {
   const router = useRouter();
   const { currentUser: user } = useAuthStore();
-  const { fetchSaleItemsByAccountId, sales, queryLoading, updateSale } =
-    useSales();
+  const { fetchSaleItemsByAccountId, sales, queryLoading } = useSales();
   // const [sales, setSales] = useState([]);
   const [selectedSale, setSelectedSale] = useState<SaleFullDetails | null>(
-    null,
-  );
-  const [openProofModal, setOpenProofModal] = useState(false);
-  const [saleToUpload, setSaleToUpload] = useState<SaleFullDetails | null>(
     null,
   );
 
@@ -183,34 +175,6 @@ function PurchasesClientComponent() {
         open={!!selectedSale}
         onClose={() => setSelectedSale(null)}
         sale={selectedSale}
-      />
-      <UploadProofModal
-        open={openProofModal}
-        onClose={() => {
-          setOpenProofModal(false);
-          setSaleToUpload(null);
-        }}
-        onUpload={async (file: File) => {
-          if (!saleToUpload) return;
-
-          const folder = "transfer";
-          const filename = `${Date.now()}_${file.name}`;
-          const { url } = await uploadFile(file, `${folder}/${filename}`);
-          const { success } = await updateSale(saleToUpload.id, {
-            transfer_proof_url: url || undefined,
-            transfer_status: url ? "uploaded" : "pending",
-          });
-
-          if (success) {
-            toast.success(
-              "¡Comprobante enviado! Tu compra estará pendiente hasta que el administrador la apruebe.",
-            );
-          } else {
-            toast.error("Error al subir el comprobante, intente nuevamente");
-          }
-          setOpenProofModal(false);
-          setSaleToUpload(null);
-        }}
       />
     </Card>
   );

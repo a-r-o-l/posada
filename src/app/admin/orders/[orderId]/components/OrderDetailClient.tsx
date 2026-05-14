@@ -371,6 +371,7 @@ function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
       console.error("Error al generar el PDF:", error);
     }
   };
+
   return (
     <Card>
       <CardHeader>

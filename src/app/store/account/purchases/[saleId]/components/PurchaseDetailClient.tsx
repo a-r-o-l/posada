@@ -201,8 +201,15 @@ function PurchaseDetailClient({ sale }: { sale: SaleFullDetails }) {
           if (!saleToUpload) return;
 
           const folder = "transfer";
-          const filename = `${Date.now()}_${file.name}`;
-          const { url } = await uploadFile(file, `${folder}/${filename}`);
+          const filename = `${Date.now()}_${saleToUpload.id}`;
+          const { url, success: uploadSuccess } = await uploadFile(
+            file,
+            `${folder}/${filename}`,
+          );
+          if (!uploadSuccess) {
+            toast.error("Error al subir el archivo, intente nuevamente");
+            return;
+          }
           const { success } = await updateSale(saleToUpload.id, {
             transfer_proof_url: url || undefined,
             transfer_status: url ? "uploaded" : "pending",
