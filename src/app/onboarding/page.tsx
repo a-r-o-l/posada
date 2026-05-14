@@ -33,6 +33,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import Page1 from "./components/Page1";
 import StepIndicator from "./components/StepIndicator";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -271,15 +272,17 @@ export default function OnboardingPage() {
                         <SelectValue placeholder="Seleccionar curso" />
                       </SelectTrigger>
                       <SelectContent>
-                        {availableGrades.map((grade) => (
-                          <SelectItem
-                            key={grade.id}
-                            value={grade.id}
-                            className="uppercase"
-                          >
-                            {grade.display_name} ({grade.year})
-                          </SelectItem>
-                        ))}
+                        <ScrollArea className="h-[250px]">
+                          {availableGrades.map((grade) => (
+                            <SelectItem
+                              key={grade.id}
+                              value={grade.id}
+                              className="uppercase"
+                            >
+                              {grade.display_name} ({grade.year})
+                            </SelectItem>
+                          ))}
+                        </ScrollArea>
                       </SelectContent>
                     </Select>
                   </div>
