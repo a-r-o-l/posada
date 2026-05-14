@@ -2,19 +2,7 @@ import { Payment } from "mercadopago";
 import { mercadopago } from "@/app/api";
 // import { getSale, updateSale } from "@/server/saleAction";
 import { getSale, updateSale } from "@/supabase/hooks/server/sales";
-import { sendEmail } from "@/lib/brevo";
-import { newTahnksEmailTemplate } from "@/templates/thanksEmail";
 import { getSaleItemsBySaleId } from "@/supabase/hooks/server/sale_items";
-
-type BrevoHttpError = {
-  message?: string;
-  statusCode?: number;
-  body?: unknown;
-  response?: {
-    statusCode?: number;
-    body?: unknown;
-  };
-};
 
 export async function POST(request: Request) {
   try {
@@ -57,29 +45,29 @@ export async function POST(request: Request) {
 
       // Si la actualización fue exitosa, enviar email
       if (res.success) {
-        try {
-          await sendEmail({
-            subject: "Compra Exitosa",
-            to: [
-              {
-                name: foundSale?.profile?.name,
-                email: foundSale?.profile?.email,
-              },
-            ],
-            htmlContent: newTahnksEmailTemplate(foundSale, data),
-          });
-        } catch (emailError) {
-          const brevoError = emailError as BrevoHttpError;
-          console.error(
-            "Venta actualizada pero fallo el envio de email en Brevo:",
-            {
-              message: brevoError.message,
-              statusCode:
-                brevoError.statusCode ?? brevoError.response?.statusCode,
-              body: brevoError.body ?? brevoError.response?.body,
-            },
-          );
-        }
+        // try {
+        //   await sendEmail({
+        //     subject: "Compra Exitosa",
+        //     to: [
+        //       {
+        //         name: foundSale?.profile?.name,
+        //         email: foundSale?.profile?.email,
+        //       },
+        //     ],
+        //     htmlContent: newTahnksEmailTemplate(foundSale, data),
+        //   });
+        // } catch (emailError) {
+        //   const brevoError = emailError as BrevoHttpError;
+        //   console.error(
+        //     "Venta actualizada pero fallo el envio de email en Brevo:",
+        //     {
+        //       message: brevoError.message,
+        //       statusCode:
+        //         brevoError.statusCode ?? brevoError.response?.statusCode,
+        //       body: brevoError.body ?? brevoError.response?.body,
+        //     },
+        //   );
+        // }
 
         return new Response(null, { status: 200 });
       } else {

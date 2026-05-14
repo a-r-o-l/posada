@@ -16,7 +16,7 @@ export const createTransferSale = async (payload: FormData) => {
     // Carpeta para comprobantes de transferencia
     const folder = "transfer";
     // Nombre único para el archivo
-    const filename = `${Date.now()}_${file.name}`;
+    const filename = `${Date.now()}`;
     const { url } = await serverUploadFile(file, `${folder}/${filename}`);
     transferProofUrl = url ?? "";
   }

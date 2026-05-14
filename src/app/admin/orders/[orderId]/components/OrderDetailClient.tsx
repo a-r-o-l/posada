@@ -32,7 +32,6 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import TransferProofModal from "./TransferProofModal";
 import { toast } from "sonner";
-import { newSendEmailToUserAfterApproveTransfer } from "@/server/emailsAction";
 import { SaleFullDetails } from "@/supabase/models/sale";
 import { useProfileStudents } from "@/supabase/hooks/client/useProfileStudents";
 import { useSaleItems } from "@/supabase/hooks/client/useSaleItems";
@@ -82,7 +81,7 @@ function OrderDetailClient({ sale }: { sale: SaleFullDetails }) {
         toast.error("Error al aprobar la orden");
         return;
       }
-      await newSendEmailToUserAfterApproveTransfer(sale, saleItems);
+      // await newSendEmailToUserAfterApproveTransfer(sale, saleItems);
       await new Promise((r) => setTimeout(r, 1000));
       toast.success("Orden aprobada correctamente");
       setProofModalOpen(false);
