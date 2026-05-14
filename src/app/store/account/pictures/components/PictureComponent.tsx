@@ -23,15 +23,27 @@ export function DigitalDownloadsGrid({
             onContextMenu={(e) => e.preventDefault()}
             onDragStart={(e) => e.preventDefault()}
           >
-            <Image
-              src={download?.url}
-              alt={download?.file_name}
-              fill
-              className="object-cover transition-transform duration-300 group-hover:scale-105"
-              onContextMenu={(e) => e.preventDefault()}
-              onDragStart={(e) => e.preventDefault()}
-              unoptimized
-            />
+            {download?.status === "approved" ? (
+              <Image
+                src={download?.url}
+                alt={download?.file_name}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                unoptimized
+              />
+            ) : (
+              <Image
+                src={download?.url}
+                alt={download?.file_name}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105 blur-sm"
+                onContextMenu={(e) => e.preventDefault()}
+                onDragStart={(e) => e.preventDefault()}
+                unoptimized
+              />
+            )}
           </div>
         ) : (
           <div className="w-full h-full flex items-center justify-center">

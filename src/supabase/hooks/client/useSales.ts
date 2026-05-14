@@ -39,20 +39,20 @@ export const useSales = () => {
       if (start) {
         // Desde las 00:00:00 del día START (en UTC)
         const startDate = new Date(`${start}T00:00:00.000Z`);
-        query = query.gte("date_created", startDate.toISOString());
+        query = query.gte("created_at", startDate.toISOString());
       }
 
       if (end) {
         // Hasta las 23:59:59.999 del día END (en UTC)
         const endDate = new Date(`${end}T23:59:59.999Z`);
-        query = query.lte("date_created", endDate.toISOString());
+        query = query.lte("created_at", endDate.toISOString());
       }
 
       if (state && state !== "all") {
         query = query.eq("status", state);
       }
 
-      const { data: sales, error } = await query.order("date_created", {
+      const { data: sales, error } = await query.order("created_at", {
         ascending: false,
       });
 

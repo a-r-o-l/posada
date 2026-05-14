@@ -7,7 +7,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useCartStore } from "@/zustand/useCartStore";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import React, { useMemo, useState } from "react";
 import { createPayment } from "@/server/mpAction";
 import { toast } from "sonner";
@@ -16,11 +16,11 @@ import { Banknote } from "lucide-react";
 import TransferModal from "./TransferModal";
 import BigCartItemsTable from "./BigCartItemsTable";
 import SmallCartItemsTable from "./SmallCartItemsTable";
-// import { createTransferSale } from "@/server/saleAction";
 import { createTransferSale } from "@/supabase/hooks/server/transferSale";
 import { useAuthStore } from "@/zustand/auth-store";
 
 function CartItemsList() {
+  const router = useRouter();
   const { currentUser: account } = useAuthStore();
   const cartItems = useCartStore((state) => state.products);
   const cleanCart = useCartStore((state) => state.clearCart);
@@ -125,6 +125,7 @@ function CartItemsList() {
                   "Venta creada correctamente. Puedes subir el comprobante desde Mis Compras.",
                 );
               }
+              router.push("/store/cart/checkout?status=success&type=transfer");
             } else {
               toast.error(res.message || "Error al crear la venta");
             }

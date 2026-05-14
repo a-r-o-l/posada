@@ -23,14 +23,22 @@ import NextImage from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import PaymentBadge from "../../components/PaymentBadge";
-import DeliveryBadge from "../../components/DeliveryBadge";
 import PaymentModal from "../../components/PaymentModal";
 import { SaleFullDetails } from "@/supabase/models/sale";
 import { useSaleItems } from "@/supabase/hooks/client/useSaleItems";
+import { toast } from "sonner";
+import { uploadFile } from "@/supabase/storage";
+import UploadProofModal from "../../components/UploadProofModal";
+import { useSales } from "@/supabase/hooks/client/useSales";
 
 function PurchaseDetailClient({ sale }: { sale: SaleFullDetails }) {
   const router = useRouter();
   const { fetchSaleItemsBySaleId, saleItems: products } = useSaleItems();
+  const [openProofModal, setOpenProofModal] = useState(false);
+  const [saleToUpload, setSaleToUpload] = useState<SaleFullDetails | null>(
+    null,
+  );
+  const { updateSale } = useSales();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -65,6 +73,28 @@ function PurchaseDetailClient({ sale }: { sale: SaleFullDetails }) {
                 Pagar ahora
               </Button>
             )}
+
+          {sale.status !== "approved" &&
+            sale.payment_type_id === "transfer" && (
+              <Button
+                className="flex items-center justify-center gap-2 rounded-md p-2 px-4"
+                variant="secondary"
+                onClick={() => {
+                  setSaleToUpload(sale);
+                  setOpenProofModal(true);
+                }}
+                disabled={
+                  sale.transfer_status === "approved" ||
+                  sale.transfer_status === "uploaded"
+                }
+              >
+                {sale.transfer_status === "approved"
+                  ? "Comprobante aprobado"
+                  : sale.transfer_status === "uploaded"
+                    ? "Comprobante en revisión"
+                    : "Subir comprobante"}
+              </Button>
+            )}
         </div>
         <CardTitle></CardTitle>
         <CardDescription></CardDescription>
@@ -81,17 +111,22 @@ function PurchaseDetailClient({ sale }: { sale: SaleFullDetails }) {
                   <TableRow>
                     <TableHead>Orden</TableHead>
                     <TableHead>Transaccion</TableHead>
+                    <TableHead>Tipo</TableHead>
                     <TableHead>Fecha</TableHead>
                     <TableHead>Cliente</TableHead>
                     <TableHead>Total</TableHead>
                     <TableHead>Estado</TableHead>
-                    <TableHead>Entrega</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   <TableRow>
                     <TableCell>{sale.order}</TableCell>
                     <TableCell>{sale.transaction_id || "-"}</TableCell>
+                    <TableCell>
+                      {sale.payment_type_id === "transfer"
+                        ? "Transferencia"
+                        : "Mercado pago"}
+                    </TableCell>
                     <TableCell>
                       {format(sale.created_at!, "dd / MM / yyyy", {
                         locale: es,
@@ -105,9 +140,6 @@ function PurchaseDetailClient({ sale }: { sale: SaleFullDetails }) {
                         paymentTypeId={sale?.payment_type_id || ""}
                         transferProofUrl={sale?.transfer_proof_url || ""}
                       />
-                    </TableCell>
-                    <TableCell>
-                      <DeliveryBadge state={sale?.delivered || false} />
                     </TableCell>
                   </TableRow>
                 </TableBody>
@@ -159,6 +191,34 @@ function PurchaseDetailClient({ sale }: { sale: SaleFullDetails }) {
         </div>
       </CardContent>
       <PaymentModal open={open} onClose={() => setOpen(false)} sale={sale} />
+      <UploadProofModal
+        open={openProofModal}
+        onClose={() => {
+          setOpenProofModal(false);
+          setSaleToUpload(null);
+        }}
+        onUpload={async (file: File) => {
+          if (!saleToUpload) return;
+
+          const folder = "transfer";
+          const filename = `${Date.now()}_${file.name}`;
+          const { url } = await uploadFile(file, `${folder}/${filename}`);
+          const { success } = await updateSale(saleToUpload.id, {
+            transfer_proof_url: url || undefined,
+            transfer_status: url ? "uploaded" : "pending",
+          });
+
+          if (success) {
+            toast.success(
+              "¡Comprobante enviado! Tu compra estará pendiente hasta que el administrador la apruebe.",
+            );
+          } else {
+            toast.error("Error al subir el comprobante, intente nuevamente");
+          }
+          setOpenProofModal(false);
+          setSaleToUpload(null);
+        }}
+      />
     </Card>
   );
 }

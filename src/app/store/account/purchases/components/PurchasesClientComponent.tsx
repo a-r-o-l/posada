@@ -19,18 +19,8 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import PaymentBadge from "./PaymentBadge";
-import DeliveryBadge from "./DeliveryBadge";
 import { Button } from "@/components/ui/button";
-import { Banknote, Ellipsis, ReceiptText } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import PaymentModal from "./PaymentModal";
 import UploadProofModal from "./UploadProofModal";
 import { toast } from "sonner";
@@ -38,7 +28,7 @@ import { useAuthStore } from "@/zustand/auth-store";
 import { useSales } from "@/supabase/hooks/client/useSales";
 import { SaleFullDetails } from "@/supabase/models/sale";
 import LoadingTable from "@/components/LoadingTable";
-import { serverUploadFile } from "@/supabase/serverStorage";
+import { uploadFile } from "@/supabase/storage";
 
 function PurchasesClientComponent() {
   const router = useRouter();
@@ -77,7 +67,6 @@ function PurchasesClientComponent() {
               <TableHead>Tipo de pago</TableHead>
               <TableHead>Total</TableHead>
               <TableHead>Estado de pago</TableHead>
-              <TableHead>Estado de entrega</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>
@@ -86,7 +75,6 @@ function PurchasesClientComponent() {
               <LoadingTable span={7} />
             ) : !!sales.length ? (
               sales.map((sale: SaleFullDetails, index) => {
-                const isTransfer = sale.payment_type_id === "transfer";
                 return (
                   <TableRow key={index}>
                     <TableCell className="truncate max-w-20">
@@ -110,11 +98,17 @@ function PurchasesClientComponent() {
                         transferProofUrl={sale.transfer_proof_url || ""}
                       />
                     </TableCell>
-                    <TableCell>
-                      <DeliveryBadge state={sale.delivered || false} />
-                    </TableCell>
                     <TableCell className="">
-                      <DropdownMenu>
+                      <Button
+                        className="flex items-center justify-between"
+                        variant="outline"
+                        onClick={() =>
+                          router.push(`/store/account/purchases/${sale.id}`)
+                        }
+                      >
+                        Ver detalles
+                      </Button>
+                      {/* <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button
                             variant="outline"
@@ -167,7 +161,7 @@ function PurchasesClientComponent() {
                             )}
                           </DropdownMenuGroup>
                         </DropdownMenuContent>
-                      </DropdownMenu>
+                      </DropdownMenu> */}
                     </TableCell>
                   </TableRow>
                 );
@@ -201,7 +195,7 @@ function PurchasesClientComponent() {
 
           const folder = "transfer";
           const filename = `${Date.now()}_${file.name}`;
-          const { url } = await serverUploadFile(file, `${folder}/${filename}`);
+          const { url } = await uploadFile(file, `${folder}/${filename}`);
           const { success } = await updateSale(saleToUpload.id, {
             transfer_proof_url: url || undefined,
             transfer_status: url ? "uploaded" : "pending",

@@ -8,7 +8,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { addMonths, format } from "date-fns";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Table,
   TableBody,
@@ -86,6 +86,7 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
   });
   const [state, setState] = useState("all");
   const { fetchSalesByDate, sales } = useSales();
+  const fetchSalesByDateRef = useRef(fetchSalesByDate);
 
   // Mostrar todos los colegios disponibles
   const allSchools = useMemo(() => {
@@ -94,14 +95,23 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
 
   // Inicializar con todos los colegios seleccionados
   useEffect(() => {
-    if (allSchools.length > 0 && selectedSchools.length === 0) {
-      setSelectedSchools(allSchools.map((school) => school.id));
+    if (allSchools.length > 0) {
+      setSelectedSchools((prev) => {
+        if (prev.length === 0) {
+          return allSchools.map((school) => school.id);
+        }
+        return prev;
+      });
     }
-  }, [allSchools, selectedSchools.length]);
+  }, [allSchools]);
+
+  useEffect(() => {
+    fetchSalesByDateRef.current = fetchSalesByDate;
+  }, [fetchSalesByDate]);
 
   useEffect(() => {
     if (state && date) {
-      fetchSalesByDate(
+      fetchSalesByDateRef.current(
         date?.from?.toISOString().split("T")[0] || "",
         date?.to?.toISOString().split("T")[0] || "",
         state,
@@ -125,17 +135,28 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
       });
     }
     // Filtro por colegios seleccionados
-    // if (selectedSchools.length > 0) {
-    //   console.log("selectedSchools.length > 0");
-    //   filtered = filtered.filter((sale) => {
-    //     const schoolId = sale.products?.[0]?.;
-    //     return (
-    //       typeof schoolId === "string" && selectedSchools.includes(schoolId)
-    //     );
-    //   });
-    // }
+    // 1) Sin colegios seleccionados => no mostrar resultados
+    // 2) Todos seleccionados => no aplicar filtro por colegio
+    // 3) Seleccion parcial => filtrar por interseccion profile.schools / selectedSchools
+    if (allSchools.length > 0) {
+      if (selectedSchools.length === 0) {
+        return [];
+      }
+
+      const areAllSchoolsSelected =
+        selectedSchools.length === allSchools.length;
+
+      if (!areAllSchoolsSelected) {
+        filtered = filtered.filter((sale) => {
+          const profileSchools = sale?.profile?.schools || [];
+          return profileSchools.some((schoolId) =>
+            selectedSchools.includes(schoolId),
+          );
+        });
+      }
+    }
     return filtered;
-  }, [searchParams, sales, selectedSchools, order]);
+  }, [searchParams, sales, selectedSchools, order, allSchools.length]);
 
   const salesQuantity = useMemo(() => {
     if (!filteredSales || !filteredSales.length)
@@ -169,6 +190,10 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
 
   const selectAllSchools = () => {
     setSelectedSchools(allSchools.map((school) => school.id));
+  };
+
+  const deselectAllSchools = () => {
+    setSelectedSchools([]);
   };
 
   return (
@@ -315,11 +340,37 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
               <DropdownMenuContent className="w-56" align="end">
                 <DropdownMenuLabel>Filtrar colegios</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem onClick={selectAllSchools}>
-                    <span>Seleccionar todos</span>
-                  </DropdownMenuItem>
-                </DropdownMenuGroup>
+                <div className="flex items-center gap-2 px-2 py-1">
+                  <Checkbox
+                    checked={
+                      selectedSchools.length === allSchools.length &&
+                      allSchools.length > 0
+                    }
+                    onCheckedChange={(checked) => {
+                      if (checked) {
+                        selectAllSchools();
+                      } else {
+                        deselectAllSchools();
+                      }
+                    }}
+                    className="cursor-pointer"
+                  />
+                  <span
+                    className="flex-1 cursor-pointer"
+                    onClick={() => {
+                      if (
+                        selectedSchools.length === allSchools.length &&
+                        allSchools.length > 0
+                      ) {
+                        deselectAllSchools();
+                      } else {
+                        selectAllSchools();
+                      }
+                    }}
+                  >
+                    Seleccionar todos
+                  </span>
+                </div>
                 <DropdownMenuSeparator />
                 {allSchools.map((school) => (
                   <div

@@ -1,14 +1,5 @@
 "use client";
-import {
-  Blocks,
-  Folder,
-  Home,
-  Images,
-  Mail,
-  School,
-  Truck,
-  User,
-} from "lucide-react";
+import { Folder, Home, Images, School, Truck, User } from "lucide-react";
 import AppSideBarMenuItem from "./AppSideBarMenuItem";
 import { useAuthStore } from "@/zustand/auth-store";
 
@@ -50,18 +41,18 @@ const items = [
     icon: Truck,
     private: false,
   },
-  {
-    title: "Mensajes",
-    url: "/admin/messages",
-    icon: Mail,
-    private: false,
-  },
-  {
-    title: "Tutorial",
-    url: "/admin/tutorial",
-    icon: Blocks,
-    private: false,
-  },
+  // {
+  //   title: "Mensajes",
+  //   url: "/admin/messages",
+  //   icon: Mail,
+  //   private: false,
+  // },
+  // {
+  //   title: "Tutorial",
+  //   url: "/admin/tutorial",
+  //   icon: Blocks,
+  //   private: false,
+  // },
 ];
 
 function AppSideBarMenu() {

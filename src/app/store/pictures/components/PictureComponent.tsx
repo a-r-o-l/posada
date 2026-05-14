@@ -48,7 +48,7 @@ export function DigitalDownloadsGrid({
                 src={download?.url}
                 alt={download?.file_name}
                 fill
-                className="object-cover transition-transform duration-300 group-hover:scale-105 grayscale"
+                className="object-cover transition-transform duration-300 group-hover:scale-105 blur-sm"
                 onContextMenu={(e) => e.preventDefault()}
                 onDragStart={(e) => e.preventDefault()}
                 unoptimized
