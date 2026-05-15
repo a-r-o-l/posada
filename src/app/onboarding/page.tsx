@@ -80,10 +80,14 @@ export default function OnboardingPage() {
   const availableGrades = useMemo(() => {
     if (!selectedSchool) return [];
     const school = schools.find((s) => s.id === selectedSchool);
-    const grades =
-      school?.grades?.sort((a, b) =>
-        a.display_name.localeCompare(b.display_name),
-      ) || [];
+    const grades = school?.grades
+      ? [...school.grades].sort((a, b) => {
+          const aName = a.display_name ?? "";
+          const bName = b.display_name ?? "";
+
+          return aName.localeCompare(bName);
+        })
+      : [];
     return grades.filter((grade) => grade.year === year);
   }, [selectedSchool, schools, year]);
 
@@ -97,16 +101,18 @@ export default function OnboardingPage() {
     const school = schools.find((s) => s.id === selectedSchool);
     const grade = school?.grades?.find((g) => g.id === selectedGrade);
     return grade || null;
-  }, [selectedGrade, availableGrades]);
+  }, [selectedGrade, selectedSchool, schools]);
 
   useEffect(() => {
     if (user) {
       fetchProfileStudentsByAccountId(user.id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   useEffect(() => {
     fetchSchools();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (page === 0) {
@@ -272,17 +278,23 @@ export default function OnboardingPage() {
                         <SelectValue placeholder="Seleccionar curso" />
                       </SelectTrigger>
                       <SelectContent>
-                        <ScrollArea className="h-[250px]">
-                          {availableGrades.map((grade) => (
-                            <SelectItem
-                              key={grade.id}
-                              value={grade.id}
-                              className="uppercase"
-                            >
-                              {grade.display_name} ({grade.year})
-                            </SelectItem>
-                          ))}
-                        </ScrollArea>
+                        {availableGrades.length ? (
+                          <ScrollArea className="h-[250px]">
+                            {availableGrades.map((grade) => (
+                              <SelectItem
+                                key={grade.id}
+                                value={grade.id}
+                                className="uppercase"
+                              >
+                                {grade.display_name} ({grade.year})
+                              </SelectItem>
+                            ))}
+                          </ScrollArea>
+                        ) : (
+                          <div className="px-3 py-2 text-sm text-muted-foreground">
+                            No hay cursos disponibles
+                          </div>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>

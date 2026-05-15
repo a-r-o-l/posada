@@ -7,6 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Table,
   TableBody,
@@ -62,14 +63,15 @@ function SearchChildrenModal({
         setOpen(val);
       }}
     >
-      <DialogContent>
+      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-hidden sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Buscar Alumnos</DialogTitle>
           <DialogDescription>
             Seleccione su menor a cargo de la lista
           </DialogDescription>
         </DialogHeader>
-        <div>
+
+        <div className="flex min-h-0 flex-1 flex-col">
           <Table>
             <TableHeader>
               <TableRow>
@@ -78,90 +80,96 @@ function SearchChildrenModal({
                 <TableHead>Apellido</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="text-center h-60"
-                    align="center"
-                  >
-                    <Loader2 className="animate-spin h-6 w-6 mx-auto" />
-                  </TableCell>
-                </TableRow>
-              ) : !!students?.length ? (
-                students.map((student) => (
-                  <TableRow
-                    key={student.id}
-                    onClick={() => setSelectedStudent(student)}
-                    className="cursor-pointer hover:bg-gray-100"
-                  >
-                    <TableCell>
-                      <Checkbox checked={selectedStudent?.id === student.id} />
-                    </TableCell>
-                    <TableCell>{student.name}</TableCell>
-                    <TableCell>{student.lastname}</TableCell>
-                  </TableRow>
-                ))
-              ) : (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="text-center h-40"
-                    align="center"
-                  >
-                    No se encontraron estudiantes
-                  </TableCell>
-                </TableRow>
-              )}
-            </TableBody>
           </Table>
-          <div>
-            <div className="flex justify-end mt-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setSelectedStudent(null);
-                  setOpen(false);
-                }}
-              >
-                Cancelar
-              </Button>
-              <Button
-                className="ml-2"
-                onClick={async () => {
-                  if (!selectedStudent) {
-                    toast.error("Debe seleccionar un estudiante");
-                    return;
-                  }
-                  if (!!func) {
-                    func(selectedStudent);
-                    return;
-                  }
-                  const { success } = await createProfileStudent({
-                    student_id: selectedStudent.id,
-                    profile_id: accountId,
-                  });
-                  if (success) {
-                    toast.success("Estudiante agregado a su cuenta");
-                    setSearchParam("");
-                    await onUpdate(accountId);
-                    setOpen(false);
-                  } else {
-                    toast.error(
-                      "Error al agregar el estudiante a su cuenta, intente nuevamente.",
-                    );
-                  }
-                }}
-                disabled={!selectedStudent || mutationLoading}
-              >
-                {mutationLoading ? (
-                  <Loader2 className="animate-spin h-5 w-5" />
+
+          <ScrollArea className="h-[min(50dvh,24rem)] rounded-md border">
+            <Table>
+              <TableBody>
+                {loading ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      className="text-center h-60"
+                      align="center"
+                    >
+                      <Loader2 className="animate-spin h-6 w-6 mx-auto" />
+                    </TableCell>
+                  </TableRow>
+                ) : !!students?.length ? (
+                  students.map((student) => (
+                    <TableRow
+                      key={student.id}
+                      onClick={() => setSelectedStudent(student)}
+                      className="cursor-pointer hover:bg-gray-100"
+                    >
+                      <TableCell>
+                        <Checkbox
+                          checked={selectedStudent?.id === student.id}
+                        />
+                      </TableCell>
+                      <TableCell>{student.name}</TableCell>
+                      <TableCell>{student.lastname}</TableCell>
+                    </TableRow>
+                  ))
                 ) : (
-                  "Agregar menor"
+                  <TableRow>
+                    <TableCell
+                      colSpan={4}
+                      className="text-center h-40"
+                      align="center"
+                    >
+                      No se encontraron estudiantes
+                    </TableCell>
+                  </TableRow>
                 )}
-              </Button>
-            </div>
+              </TableBody>
+            </Table>
+          </ScrollArea>
+
+          <div className="flex justify-end mt-4">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setSelectedStudent(null);
+                setOpen(false);
+              }}
+            >
+              Cancelar
+            </Button>
+            <Button
+              className="ml-2"
+              onClick={async () => {
+                if (!selectedStudent) {
+                  toast.error("Debe seleccionar un estudiante");
+                  return;
+                }
+                if (!!func) {
+                  func(selectedStudent);
+                  return;
+                }
+                const { success } = await createProfileStudent({
+                  student_id: selectedStudent.id,
+                  profile_id: accountId,
+                });
+                if (success) {
+                  toast.success("Estudiante agregado a su cuenta");
+                  setSearchParam("");
+                  await onUpdate(accountId);
+                  setOpen(false);
+                } else {
+                  toast.error(
+                    "Error al agregar el estudiante a su cuenta, intente nuevamente.",
+                  );
+                }
+              }}
+              disabled={!selectedStudent || mutationLoading}
+            >
+              {mutationLoading ? (
+                <Loader2 className="animate-spin h-5 w-5" />
+              ) : (
+                "Agregar menor"
+              )}
+            </Button>
           </div>
         </div>
       </DialogContent>

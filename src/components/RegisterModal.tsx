@@ -16,6 +16,7 @@ import {
   FormMessage,
 } from "./ui/form";
 import { Input } from "./ui/input";
+import { ScrollArea } from "./ui/scroll-area";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
@@ -100,9 +101,16 @@ function RegisterModal({
           password: values.passwordr,
         };
 
-        const registerSuccess = await register(formData);
+        const registerResult = await register(formData);
 
-        if (!registerSuccess) {
+        if (!registerResult.success) {
+          if (registerResult.errorType === "email_exists") {
+            toast.error(
+              "Ese correo ya está registrado. Probá iniciando sesión.",
+            );
+            return;
+          }
+
           toast.error("Error al crear la cuenta. Inténtalo de nuevo.");
           return;
         }
@@ -143,9 +151,12 @@ function RegisterModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="p-3 md:p-6" showCloseButton={false}>
+      <DialogContent
+        className="max-h-[calc(100dvh-1.5rem)] overflow-hidden p-3 md:p-6"
+        showCloseButton={false}
+      >
         <DialogHeader className="p-0">
-          <DialogTitle className="text-xl md:text-2xl font-bold">
+          <DialogTitle className="text-lg md:text-2xl font-bold">
             Crear una cuenta nueva
           </DialogTitle>
           <DialogDescription></DialogDescription>
@@ -163,167 +174,169 @@ function RegisterModal({
             </div>
           </div>
         </DialogHeader>
-        <Form {...formRegister}>
-          <form onSubmit={formRegister.handleSubmit(onSubmitRegister)}>
-            <div className="space-y-5 p-0">
-              <FormField
-                control={formRegister.control}
-                name="namer"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs md:text-base">
-                      Nombre
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Juan"
-                        {...field}
-                        disabled={isPending}
-                        autoComplete="off"
-                        className="text-xs md:text-base"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formRegister.control}
-                name="lastnamer"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs md:text-base">
-                      Apellido
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Pérez"
-                        {...field}
-                        disabled={isPending}
-                        autoComplete="off"
-                        className="text-xs md:text-base"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
+        <ScrollArea className="h-[min(72dvh,38rem)] mt-3 pr-1">
+          <Form {...formRegister}>
+            <form onSubmit={formRegister.handleSubmit(onSubmitRegister)}>
+              <div className="space-y-4 md:space-y-5 p-0">
+                <FormField
+                  control={formRegister.control}
+                  name="namer"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs md:text-base">
+                        Nombre
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Juan"
+                          {...field}
+                          disabled={isPending}
+                          autoComplete="off"
+                          className="text-xs md:text-base"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formRegister.control}
+                  name="lastnamer"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs md:text-base">
+                        Apellido
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Pérez"
+                          {...field}
+                          disabled={isPending}
+                          autoComplete="off"
+                          className="text-xs md:text-base"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={formRegister.control}
-                name="phoner"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs md:text-base">
-                      Telefono
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="+54 9 11-1234-1234"
-                        {...field}
-                        disabled={isPending}
-                        autoComplete="off"
-                        type="number"
-                        className="text-xs md:text-base"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formRegister.control}
-                name="emailr"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs md:text-base">
-                      Correo Electrónico
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="juanperez@ejemplo.com"
-                        {...field}
-                        disabled={isPending}
-                        autoComplete="off"
-                        className="text-xs md:text-base"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={formRegister.control}
-                name="passwordr"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-xs md:text-base">
-                      Contraseña
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="********"
-                        {...field}
-                        disabled={isPending}
-                        autoComplete="off"
-                        type="password"
-                        className="text-xs md:text-base"
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-500" />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            <div className="flex flex-col space-y-5 mt-10">
-              <LoadingButton
-                loading={isPending}
-                title="Crear Cuenta"
-                type="submit"
-                classname="rounded-full text-xs md:text-base w-full"
-                disabled={isPending}
-              >
-                {!isPending && <UserPlus className="mr-2 h-4 w-4" />}
-              </LoadingButton>
-
-              <div className="relative">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-neutral-700"></div>
-                </div>
-                <div className="relative flex justify-center text-sm">
-                  <span className="bg-white px-4 text-gray-400">o</span>
-                </div>
+                <FormField
+                  control={formRegister.control}
+                  name="phoner"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs md:text-base">
+                        Telefono
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="+54 9 11-1234-1234"
+                          {...field}
+                          disabled={isPending}
+                          autoComplete="off"
+                          type="number"
+                          className="text-xs md:text-base"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formRegister.control}
+                  name="emailr"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs md:text-base">
+                        Correo Electrónico
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="juanperez@ejemplo.com"
+                          {...field}
+                          disabled={isPending}
+                          autoComplete="off"
+                          className="text-xs md:text-base"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={formRegister.control}
+                  name="passwordr"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs md:text-base">
+                        Contraseña
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="********"
+                          {...field}
+                          disabled={isPending}
+                          autoComplete="off"
+                          type="password"
+                          className="text-xs md:text-base"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-500" />
+                    </FormItem>
+                  )}
+                />
               </div>
-              <Button
-                className="w-full cursor-pointer rounded-full text-xs md:text-base"
-                type="button"
-                onClick={async () => {
-                  setGoogleLoading(true);
-                  await loginWithGoogle();
-                  setGoogleLoading(false);
-                }}
-                disabled={isPending || googleLoading}
-              >
-                {googleLoading ? (
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <FcGoogle className="mr-2" />
-                )}
-                Continuar con Google
-              </Button>
-              <Button
-                className="w-full rounded-full text-xs md:text-base"
-                type="button"
-                variant="outline"
-                disabled={isPending}
-                onClick={() => onOpenChange(false)}
-              >
-                Cancelar
-              </Button>
-            </div>
-          </form>
-        </Form>
+
+              <div className="flex flex-col space-y-4 md:space-y-5 mt-8 md:mt-10 pb-1">
+                <LoadingButton
+                  loading={isPending}
+                  title="Crear Cuenta"
+                  type="submit"
+                  classname="rounded-full text-xs md:text-base w-full"
+                  disabled={isPending}
+                >
+                  {!isPending && <UserPlus className="mr-2 h-4 w-4" />}
+                </LoadingButton>
+
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-neutral-700"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="bg-white px-4 text-gray-400">o</span>
+                  </div>
+                </div>
+                <Button
+                  className="w-full cursor-pointer rounded-full text-xs md:text-base"
+                  type="button"
+                  onClick={async () => {
+                    setGoogleLoading(true);
+                    await loginWithGoogle();
+                    setGoogleLoading(false);
+                  }}
+                  disabled={isPending || googleLoading}
+                >
+                  {googleLoading ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <FcGoogle className="mr-2" />
+                  )}
+                  Continuar con Google
+                </Button>
+                <Button
+                  className="w-full rounded-full text-xs md:text-base"
+                  type="button"
+                  variant="outline"
+                  disabled={isPending}
+                  onClick={() => onOpenChange(false)}
+                >
+                  Cancelar
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

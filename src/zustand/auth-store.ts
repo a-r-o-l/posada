@@ -17,7 +17,7 @@ interface AuthStore {
   refreshUser: () => Promise<void>; // Nueva función para recargar datos
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => Promise<void>;
-  register: (userData: RegisterData) => Promise<boolean>;
+  register: (userData: RegisterData) => Promise<RegisterResult>;
   updateProfile: (data: Partial<Profile>) => Promise<boolean>;
 }
 
@@ -28,6 +28,31 @@ export interface RegisterData {
   email: string;
   password: string;
   role?: "user" | "admin";
+}
+
+export type RegisterResult =
+  | { success: true }
+  | {
+      success: false;
+      errorType: "email_exists" | "unknown";
+      message: string;
+    };
+
+function isEmailAlreadyRegisteredError(error: {
+  message?: string;
+  code?: string | number;
+  status?: number;
+}) {
+  const message = (error.message ?? "").toLowerCase();
+
+  return (
+    message.includes("already registered") ||
+    message.includes("user already exists") ||
+    (message.includes("email") && message.includes("registered")) ||
+    error.code === "email_exists" ||
+    error.code === "user_already_exists" ||
+    (error.status === 400 && message.includes("registered"))
+  );
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
@@ -233,7 +258,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  register: async (userData: RegisterData) => {
+  register: async (userData: RegisterData): Promise<RegisterResult> => {
     set({ isLoading: true });
 
     try {
@@ -252,23 +277,37 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       if (authError) {
         console.error("Error en registro:", authError);
         set({ isLoading: false });
-        return false;
+        return {
+          success: false,
+          errorType: isEmailAlreadyRegisteredError(authError)
+            ? "email_exists"
+            : "unknown",
+          message: authError.message,
+        };
       }
 
       if (!authData.user) {
         set({ isLoading: false });
-        return false;
+        return {
+          success: false,
+          errorType: "unknown",
+          message: "No se pudo crear la cuenta.",
+        };
       }
 
       // El trigger handle_new_user() se encarga de crear el perfil automáticamente
       // No necesitamos insertar manualmente
 
       set({ isLoading: false });
-      return true;
+      return { success: true };
     } catch (error) {
       console.error("Error en registro:", error);
       set({ isLoading: false });
-      return false;
+      return {
+        success: false,
+        errorType: "unknown",
+        message: "Ocurrió un error al crear la cuenta.",
+      };
     }
   },
 
