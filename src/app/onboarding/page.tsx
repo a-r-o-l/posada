@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -111,11 +111,8 @@ export default function OnboardingPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
-  const initialCheckRef = useRef(false);
-
   useEffect(() => {
-    if (!queryLoading && !initialCheckRef.current) {
-      initialCheckRef.current = true;
+    if (!queryLoading) {
       if (profileStudents.length > 0) {
         router.replace("/store");
       }
