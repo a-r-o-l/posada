@@ -63,8 +63,8 @@ function LoginModal({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const formData = new FormData();
-    formData.append("email", values.email);
-    formData.append("password", values.password);
+    formData.append("email", values.email.trim().toLowerCase());
+    formData.append("password", values.password.trim());
 
     startTransition(async () => {
       const result = await login(formData);

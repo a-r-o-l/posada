@@ -94,11 +94,11 @@ function RegisterModal({
     startTransition(async () => {
       try {
         const formData: SignupData = {
-          name: values.namer,
-          lastname: values.lastnamer,
-          email: values.emailr,
-          phone: values.phoner,
-          password: values.passwordr,
+          name: values.namer.trim(),
+          lastname: values.lastnamer.trim(),
+          email: values.emailr.trim().toLowerCase(),
+          phone: values.phoner.trim(),
+          password: values.passwordr.trim(),
         };
 
         const registerResult = await register(formData);
@@ -115,7 +115,10 @@ function RegisterModal({
           return;
         }
 
-        const loginSuccess = await login(values.emailr, values.passwordr);
+        const loginSuccess = await login(
+          values.emailr.trim().toLowerCase(),
+          values.passwordr.trim(),
+        );
 
         if (!loginSuccess) {
           toast.error(
@@ -128,8 +131,8 @@ function RegisterModal({
 
         // Sincronizar cookies en servidor para que middleware los vea
         const syncResult = await loginToSyncCookies(
-          values.emailr,
-          values.passwordr,
+          values.emailr.trim().toLowerCase(),
+          values.passwordr.trim(),
         );
         if (syncResult?.error) {
           console.error("Error sincronizando cookies:", syncResult.error);
