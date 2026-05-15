@@ -439,8 +439,7 @@ export default function OnboardingPage() {
                       return;
                     }
                     toast.success("Preferencias guardadas correctamente");
-                    router.refresh();
-                    router.push("/store");
+                    router.replace("/onboarding/finalizing");
                   } else {
                     toast.error(
                       "Error al guardar preferencias, intente nuevamente",
