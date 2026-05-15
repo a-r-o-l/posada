@@ -47,6 +47,7 @@ export default function OnboardingPage() {
     profileStudents,
     createProfileStudents,
     mutationLoading,
+    queryLoading,
   } = useProfileStudents();
   const { updateProfile } = useProfile();
   const [createChildrenModal, setCreateChildrenModal] =
@@ -111,13 +112,20 @@ export default function OnboardingPage() {
   }, [user]);
 
   useEffect(() => {
+    if (!queryLoading && profileStudents.length > 0) {
+      router.replace("/store");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queryLoading, profileStudents]);
+
+  useEffect(() => {
     fetchSchools();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (page === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-gray-50 py-6 md:py-12">
         <div className="max-w-5xl mx-auto px-4">
           <Card>
             <CardHeader>
@@ -193,7 +201,7 @@ export default function OnboardingPage() {
 
   if (page === 1) {
     return (
-      <div className="min-h-screen bg-gray-50 py-12">
+      <div className="min-h-screen bg-gray-50 py-6 md:py-12">
         <div className="max-w-5xl mx-auto px-4">
           <StepIndicator currentStep={page} setStep={setPage} />
           <Page1
@@ -201,15 +209,17 @@ export default function OnboardingPage() {
             selectedSchool={selectedSchool}
             setSelectedSchool={setSelectedSchool}
           />
-          <div className="flex items-center justify-center mt-5">
-            <Button
-              onClick={() => setPage(2)}
-              className="w-60 rounded-full"
-              disabled={!selectedSchool}
-            >
-              <ArrowRight className="mr-2 h-4 w-4" />
-              Siguiente
-            </Button>
+          <div className="mt-5 md:mt-8 flex items-center justify-center">
+            <div className="w-full max-w-md md:max-w-none sticky bottom-3 z-20 bg-gradient-to-t from-gray-50 via-gray-50 to-transparent pt-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] md:static md:bg-transparent md:pt-0 md:pb-0 md:flex md:justify-center">
+              <Button
+                onClick={() => setPage(2)}
+                className="w-full md:w-60 rounded-full"
+                disabled={!selectedSchool}
+              >
+                <ArrowRight className="mr-2 h-4 w-4" />
+                Siguiente
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -217,10 +227,10 @@ export default function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 py-6 md:py-12">
       <div className="max-w-5xl mx-auto px-4">
         <StepIndicator currentStep={page} setStep={setPage} />
-        <div className="flex flex-col gap-10 mt-10">
+        <div className="flex flex-col gap-10 mt-10 pb-28 md:pb-0">
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center p-2 bg-blue-100 rounded-full mb-4">
               <Users className="w-6 h-6 text-blue-600" />
@@ -394,52 +404,54 @@ export default function OnboardingPage() {
             accountId={user?.id || ""}
             func={addStudent}
           />
-          <div className="flex flex-col items-center justify-center gap-5">
-            <Button
-              onClick={async () => {
-                if (!user) {
-                  toast.error("Usuario no encontrado");
-                  return;
-                }
-                if (!childrenAdded.length) {
-                  toast.error("Agrega al menos un menor");
-                  return;
-                }
-                const resMap = childrenAdded.map((child) => ({
-                  profile_id: user.id,
-                  student_id: child.id,
-                }));
+          <div className="mt-2 md:mt-0 flex items-center justify-center">
+            <div className="w-full max-w-md md:max-w-none sticky bottom-3 z-20 bg-gradient-to-t from-gray-50 via-gray-50 to-transparent pt-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] md:static md:bg-transparent md:pt-0 md:pb-0 md:flex md:justify-center">
+              <Button
+                onClick={async () => {
+                  if (!user) {
+                    toast.error("Usuario no encontrado");
+                    return;
+                  }
+                  if (!childrenAdded.length) {
+                    toast.error("Agrega al menos un menor");
+                    return;
+                  }
+                  const resMap = childrenAdded.map((child) => ({
+                    profile_id: user.id,
+                    student_id: child.id,
+                  }));
 
-                const { success } = await createProfileStudents(resMap);
-                if (success) {
-                  const { success } = await updateProfile({
-                    schools: !!fullSchool?.id ? [fullSchool?.id] : undefined,
-                    id: user.id,
-                  });
-                  if (!success) {
+                  const { success } = await createProfileStudents(resMap);
+                  if (success) {
+                    const { success } = await updateProfile({
+                      schools: !!fullSchool?.id ? [fullSchool?.id] : undefined,
+                      id: user.id,
+                    });
+                    if (!success) {
+                      toast.error(
+                        "Error al guardar preferencias, intente nuevamente",
+                      );
+                      return;
+                    }
+                    toast.success("Preferencias guardadas correctamente");
+                    router.push("/store");
+                  } else {
                     toast.error(
                       "Error al guardar preferencias, intente nuevamente",
                     );
                     return;
                   }
-                  toast.success("Preferencias guardadas correctamente");
-                  router.push("/store");
-                } else {
-                  toast.error(
-                    "Error al guardar preferencias, intente nuevamente",
-                  );
-                  return;
-                }
-              }}
-              className="w-60 rounded-full"
-              size="lg"
-              disabled={!childrenAdded.length || mutationLoading}
-            >
-              {mutationLoading && (
-                <Loader2 className="animate-spin h-5 w-5 mr-2" />
-              )}
-              Guardar Preferencias
-            </Button>
+                }}
+                className="w-full md:w-60 rounded-full"
+                size="lg"
+                disabled={!childrenAdded.length || mutationLoading}
+              >
+                {mutationLoading && (
+                  <Loader2 className="animate-spin h-5 w-5 mr-2" />
+                )}
+                Guardar Preferencias
+              </Button>
+            </div>
           </div>
         </div>
       </div>
