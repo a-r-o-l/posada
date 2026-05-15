@@ -1,5 +1,5 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Card,
@@ -105,15 +105,20 @@ export default function OnboardingPage() {
   }, [selectedGrade, selectedSchool, schools]);
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       fetchProfileStudentsByAccountId(user.id);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user?.id]);
+
+  const initialCheckRef = useRef(false);
 
   useEffect(() => {
-    if (!queryLoading && profileStudents.length > 0) {
-      router.replace("/store");
+    if (!queryLoading && !initialCheckRef.current) {
+      initialCheckRef.current = true;
+      if (profileStudents.length > 0) {
+        router.replace("/store");
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [queryLoading, profileStudents]);
@@ -434,6 +439,7 @@ export default function OnboardingPage() {
                       return;
                     }
                     toast.success("Preferencias guardadas correctamente");
+                    router.refresh();
                     router.push("/store");
                   } else {
                     toast.error(
