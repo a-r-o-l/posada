@@ -233,8 +233,27 @@ function SelectFileModal({
                     <SelectFileTableRow
                       item={item}
                       key={item.id}
-                      onPlus={() => handlePlus(item.id)}
-                      onMinus={() => handleMinus(item.id)}
+                      disabled={
+                        (file?.is_group && item?.order === 1) ?? undefined
+                      }
+                      onPlus={() => {
+                        if (file?.is_group && item.order === 1) {
+                          toast.error(
+                            "Este producto no esta habilitado para fotos grupales",
+                          );
+                          return;
+                        }
+                        handlePlus(item.id);
+                      }}
+                      onMinus={() => {
+                        if (file?.is_group && item.order === 1) {
+                          toast.error(
+                            "Este producto no esta habilitado para fotos grupales",
+                          );
+                          return;
+                        }
+                        handleMinus(item.id);
+                      }}
                     />
                   ))}
                 </TableBody>
