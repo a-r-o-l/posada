@@ -1,7 +1,9 @@
 import React from "react";
 import AccountsClientSide from "./components/AccountsClientSide";
 import { searchProfiles } from "@/supabase/hooks/server/profiles";
-import { getStudents } from "@/supabase/hooks/server/students";
+import { getSchools } from "@/supabase/hooks/server/schools";
+
+export const dynamic = "force-dynamic";
 
 export default async function page({
   searchParams,
@@ -10,14 +12,14 @@ export default async function page({
 }) {
   const search = await searchParams;
   const accounts = await searchProfiles(search.search || "");
-  const students = await getStudents();
+  const schools = await getSchools();
 
   return (
     <div className="container mx-auto p-4">
       <AccountsClientSide
         accounts={accounts}
-        students={students}
-        key={Date.now()}
+        schools={schools || []}
+        // key={Date.now()}
       />
     </div>
   );

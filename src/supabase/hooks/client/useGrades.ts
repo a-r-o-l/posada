@@ -47,6 +47,31 @@ export const useGrades = () => {
     }
   };
 
+  const fetchGradesBySchoolIdAndYear = async (
+    schoolId: string,
+    year: string,
+  ) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const { data, error } = await supabase
+        .from("grades")
+        .select("*")
+        .eq("school_id", schoolId)
+        .eq("year", year)
+        .order("display_name", { ascending: true });
+      if (error) throw error;
+      setGrades(data || []);
+      return data || [];
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al obtener cursos");
+      setGrades([]);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const createGrade = async (formData: FormData) => {
     try {
       setLoading(true);
@@ -129,6 +154,7 @@ export const useGrades = () => {
     error,
     fetchGrades,
     fetchGradesBySchoolId,
+    fetchGradesBySchoolIdAndYear,
     createGrade,
     updateGrade,
     deleteGrade,

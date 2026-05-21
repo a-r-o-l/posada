@@ -31,17 +31,20 @@ import CustomAlertDialog from "@/components/CustomAlertDialog";
 import { Profile, ProfileFullDetails } from "@/supabase/models/profile";
 import { useProfileStudents } from "@/supabase/hooks/client/useProfileStudents";
 import { useProfile } from "@/supabase/hooks/client/useProfile";
-import { StudentFullDetails } from "@/supabase/models/student";
+import { School } from "@/supabase/models/school";
+import { useRouter } from "next/navigation";
 
 function AccountsClientSide({
   accounts,
-  students,
+  schools,
 }: {
   accounts: ProfileFullDetails[];
-  students: StudentFullDetails[];
+  schools: School[];
 }) {
-  const [selectedAccount, setSelectedAccount] =
-    useState<ProfileFullDetails | null>(null);
+  const router = useRouter();
+  const [selectedAccountId, setSelectedAccountId] = useState<string | null>(
+    null,
+  );
   const { deleteProfileStudent } = useProfileStudents();
   const { updateProfile } = useProfile();
   const [openAccountModal, setOpenAccountModal] = useState(false);
@@ -52,13 +55,25 @@ function AccountsClientSide({
   const filteredAccounts = useMemo(() => {
     if (!accounts || !accounts.length) return [];
     if (!searchValue) return accounts;
+    const query = searchValue.toLowerCase();
+
     return accounts.filter((account: Profile) => {
       const fullName = `${account.name} ${account.lastname}`.toLowerCase();
-      return fullName.includes(searchValue.toLowerCase());
+      const email = (account.email || "").toLowerCase();
+      const phone = (account.phone || "").toLowerCase();
+
+      return (
+        fullName.includes(query) ||
+        email.includes(query) ||
+        phone.includes(query)
+      );
     });
   }, [accounts, searchValue]);
 
-  console.log(selectedAccount);
+  const selectedAccount = useMemo(
+    () => accounts.find((account) => account.id === selectedAccountId) || null,
+    [accounts, selectedAccountId],
+  );
 
   const RenderBadge = ({ role }: { role: string }) => {
     if (!role) {
@@ -97,7 +112,10 @@ function AccountsClientSide({
     <Card className="w-full" key={accounts.map((a) => a.id).join(",")}>
       <CardHeader className="flex flex-row justify-between">
         <div>
-          <CardTitle>Cuentas</CardTitle>
+          <div className="flex items-center gap-2">
+            <CardTitle>Cuentas</CardTitle>
+            <p className="text-sm">{filteredAccounts.length}</p>
+          </div>
           <CardDescription>Ver y administrar cuentas</CardDescription>
         </div>
         <Button onClick={() => setOpenAccountModal(true)}>Crear cuenta</Button>
@@ -126,7 +144,7 @@ function AccountsClientSide({
                     value={searchValue}
                     onKeyDown={(e) => {
                       if (selectedAccount) {
-                        setSelectedAccount(null);
+                        setSelectedAccountId(null);
                       }
                       if (e.key === "Escape") {
                         setSearchValue("");
@@ -153,7 +171,7 @@ function AccountsClientSide({
                     onClick={(e) => {
                       e.stopPropagation();
                       e.preventDefault();
-                      setSelectedAccount(account);
+                      setSelectedAccountId(account.id);
                     }}
                   >
                     <div className="flex items-center space-x-2 w-full justify-between">
@@ -292,6 +310,7 @@ function AccountsClientSide({
                                       toast.success(
                                         "Menor eliminado correctamente",
                                       );
+                                      router.refresh();
                                     } else {
                                       toast.error(
                                         res.error ||
@@ -325,7 +344,7 @@ function AccountsClientSide({
         open={openChildrenModal}
         onClose={() => setOpenChildrenModal(false)}
         accountId={selectedAccount?.id || ""}
-        students={students}
+        schools={schools}
       />
       <CreateAccountModal
         open={openAccountModal}

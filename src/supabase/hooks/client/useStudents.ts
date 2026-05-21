@@ -58,7 +58,7 @@ export const useStudents = () => {
       setError(null);
       const { data, error } = await supabase
         .from("students")
-        .select("*")
+        .select("*, grade:grades(*), school:schools(*)")
         .eq("grade_id", id);
       if (error) throw error;
       setStudents(data);
