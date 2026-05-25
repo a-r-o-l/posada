@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Select,
   SelectContent,
@@ -208,15 +209,17 @@ function CreateChildren({
                   <SelectValue placeholder="Selecciona un curso" />
                 </SelectTrigger>
                 <SelectContent>
-                  {grades.map((grade) => (
-                    <SelectItem
-                      key={grade.id}
-                      value={grade.id}
-                      className="truncate"
-                    >
-                      {grade.display_name} {grade.division}
-                    </SelectItem>
-                  ))}
+                  <ScrollArea className="h-[250px]">
+                    {grades.map((grade) => (
+                      <SelectItem
+                        key={grade.id}
+                        value={grade.id}
+                        className="truncate"
+                      >
+                        {grade.display_name} {grade.division}
+                      </SelectItem>
+                    ))}
+                  </ScrollArea>
                 </SelectContent>
               </Select>
             </div>

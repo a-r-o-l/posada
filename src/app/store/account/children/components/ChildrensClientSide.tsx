@@ -57,9 +57,9 @@ function ChildrensClientSide() {
     const school = schools.find((s) => s.id === selectedSchool);
     const grades =
       school?.grades?.sort((a, b) =>
-        a.display_name.localeCompare(b.display_name),
+        a?.display_name?.localeCompare(b?.display_name),
       ) || [];
-    return grades.filter((grade) => grade.year === year);
+    return grades?.filter((grade) => grade.year === year);
   }, [selectedSchool, schools, year]);
 
   const children = useMemo(() => {

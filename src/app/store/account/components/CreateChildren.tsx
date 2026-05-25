@@ -56,17 +56,34 @@ function CreateChildren({
   const [openPop, setOpenPop] = useState(false);
 
   const filteredStudents = useMemo(() => {
-    if (!searchParam) {
-      return students;
+    // Si no hay búsqueda o students no es un array, devolver students (o array vacío)
+    if (!searchParam || !Array.isArray(students)) {
+      return students || [];
     }
+
+    const searchLower = searchParam.toLowerCase();
+
     return students
       .filter((student) => {
+        // Verificar que student existe y tiene name/lastname como strings
+        if (
+          !student ||
+          typeof student.name !== "string" ||
+          typeof student.lastname !== "string"
+        ) {
+          return false;
+        }
         const fullName = `${student.name} ${student.lastname}`.toLowerCase();
-        return fullName.includes(searchParam.toLowerCase());
+        return fullName.includes(searchLower);
       })
       .sort((a, b) => {
+        // Después del filtro, a y b deberían ser válidos, pero por seguridad:
         const nameA = `${a.name} ${a.lastname}`.toLowerCase();
         const nameB = `${b.name} ${b.lastname}`.toLowerCase();
+
+        // Protección adicional (no debería ser necesaria, pero evita errores inesperados)
+        if (typeof nameA !== "string") return 1;
+        if (typeof nameB !== "string") return -1;
         return nameA.localeCompare(nameB);
       });
   }, [searchParam, students]);
