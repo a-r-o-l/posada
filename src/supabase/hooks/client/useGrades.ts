@@ -51,15 +51,26 @@ export const useGrades = () => {
     schoolId: string,
     year: string,
   ) => {
+    let query = supabase
+      .from("grades")
+      .select("*")
+      .order("display_name", { ascending: true });
+
+    if (!schoolId || !year) {
+      setGrades([]);
+      return [];
+    }
+    if (schoolId) {
+      query = query.eq("school_id", schoolId);
+    }
+    if (year) {
+      query = query.eq("year", year);
+    }
+
     try {
       setLoading(true);
       setError(null);
-      const { data, error } = await supabase
-        .from("grades")
-        .select("*")
-        .eq("school_id", schoolId)
-        .eq("year", year)
-        .order("display_name", { ascending: true });
+      const { data, error } = await query;
       if (error) throw error;
       setGrades(data || []);
       return data || [];
@@ -101,16 +112,17 @@ export const useGrades = () => {
 
   const updateGrade = async (formData: FormData, id: string) => {
     try {
+      const payload = {
+        grade: formData.get("grade") as string,
+        division: formData.get("division") as string,
+        year: formData.get("year") as string,
+        display_name: formData.get("display_name") as string,
+      };
       setLoading(true);
       setError(null);
       const { data, error } = await supabase
         .from("grades")
-        .update({
-          grade: formData.get("grade") as string,
-          division: formData.get("division") as string,
-          year: formData.get("year") as string,
-          display_name: formData.get("displayName") as string,
-        })
+        .update(payload)
         .eq("id", id)
         .select()
         .single();
