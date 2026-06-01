@@ -139,7 +139,7 @@ function SchoolStoreDetailClient({ school }: { school: School }) {
   return (
     <div className="flex flex-col lg:flex-row h-full">
       <div className="flex flex-col h-full w-full bg-[#F0F1FF] border-t-8 rounded-b-3xl lg:border-l-8 lg:border-t-0 border-[#139FDC] p-5 lg:rounded-r-3xl lg:rounded-l-3xl">
-        <div className="w-full flex justify-center items-end mb-5 lg:justify-start">
+        <div className="flex flex-col sm:flex-row gap-5 justify-center mb-5 lg:justify-start">
           <Link href={school?.id ? `/store/${school.id}` : "#"}>
             <Image
               src={school?.image_url || "/placeholderimg.jpg"}
@@ -148,10 +148,10 @@ function SchoolStoreDetailClient({ school }: { school: School }) {
               height={150}
             />
           </Link>
-          <div className="w-96 px-5 text-center">
+          <div className="w-full sm:w-60 px-5 text-center">
             <Label className="text-xs md:text-base">Año</Label>
             <div className="flex items-center gap-2">
-              <Calendar size={24} />
+              <Calendar size={24} className="hidden sm:flex" />
               <Select value={year} onValueChange={handleYearChange}>
                 <SelectTrigger className="border-[#139FDC] border-2 w-full text-xs md:text-base">
                   <SelectValue>{year}</SelectValue>
@@ -166,10 +166,10 @@ function SchoolStoreDetailClient({ school }: { school: School }) {
               </Select>
             </div>
           </div>
-          <div className="w-96 px-5 text-center">
-            <Label className="text-xs md:text-base">División</Label>
+          <div className="w-full sm:w-60 px-5 text-center">
+            <Label className="text-xs md:text-base">Divisiones y eventos</Label>
             <div className="flex items-center gap-2">
-              <Layers size={24} />
+              <Layers size={24} className="hidden sm:flex" />
               <Select value={division} onValueChange={handleDivisionChange}>
                 <SelectTrigger className="border-[#139FDC] border-2 w-full text-xs md:text-base">
                   <SelectValue>{division}</SelectValue>
