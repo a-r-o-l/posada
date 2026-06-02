@@ -26,13 +26,13 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { CircleX, Search, Trash2 } from "lucide-react";
 import CreateChildren from "./CreateChildren";
-import { Checkbox } from "@/components/ui/checkbox";
 import CustomAlertDialog from "@/components/CustomAlertDialog";
 import { Profile, ProfileFullDetails } from "@/supabase/models/profile";
 import { useProfileStudents } from "@/supabase/hooks/client/useProfileStudents";
 import { useProfile } from "@/supabase/hooks/client/useProfile";
 import { School } from "@/supabase/models/school";
 import { useRouter } from "next/navigation";
+import AccountSchoolSelected from "./AccountSchoolSelected";
 
 function AccountsClientSide({
   accounts,
@@ -217,28 +217,29 @@ function AccountsClientSide({
                 <CardTitle>Detalles de la cuenta</CardTitle>
                 <CardDescription></CardDescription>
                 {selectedAccount && (
-                  <div className="flex items-center gap-2">
-                    <Label>Verificada</Label>
-                    <Checkbox
-                      checked={selectedAccount?.verified}
-                      onClick={() => setOpenVerifiedDialog(true)}
-                    />
-                  </div>
+                  <AccountSchoolSelected
+                    account={selectedAccount}
+                    schools={schools}
+                    onRefresh={() => router.refresh()}
+                  />
                 )}
               </div>
             </CardHeader>
             <CardContent>
               {selectedAccount ? (
                 <div className="flex flex-col justify-center gap-10">
-                  <div>
+                  <div className="">
                     <div className="space-y-2">
-                      <Label onClick={() => console.log(selectedAccount)}>
+                      <Label
+                        onClick={() => console.log(selectedAccount)}
+                        className="text-xs"
+                      >
                         Nombre
                       </Label>
                       <Input value={selectedAccount?.name} disabled readOnly />
                     </div>
                     <div className="space-y-2">
-                      <Label>Apellido</Label>
+                      <Label className="text-xs">Apellido</Label>
                       <Input
                         value={selectedAccount?.lastname}
                         disabled
@@ -246,15 +247,15 @@ function AccountsClientSide({
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Telefono</Label>
+                      <Label className="text-xs">Telefono</Label>
                       <Input value={selectedAccount?.phone} disabled readOnly />
                     </div>
                     <div className="space-y-2">
-                      <Label>email</Label>
+                      <Label className="text-xs">Correo Electrónico</Label>
                       <Input value={selectedAccount?.email} disabled readOnly />
                     </div>
                     <div className="space-y-2">
-                      <Label>password</Label>
+                      <Label className="text-xs">Contraseña</Label>
                       <PasswordInput
                         value={selectedAccount?.password}
                         onChange={() => {}}
