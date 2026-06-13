@@ -33,11 +33,23 @@ function SchoolPasswordModal({
 
   const onSubmit = () => {
     const pswrd = school.password;
-    if (pswrd?.toLowerCase() === password?.toLowerCase()) {
-      onAccess();
-      onClose();
+    if (school.id === "2f5cf1c9-65ab-4f8d-87a5-20cdb73382a9") {
+      if (
+        password?.toLowerCase() === "bds3035" ||
+        password?.toLowerCase() === "bds3036"
+      ) {
+        onAccess();
+        onClose();
+      } else {
+        toast.error("Contraseña incorrecta, intenta nuevamente.");
+      }
     } else {
-      toast.error("Contraseña incorrecta, intenta nuevamente.");
+      if (pswrd?.toLowerCase() === password?.toLowerCase()) {
+        onAccess();
+        onClose();
+      } else {
+        toast.error("Contraseña incorrecta, intenta nuevamente.");
+      }
     }
   };
 
