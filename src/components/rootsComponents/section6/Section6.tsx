@@ -81,20 +81,15 @@ function Section6() {
             </AccordionTrigger>
             <AccordionContent>
               <p className="text-xl">
-                Los recibis por WhatsApp, al número registrado cuando creaste tu
-                cuenta o el que pusiste en el sobre. Las fotos se entregan en
-                alta resolución.
+                {`¡Al instante! Apenas se aprueba el pago, encontrás tus fotos en
+                la sección "Mis Fotos" de tu cuenta, listas para descargar en
+                alta resolución.`}
               </p>
-              <p className="text-xl mt-5">Te los enviamos:</p>
-              <ul className="list-disc pl-5 text-xl">
-                <li>
-                  Dentro de los 5 días tras el retiro de sobres (viernes).
-                </li>
-                <li>
-                  {`Inmediatamente despues de aprobar el pago, encontraras tus
-                  fotos en la seccion "Mis Fotos".`}
-                </li>
-              </ul>
+              <p className="text-xl mt-5">
+                Si hiciste el pedido en sobre en el colegio, te los mandamos por
+                WhatsApp (al número que pusiste en el sobre) dentro de los 5
+                días después del retiro de sobres.
+              </p>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

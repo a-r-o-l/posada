@@ -143,12 +143,14 @@ export const getPaymentLink = async (saleId: string) => {
       throw new Error("Venta no encontrada.");
     }
     const { sale: foundSale } = sale;
-    if (!foundSale.preferenceId) {
+    // En la base la columna es preference_id (snake_case)
+    const preferenceId = foundSale?.preference_id ?? foundSale?.preferenceId;
+    if (!preferenceId) {
       throw new Error("ID de preferencia no encontrado en la venta.");
     }
 
     const response = await fetch(
-      `https://api.mercadopago.com/checkout/preferences/${foundSale.preferenceId}`,
+      `https://api.mercadopago.com/checkout/preferences/${preferenceId}`,
       {
         method: "GET",
         headers: {

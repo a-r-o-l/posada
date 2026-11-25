@@ -29,8 +29,14 @@ export async function POST(request: Request) {
     const formData = new FormData();
     formData.append("status_detail", payment.status_detail || "");
     formData.append("transaction_id", payment.id?.toString() || "");
-    formData.append("date_approved", payment?.date_approved || "");
-    formData.append("date_created", payment?.date_created || "");
+    // Las fechas vacías ("") rompen la columna timestamptz: solo se mandan si existen
+    // (un pago pendiente o rechazado no tiene date_approved)
+    if (payment?.date_approved) {
+      formData.append("date_approved", payment.date_approved);
+    }
+    if (payment?.date_created) {
+      formData.append("date_created", payment.date_created);
+    }
     formData.append("payment_method_id", payment.payment_method_id || "");
     formData.append("payment_type_id", payment.payment_type_id || "");
     formData.append("collector_id", payment.collector_id?.toString() || "");
