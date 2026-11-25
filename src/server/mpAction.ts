@@ -57,6 +57,25 @@ const getBackUrls = async () => {
   };
 };
 
+// Datos del comprador para Mercado Pago: sin ellos el antifraude rechaza
+// tarjetas con más facilidad. Solo mail y nombre (un teléfono mal formado
+// puede hacer fallar la preferencia). Si algo falta, no se manda.
+const getPayer = async (saleId: string) => {
+  try {
+    const { sale } = await getSale(saleId, true);
+    const profile = sale?.profile;
+    const email = (profile?.email || "").trim();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return undefined;
+    return {
+      email,
+      ...(profile?.name ? { name: String(profile.name).trim() } : {}),
+      ...(profile?.lastname ? { surname: String(profile.lastname).trim() } : {}),
+    };
+  } catch {
+    return undefined;
+  }
+};
+
 export const createPayment = async (data: FormData) => {
   if (!MERCADOPAGO_ACCESS_TOKEN) {
     throw new Error("El token de acceso de MercadoPago no está configurado.");
@@ -74,6 +93,7 @@ export const createPayment = async (data: FormData) => {
       }));
       const preference = {
         items: parsedProds,
+        payer: await getPayer(res.sale.id),
         external_reference: res.sale.order,
         metadata: {
           sale: res.sale.id.toString(),

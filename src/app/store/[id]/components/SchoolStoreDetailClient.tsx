@@ -1,6 +1,8 @@
 "use client";
 import { useCacheSchools } from "@/zustand/useCacheSchools";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useAuthStore } from "@/zustand/auth-store";
+import { useProfileStudents } from "@/supabase/hooks/client/useProfileStudents";
 import SchoolPasswordModal from "./SchoolPasswordModal";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import DynamicFolder from "./DynamicFolder";
@@ -38,6 +40,38 @@ function SchoolStoreDetailClient({ school }: { school: School }) {
   const [year, setYear] = useState(yearFromUrl || "2026");
   const [division, setDivision] = useState(divisionFromUrl || "eventos");
   const [needAccess, setNeedAccess] = useState(false);
+
+  // Si no vienen filtros en la URL, abrir en el nivel y año del hijo/a en
+  // este colegio (antes abría siempre en "Eventos" y parecía que no había fotos)
+  const { currentUser: user } = useAuthStore();
+  const { fetchProfileStudentsByAccountId, profileStudents } =
+    useProfileStudents();
+  const nivelDelHijoAplicado = useRef(false);
+
+  useEffect(() => {
+    if (user?.id && !yearFromUrl && !divisionFromUrl) {
+      fetchProfileStudentsByAccountId(user.id);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (nivelDelHijoAplicado.current || yearFromUrl || divisionFromUrl) return;
+    const hijo = profileStudents.find(
+      (ps) =>
+        ps?.student?.school_id === school.id &&
+        ps?.student?.grade?.division,
+    );
+    const curso = hijo?.student?.grade;
+    if (!curso) return;
+    nivelDelHijoAplicado.current = true;
+    const nivel = String(curso.division).toLowerCase();
+    if (["jardin", "primaria", "secundaria"].includes(nivel)) {
+      setDivision(nivel);
+    }
+    if (curso.year) {
+      setYear(String(curso.year));
+    }
+  }, [profileStudents, school.id]);
 
   useEffect(() => {
     if (!accesses.includes(school.id) && school.is_private) {
