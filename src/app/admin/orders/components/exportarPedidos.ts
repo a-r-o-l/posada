@@ -119,6 +119,19 @@ export const exportarPedidos = async (ventas: SaleFullDetails[]) => {
     }),
   );
 
+  // La plata queda como número (se puede sumar) pero se ve "$15.000"
+  const formatoPesos = (hoja: XLSX.WorkSheet, columnas: string[]) => {
+    const rango = XLSX.utils.decode_range(hoja["!ref"] || "A1");
+    for (let c = rango.s.c; c <= rango.e.c; c++) {
+      const titulo = hoja[XLSX.utils.encode_cell({ r: 0, c })]?.v;
+      if (!columnas.includes(titulo)) continue;
+      for (let r = 1; r <= rango.e.r; r++) {
+        const celda = hoja[XLSX.utils.encode_cell({ r, c })];
+        if (celda && typeof celda.v === "number") celda.z = '"$"#,##0';
+      }
+    }
+  };
+
   const libro = XLSX.utils.book_new();
   const hoja1 = XLSX.utils.json_to_sheet(pedidos);
   hoja1["!cols"] = [14, 17, 24, 30, 15, 28, 16, 22, 60, 9, 10, 12, 22, 22, 13, 10].map(
@@ -126,6 +139,8 @@ export const exportarPedidos = async (ventas: SaleFullDetails[]) => {
   );
   const hoja2 = XLSX.utils.json_to_sheet(productos);
   hoja2["!cols"] = [14, 17, 12, 28, 16, 22, 28, 22, 9, 10, 10].map((wch) => ({ wch }));
+  formatoPesos(hoja1, ["Total"]);
+  formatoPesos(hoja2, ["Precio", "Subtotal"]);
   XLSX.utils.book_append_sheet(libro, hoja1, "Pedidos");
   XLSX.utils.book_append_sheet(libro, hoja2, "Productos");
 
