@@ -164,7 +164,8 @@ function ChildrensClientSide() {
             <div className="flex items-center justify-between gap-5">
               <div className="space-y-2 md:col-span-2 w-full">
                 <Label className="text-xs md:text-base">
-                  Buscar Estudiante
+                  Nombre o apellido (opcional: si lo dejás vacío ves todo el
+                  curso)
                 </Label>
                 <Input
                   value={searchParam}
@@ -176,9 +177,9 @@ function ChildrensClientSide() {
                 <Button
                   className="mt-6"
                   onClick={() => setCreateChildrenModal(true)}
-                  disabled={!fullGrade || !searchParam}
+                  disabled={!fullGrade}
                 >
-                  Buscar
+                  {searchParam ? "Buscar" : "Ver alumnos"}
                 </Button>
               </div>
             </div>

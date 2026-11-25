@@ -88,38 +88,39 @@ export const useStudents = () => {
       setLoading(true);
       setError(null);
 
-      let query = supabase
+      // Se traen todos los alumnos del curso (son pocos) y se filtra acá:
+      // sin tildes, en cualquier orden y con dos nombres o dos apellidos.
+      // Sin texto se devuelve el curso entero para elegir de la lista.
+      const { data, error } = await supabase
         .from("students")
         .select("*, grade:grades(*), school:schools(*)")
         .eq("grade_id", id);
-
-      if (fullName && fullName.trim()) {
-        const searchTerm = fullName.trim().toLowerCase();
-        const [firstName, ...lastNameParts] = searchTerm.split(/\s+/);
-        const lastName = lastNameParts.join(" ");
-
-        // Buscar estudiantes donde el nombre Y apellido coincidan parcialmente
-        if (lastName) {
-          // Si tenemos nombre y apellido separados
-          query = query
-            .ilike("name", `%${firstName}%`)
-            .ilike("lastname", `%${lastName}%`);
-        } else {
-          // Si solo es un nombre o apellido
-          query = query.or(
-            `name.ilike.%${firstName}%,lastname.ilike.%${firstName}%`,
-          );
-        }
-      }
-
-      const { data, error } = await query;
       if (error) throw error;
 
-      setStudents(data || []);
+      const normalizar = (texto: string) =>
+        (texto || "")
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(/[̀-ͯ]/g, "");
+      const palabras = normalizar(fullName || "")
+        .split(/[\s,]+/)
+        .filter(Boolean);
+      const encontrados = (data || [])
+        .filter((student) => {
+          const completo = normalizar(`${student.name} ${student.lastname}`);
+          return palabras.every((palabra) => completo.includes(palabra));
+        })
+        .sort((a, b) =>
+          normalizar(`${a.lastname} ${a.name}`).localeCompare(
+            normalizar(`${b.lastname} ${b.name}`),
+          ),
+        );
+
+      setStudents(encontrados);
       return {
         success: true,
         error: null,
-        data: data || [],
+        data: encontrados,
       };
     } catch (err) {
       setError(

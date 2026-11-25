@@ -118,7 +118,10 @@ function SearchChildrenModal({
                       className="text-center h-40"
                       align="center"
                     >
-                      No se encontraron estudiantes
+                      No se encontraron estudiantes. Probá solo con el
+                      apellido o dejá el buscador vacío para ver todo el
+                      curso. Si tu hijo/a no aparece, escribinos por
+                      WhatsApp al +54 9 11 4143-4032.
                     </TableCell>
                   </TableRow>
                 )}

@@ -314,7 +314,8 @@ export default function OnboardingPage() {
                 <div className="flex items-center justify-between gap-5">
                   <div className="space-y-2 md:col-span-2 w-full">
                     <Label className="text-xs md:text-base">
-                      Buscar por nombre o apellido
+                      Nombre o apellido (opcional: si lo dejás vacío ves todo
+                      el curso)
                     </Label>
                     <Input
                       value={searchParam}
@@ -326,9 +327,9 @@ export default function OnboardingPage() {
                     <Button
                       className="mt-6"
                       onClick={() => setCreateChildrenModal(true)}
-                      disabled={!fullGrade || !searchParam || mutationLoading}
+                      disabled={!fullGrade || mutationLoading}
                     >
-                      Buscar
+                      {searchParam ? "Buscar" : "Ver alumnos"}
                     </Button>
                   </div>
                 </div>
