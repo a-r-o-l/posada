@@ -50,6 +50,7 @@ import {
 import { SaleFullDetails } from "@/supabase/models/sale";
 import { School } from "@/supabase/models/school";
 import PaymentBadge from "@/app/store/account/purchases/components/PaymentBadge";
+import { exportarPedidos } from "./exportarPedidos";
 import {
   Popover,
   PopoverContent,
@@ -85,6 +86,7 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
     to: new Date(),
   });
   const [state, setState] = useState("all");
+  const [exportando, setExportando] = useState(false);
   const { fetchSalesByDate, sales } = useSales();
   const fetchSalesByDateRef = useRef(fetchSalesByDate);
 
@@ -298,6 +300,27 @@ function OrdersClientSide({ schools = [] }: { schools?: School[] | [] }) {
                   </SelectGroup>
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex flex-col space-y-2 justify-end items-center w-60">
+              <Label>Planilla</Label>
+              <Button
+                variant="outline"
+                className="w-full"
+                disabled={exportando || !filteredSales.length}
+                onClick={async () => {
+                  setExportando(true);
+                  try {
+                    const n = await exportarPedidos(filteredSales);
+                    toast.success(`Excel descargado con ${n} pedidos`);
+                  } catch {
+                    toast.error("No se pudo armar el Excel");
+                  } finally {
+                    setExportando(false);
+                  }
+                }}
+              >
+                {exportando ? "Armando Excel..." : "Exportar a Excel"}
+              </Button>
             </div>
           </div>
         </div>
